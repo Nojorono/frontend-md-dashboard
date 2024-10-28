@@ -121,7 +121,6 @@
             this.snackbar.open = true;
             this.snackbar.type = 'error';
             this.snackbar.message = 'Update data Error!';
-            console.log(e)
           } finally {
             this.closeFormDialog();
             await this.fetchData();
@@ -138,7 +137,6 @@
             this.snackbar.open = true;
             this.snackbar.type = 'error';
             this.snackbar.message = 'Create data Error!';
-            console.log(e)
           } finally {
             this.closeFormDialog();
             await this.fetchData();
@@ -155,7 +153,6 @@
         try {
           const response = await getAll();
           this.tableData = response.data.data;
-          console.log(response.data)
         } catch (error) {
           console.error("Error fetching :", error);
           this.snackbar.open = true;
@@ -186,7 +183,6 @@
           this.snackbar.open = true;
           this.snackbar.type = 'success';
           this.snackbar.message = `Delete data ${itemToDelete.data.name} Successfully!`;
-          console.log(`Deleted row with ID: ${itemToDelete.data.id}`);
         } catch (error) {
           console.error("Error deleting outlet:", error);
           this.snackbar.open = true;

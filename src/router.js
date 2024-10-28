@@ -20,6 +20,7 @@ const router = new Router({
       beforeEnter: (to, from, next) => {
         // Perform the logout action before entering this route
         store.dispatch('logout') // Trigger Vuex logout action
+        Vue.prototype.$toast.success(`Logout successfully`)
         next('/login') // Redirect to login page after logout
       },
     },
@@ -110,9 +111,14 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // Check if the user is authenticated
-    if (!store.state.isAuthenticated) {
+
+    if (!store.state.user) {
+      // Show toast notification for re-login
+
+      Vue.prototype.$toast && Vue.prototype.$toast.error('Please re-login to continue.')
+
       // Redirect to the login page if not authenticated
-      next({ path: '/login' })
+      next({ path: '/logout' })
     } else {
       // If authenticated, proceed
       next()

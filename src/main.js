@@ -21,6 +21,20 @@ import './plugins/vee-validate'
 import vuetify from './plugins/vuetify'
 import i18n from './i18n'
 
+// Import Vue Toastification and CSS
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+
+// Customize Toastification options if needed
+const toastOptions = {
+  position: "top-right",
+  timeout: 5000,
+  closeOnClick: true,
+  pauseOnHover: true,
+}
+
+Vue.use(Toast, toastOptions)
+
 Vue.config.productionTip = false
 
 new Vue({

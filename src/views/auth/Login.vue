@@ -41,32 +41,18 @@
         </v-card>
       </v-col>
     </v-row>
-    <base-material-snackbar
-      v-model="snackbar"
-      :type="snackbarType"
-      :color="'secondary'"
-      :dismissible="true"
-      transition="scale-transition"
-      timeout="3000"
-      :top="true"
-      :right="true"
-    >
-      {{ snackbarMessage }}
-    </base-material-snackbar>
   </v-container>
 </template>
 
 <script>
   import { mapActions } from 'vuex';
   import { Login } from '@/api/authService'
+  import Vue from "vue";
 
   export default {
     name: 'Login',
     data() {
       return {
-        snackbar: false,
-        snackbarType: 'info',
-        snackbarMessage: 'Hello! This is your alert message!',
         email: '',
         password: '',
         valid: false,
@@ -87,14 +73,10 @@
             const response = await Login(this.email, this.password);
             if (response.data.statusCode === 404 ){
               this.hideLoading();
-              this.snackbarType = 'error'
-              this.snackbarMessage = response.data.message;
-              this.snackbar = true
+              Vue.prototype.$toast.error(`${response.data.message}`)
             }
             if (response.statusCode === 200){
-              this.snackbarType = 'success'
-              this.snackbarMessage = 'Successfully logged in.'
-              this.snackbar = true
+              Vue.prototype.$toast.success('Login Successfully!')
               await this.login({ token : response.data.accessToken, user: response.data.user });
               setTimeout(async () => {
                 await this.$router.push('/');  // Redirect to the homepage or any route after 5 seconds
@@ -107,9 +89,7 @@
           }
         }else{
           this.hideLoading();
-          this.snackbarType = 'error'
-          this.snackbarMessage = 'Login failed. Please check your credentials.'
-          this.snackbar = true
+          Vue.prototype.$toast.error(`Login failed. Please check your credentials.`)
         }
       },
     },

@@ -1,18 +1,18 @@
 <template>
   <v-container fluid>
     <v-row class="justify-end">
-      <v-col
-        cols="1"
-        style="max-width: none!important;"
-      >
-        <v-btn
-          color="primary"
-          style="margin: unset!important;"
-        >
-          <v-icon>mdi-plus-box-multiple</v-icon>
-          <span class="mx-1">Add</span>
-        </v-btn>
-      </v-col>
+      <!--      <v-col-->
+      <!--        cols="1"-->
+      <!--        style="max-width: none!important;"-->
+      <!--      >-->
+      <!--        <v-btn-->
+      <!--          color="primary"-->
+      <!--          style="margin: unset!important;"-->
+      <!--        >-->
+      <!--          <v-icon>mdi-plus-box-multiple</v-icon>-->
+      <!--          <span class="mx-1">Add</span>-->
+      <!--        </v-btn>-->
+      <!--      </v-col>-->
       <v-col
         cols="1"
         style="max-width: none!important;"
@@ -74,6 +74,7 @@
   import { deleteOutlet, getAllOutlets, getOutletRegion, uploadOutlet } from '@/api/masterOutletService'
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
   import UploadFormDialog from '@/components/base/UploadFormDialog.vue'
+  import Vue from "vue";
 
   export default {
     name: 'MasterOutlet',
@@ -192,7 +193,7 @@
           const response = await getAllOutlets()
           this.tableData = response.data.data
         } catch (error) {
-          console.error('Error fetching outlets:', error)
+          Vue.prototype.$toast.error(`${error.data.message}`)
         } finally {
           this.loading = false
         }
@@ -201,7 +202,6 @@
         this.loading = true
         try {
           const response = await getOutletRegion()
-          console.log(response)
           this.filterData = response.data
         } catch (error) {
           console.error('Error fetching outlets:', error)
@@ -213,17 +213,19 @@
       handleImportDialog (e) {
         this.isImportDialogOpen = e
       },
-      async handleImportSubmit (data) {
+      async handleImportSubmit (data)
+      {
         this.loading = true
         try {
-          const res = await uploadOutlet(data)
-          console.log(res)
+          await uploadOutlet(data);
+          await this.fetchOutlets()
         } catch (error) {
-          console.error('Error deleting outlet:', error)
+          Vue.prototype.$toast.error(`${error.data.message}`)
         } finally {
           this.loading = false
         }
-      },
+      }
+,
       // DELETE
       openConfirmDeleteDialog (index) {
         this.selectedItem = {
@@ -238,13 +240,12 @@
       async handleDelete () {
         this.loading = true
         const itemToDelete = this.selectedItem
-        console.log(itemToDelete)
         try {
           await deleteOutlet(itemToDelete.data.id)
           this.tableData.splice(itemToDelete.index, 1)
-          console.log(`Deleted row with ID: ${itemToDelete.data.id}`)
+          await this.fetchOutlets()
         } catch (error) {
-          console.error('Error deleting outlet:', error)
+          Vue.prototype.$toast.error(`${error.data.message}`)
         } finally {
           this.loading = false
         }
