@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height class="dark-theme">
+  <v-container fluid fill-height class="dark">
     <v-row justify="center" align="center" style="justify-content: center">
       <v-col cols="12" md="4">
         <v-card class="elevation-12" color="grey darken-3" style="padding: 10px">

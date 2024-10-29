@@ -20,12 +20,11 @@
               <v-autocomplete
                 v-model="itemData.user_id"
                 :items="userOptions"
-                item-text="name"
+                item-text="email"
                 item-value="id"
                 label="Select User"
                 clearable
                 return-object
-                :rules="userRules"
                 @change="onUserChange"
               >
                 <template v-slot:no-data>
@@ -74,14 +73,6 @@
               <!-- Area Input -->
             </v-col>
             <v-col sm="6" md="6" lg="6" xl="6">
-              <!-- Code Call Plan -->
-              <v-text-field
-                v-model="itemData.code_call_plan"
-                label="Code Call Plan"
-                :rules="codeCallPlanRules"
-                required
-              />
-              <!-- Start Plan -->
               <v-menu
                 ref="startPlanMenu"
                 v-model="startPlanMenu"
@@ -181,11 +172,11 @@
         formValid: false,
         startPlanMenu: false,
         endPlanMenu: false,
-        userOptions: [], // This will hold the user options (replace with real data)
+        userOptions: [],
         regionOptions: [],
         areaOptions: [],
         userRules: [
-          (v) => !!v || "User is required", // Add validation for user selection
+          (v) => !!v || "User is required",
         ],
         codeCallPlanRules: [
           (v) => !!v || "Code Call Plan is required",
@@ -205,6 +196,13 @@
       }
     },
     watch: {
+      dialog(newValue) {
+        if (newValue) {
+          this.fetchUsers();
+          this.fetchRegion();
+          this.fetchArea();
+        }
+      },
       item: {
         immediate: true,
         handler(newItem) {
@@ -215,11 +213,6 @@
           }
         },
       },
-    },
-    mounted() {
-      this.fetchUsers(); // Fetch user data to populate select options
-      this.fetchRegion()
-      this.fetchArea()
     },
     methods: {
       resetForm() {
@@ -242,10 +235,7 @@
         }
       },
       async fetchUsers () {
-        console.log(this.userLogin.region, this.userLogin.area)
-        // Fetch users from API or other sources
         const response = await getAllRole(this.userLogin.region , this.userLogin.area)
-        console.log(response)
         this.userOptions = response.data
       },
       async fetchArea() {

@@ -1,12 +1,5 @@
 <template>
   <v-container fluid>
-    <base-material-snackbar
-      v-model="snackbar.open"
-      :type="snackbar.type"
-      v-bind="{ top: true, right: true }"
-    >
-      <span class="font-weight-bold">&nbsp;{{ snackbar.message }}&nbsp;</span>
-    </base-material-snackbar>
     <v-row class="justify-end">
       <v-col
         cols="1"
@@ -33,26 +26,44 @@
       @update:options="fetchData"
     >
       <template v-slot:top>
-        <v-text-field
-          v-model="search"
-          label="Search"
-          class="mx-4"
-          @input="fetchData"
-        />
+        <v-row class="align-center">
+          <v-col>
+            <v-text-field
+              v-model="search"
+              label="Search"
+              class="mx-4"
+              @input="fetchData"
+            />
+          </v-col>
+          <v-col cols="auto">
+            <v-btn color="secondary"
+                   small
+                   :loading="loading"
+                   @click="refreshData">
+              <v-icon>mdi-refresh</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
       </template>
-      <template v-slot:item.actions="{ item, index }">
-        <v-btn
-          small
-          @click="openHandleUpdate(index)"
-        >
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn
-          small
-          @click="openConfirmDeleteDialog(index)"
-        >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
+      <!-- Mapping Item Properties -->
+      <template v-slot:item="{ item }">
+        <tr>
+          <td>{{ item.m_user.email }}</td>
+          <td>{{ item.call_plan.code_call_plan }}</td>
+          <td>{{ item.call_plan.area }}</td>
+          <td>{{ item.call_plan.region }}</td>
+          <td>{{ item.call_plan.start_plan }}</td>
+          <td>{{ item.call_plan.end_plan }}</td>
+          <td>{{ item.call_plan.created_at }}</td>
+          <td>{{ item.call_plan.updated_at }}</td>
+          <td>
+            <v-btn small @click="handleSchedule(item.call_plan.id, item.call_plan.code_call_plan)">
+              <v-icon>mdi-calendar-arrow-right</v-icon>
+            </v-btn>
+            <v-btn small @click="openHandleUpdate(item.call_plan)"><v-icon>mdi-pencil</v-icon></v-btn>
+            <v-btn small @click="openConfirmDeleteDialog(item.call_plan)"><v-icon>mdi-delete</v-icon></v-btn>
+          </td>
+        </tr>
       </template>
     </v-data-table>
 
@@ -67,6 +78,7 @@
       :dialog="isFormRoleDialog"
       :is-edit="isEdit"
       :item="selectedItem"
+      :refresh="refreshDataTrigger"
       @close="closeFormDialog"
       @save="handleSave"
     />
@@ -76,37 +88,28 @@
 <script>
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
   import { createData, deleteData, updateData, getAll } from '@/api/callPlanService'
-  import BaseMaterialSnackbar from '@/components/base/MaterialSnackbar.vue'
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
+  import Vue from "vue";
 
   export default {
     name: 'CallPlan',
     components: {
       FormCallPlan,
-      BaseMaterialSnackbar,
       ConfirmDeleteDialog,
     },
     data() {
       return {
-        snackbar: {
-          open: false,
-          type: 'info',
-          message: 'info',
-        },
+        refreshDataTrigger : false,
         tableHeaders: [
-          { text: 'ID', value: 'id', class: 'text-left', width: '5%' },
-          { text: 'User ID', value: 'user_id', class: 'text-left', width: '10%' },
-          { text: 'Code Call Plan', value: 'code_call_plan', class: 'text-left', width: '10%' },
+          // { text: 'ID', value: 'id', class: 'text-left', width: '5%' },
+          { text: 'User', value: 'user_id', class: 'text-left', width: '10%' },
+          { text: 'Code Call Plan', value: 'code_call_plan', class: 'text-left', width: '15%' },
           { text: 'Area', value: 'area', class: 'text-left', width: '10%' },
           { text: 'Region', value: 'region', class: 'text-left', width: '10%' },
           { text: 'Start Plan', value: 'start_plan', class: 'text-left', width: '10%' },
           { text: 'End Plan', value: 'end_plan', class: 'text-left', width: '10%' },
-          { text: 'Created By', value: 'created_by', class: 'text-left', width: '10%' },
-          { text: 'Created At', value: 'created_at', class: 'text-left', width: '10%' },
-          { text: 'Updated By', value: 'updated_by', class: 'text-left', width: '10%' },
-          { text: 'Updated At', value: 'updated_at', class: 'text-left', width: '10%' },
-          { text: 'Deleted By', value: 'deleted_by', class: 'text-left', width: '10%' },
-          { text: 'Deleted At', value: 'deleted_at', class: 'text-left', width: '10%' },
+          { text: 'Created At', value: 'created_at', class: 'text-left', width: '5%' },
+          { text: 'Updated At', value: 'updated_at', class: 'text-left', width: '5%' },
           { text: 'Actions', value: 'actions', sortable: false, class: 'text-center', width: '10%' },
         ],
         tableData: [],
@@ -131,20 +134,18 @@
         deep: true,
       },
     },
-    created() {
-      this.fetchData()
-    },
-    mounted () {
-    },
     methods: {
       openHandleAdd() {
         this.isEdit = false
         this.selectedItem = null
         this.isFormRoleDialog = true
       },
-      openHandleUpdate(index) {
+      async refreshData() {
+        await this.fetchData();
+      },
+      openHandleUpdate(item) {
         this.isEdit = true
-        this.selectedItem = { ...this.tableData[index] }
+        this.selectedItem = item
         this.isFormRoleDialog = true
       },
       async handleSave(item) {
@@ -152,17 +153,14 @@
           if (this.isEdit) {
             const { id, ...itemWithoutId } = item
             await updateData(id, itemWithoutId)
-            this.snackbar.message = 'Update data Successfully!'
+            Vue.prototype.$toast.success(`Update data Successfully!`)
           } else {
             await createData(item)
-            this.snackbar.message = 'Create data Successfully!'
+            Vue.prototype.$toast.success(`Create data Successfully!`)
           }
-          this.snackbar.open = true
           await this.fetchData()
         } catch (error) {
-          this.snackbar.open = true
-          this.snackbar.type = 'error'
-          this.snackbar.message = 'Error saving data!'
+          Vue.prototype.$toast.error(`${error.data.message}`)
           console.error(error)
         } finally {
           this.closeFormDialog()
@@ -182,34 +180,34 @@
           this.tableData = response.data.data
           this.totalItems = response.data.totalRecords
         } catch (error) {
-          this.snackbar.open = true
-          this.snackbar.type = 'error'
-          this.snackbar.message = 'Error fetching data!'
+          Vue.prototype.$toast.error(`${error.data.message}`)
           console.error(error)
         } finally {
           this.loading = false
         }
       },
-      openConfirmDeleteDialog(index) {
-        this.selectedItem = { index, data: this.tableData[index] }
+      openConfirmDeleteDialog(data) {
+        this.selectedItem = data
         this.isConfirmDeleteDialogOpen = true
+      },
+      async handleSchedule(id, code_call_plan) {
+        await this.$router.push({
+          name: 'Call Plan Schedule',
+          params: { id, code_call_plan },
+        });
       },
       closeConfirmDeleteDialog() {
         this.isConfirmDeleteDialogOpen = false
       },
       async handleDelete() {
         this.loading = true
-        const { index, data } = this.selectedItem
+        const data = this.selectedItem
         try {
           await deleteData(data.id)
-          this.tableData.splice(index, 1)
-          this.snackbar.open = true
-          this.snackbar.type = 'success'
-          this.snackbar.message = `Deleted ${data.username} successfully!`
+          await this.fetchData()
+          Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`)
         } catch (error) {
-          this.snackbar.open = true
-          this.snackbar.type = 'error'
-          this.snackbar.message = 'Error deleting user!'
+          Vue.prototype.$toast.error(`${error.data.message}`)
           console.error(error)
         } finally {
           this.loading = false

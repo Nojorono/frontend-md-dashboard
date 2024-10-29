@@ -62,15 +62,13 @@ const router = new Router({
           name: 'Call Plan',
           path: 'call-plan',
           component: () => import('@/views/dashboard/pages/CallPlan/CallPlan.vue'),
-          meta: { requiresAuth: true, breadcrumb: 'Call Plan' },
-          children: [
-            {
-              name: 'Call Plan Detail',
-              path: 'detail',
-              component: () => import('@/views/dashboard/pages/CallPlan/CallPlanDetail.vue'),
-              meta: { requiresAuth: true, breadcrumb: 'Call Plan Detail' }, // Protect this route
-            },
-          ]
+          meta: { requiresAuth: true},
+        },
+        {
+          name: 'Call Plan Schedule',
+          path: 'call-plan/schedule/:id/:code_call_plan',
+          component: () => import('@/views/dashboard/pages/CallPlan/CallPlanSchedule.vue'),
+          meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Notifications',

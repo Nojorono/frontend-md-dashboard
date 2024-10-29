@@ -54,6 +54,16 @@ export const getOutletSio = async () => {
   }
 };
 
+// Function to get a area
+export const getOutletByType = async () => {
+  try {
+    const response = await axiosInstance.get(`/outlets/list-by`);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
 // Function to create a new outlet
 export const createOutlet = async (outletData) => {
   try {
