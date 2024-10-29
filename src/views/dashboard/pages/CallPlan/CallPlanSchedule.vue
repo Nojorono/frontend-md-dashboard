@@ -166,7 +166,6 @@ export default {
         outlet_id: item.outlet_id,
       }
       this.isFormRoleDialog = true
-      console.log(item)
     },
     async handleSave(item) {
       try {
@@ -216,7 +215,6 @@ export default {
     async handleDelete() {
       this.loading = true
       const data = this.selectedItem
-      console.log(data)
       try {
         await deleteScheduleData(data.id)
         Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`)
