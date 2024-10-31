@@ -127,6 +127,11 @@
           to: '/master/roles',
         },
         {
+          icon: 'mdi-account-cog',
+          title: 'Master Batch',
+          to: '/master/batch',
+        },
+        {
           icon: 'mdi-account-group',
           title: 'Call Plan',
           to: '/call-plan',

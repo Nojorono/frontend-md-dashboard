@@ -16,23 +16,14 @@
         >
           <v-row>
             <v-col sm="6" md="6" lg="6" xl="6">
-              <!-- User Selection using v-autocomplete -->
-              <v-autocomplete
-                v-model="itemData.user_id"
-                :items="userOptions"
-                item-text="email"
-                item-value="id"
-                label="Select User"
-                clearable
-                return-object
-                @change="onUserChange"
-              >
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <v-list-item-content>No users found</v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-autocomplete>
+              <!-- Name Input -->
+              <v-text-field
+                v-model="itemData.code_batch"
+                :rules="userRules"
+                label="Code Batch"
+                required
+                readonly
+              />
               <!-- Region Input -->
               <v-autocomplete
                 v-model="itemData.region"
@@ -150,8 +141,7 @@
 
 <script>
   import { getOutletArea, getOutletRegion } from '@/api/masterOutletService'
-  import { getAllRole } from '@/api/userService'
-
+  import {findLast} from "@/api/batchService";
   export default {
     name: "FormCallPlan",
     props: {
@@ -162,8 +152,7 @@
     data() {
       return {
         itemData: {
-          user_id: null,
-          code_call_plan: '',
+          code_batch: '',
           area: '',
           region: '',
           start_plan: '',
@@ -190,53 +179,40 @@
         ],
       };
     },
-    computed :{
-      userLogin() {
-        return this.$store.getters.getUser
-      }
-    },
     watch: {
-      dialog(newValue) {
+      isEdit(newValue){
         if (newValue) {
-          this.fetchUsers();
-          this.fetchRegion();
-          this.fetchArea();
+          this.itemData = { ...this.item }; // Populate form with item data when editing
         }
       },
-      item: {
-        immediate: true,
-        handler(newItem) {
-          if (newItem) {
-            this.itemData = { ...newItem }; // Populate form with item data when editing
-          } else {
-            this.resetForm(); // Reset form for new item
-          }
-        },
+      dialog(newValue) {
+        if (newValue) {
+          this.fetchRegion();
+          this.fetchArea();
+          this.fetchBatch();
+        }
       },
     },
     methods: {
       resetForm() {
         this.itemData = {
-          user_id: null,
-          code_call_plan: '',
+          code_batch: '',
           area: '',
           region: '',
+          start_plan: '',
+          end_plan: '',
         };
         this.formValid = false;
       },
       closeDialog() {
-        this.resetForm();
         this.$emit("close");
+        this.resetForm();
       },
       saveItem() {
         if (this.$refs.form.validate()) {
           this.$emit("save", { ...this.itemData });
           this.closeDialog();
         }
-      },
-      async fetchUsers () {
-        const response = await getAllRole(this.userLogin.region , this.userLogin.area)
-        this.userOptions = response.data
       },
       async fetchArea() {
         this.loading = true;
@@ -260,12 +236,15 @@
           this.loading = false;
         }
       },
-      onUserChange(user) {
-        // Handle user selection change
-        if (user) {
-          this.itemData.user_id = user.id; // Store the selected user ID
-        } else {
-          this.itemData.user_id = null; // Reset if no user selected
+      async fetchBatch() {
+        this.loading = true;
+        try {
+          const response = await findLast();
+          this.itemData.code_batch = response.data.code_batch;
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
         }
       },
       onRegionChange(item) {

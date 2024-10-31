@@ -36,10 +36,12 @@
             />
           </v-col>
           <v-col cols="auto">
-            <v-btn color="secondary"
-                   small
-                   :loading="loading"
-                   @click="refreshData">
+            <v-btn
+              color="secondary"
+              small
+              :loading="loading"
+              @click="refreshData"
+            >
               <v-icon>mdi-refresh</v-icon>
             </v-btn>
           </v-col>
@@ -48,20 +50,31 @@
       <!-- Mapping Item Properties -->
       <template v-slot:item="{ item }">
         <tr>
-          <td>{{ item.m_user.email }}</td>
-          <td>{{ item.call_plan.code_call_plan }}</td>
-          <td>{{ item.call_plan.area }}</td>
-          <td>{{ item.call_plan.region }}</td>
-          <td>{{ item.call_plan.start_plan }}</td>
-          <td>{{ item.call_plan.end_plan }}</td>
-          <td>{{ item.call_plan.created_at }}</td>
-          <td>{{ item.call_plan.updated_at }}</td>
+          <td>{{ item?.code_batch }}</td>
+          <td>{{ item?.region }}</td>
+          <td>{{ item?.area }}</td>
+          <td>{{ item?.start_plan }}</td>
+          <td>{{ item?.end_plan }}</td>
           <td>
-            <v-btn small @click="handleSchedule(item.call_plan.id, item.call_plan.code_call_plan)">
+            <v-btn
+              small
+              @click="handleSchedule(item.id)"
+            >
               <v-icon>mdi-calendar-arrow-right</v-icon>
             </v-btn>
-            <v-btn small @click="openHandleUpdate(item.call_plan)"><v-icon>mdi-pencil</v-icon></v-btn>
-            <v-btn small @click="openConfirmDeleteDialog(item.call_plan)"><v-icon>mdi-delete</v-icon></v-btn>
+            <v-btn
+              small
+              @click="openHandleUpdate(item)"
+            >
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn
+              small
+              color="error"
+              @click="openConfirmDeleteDialog(item)"
+            >
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
           </td>
         </tr>
       </template>
@@ -102,14 +115,12 @@
         refreshDataTrigger : false,
         tableHeaders: [
           // { text: 'ID', value: 'id', class: 'text-left', width: '5%' },
-          { text: 'User', value: 'user_id', class: 'text-left', width: '10%' },
-          { text: 'Code Call Plan', value: 'code_call_plan', class: 'text-left', width: '15%' },
-          { text: 'Area', value: 'area', class: 'text-left', width: '10%' },
+          // { text: 'User', value: 'user_id', class: 'text-left', width: '10%' },
+          { text: 'Code Batch', value: 'code_batch', class: 'text-left', width: '15%' },
           { text: 'Region', value: 'region', class: 'text-left', width: '10%' },
+          { text: 'Area', value: 'area', class: 'text-left', width: '10%' },
           { text: 'Start Plan', value: 'start_plan', class: 'text-left', width: '10%' },
           { text: 'End Plan', value: 'end_plan', class: 'text-left', width: '10%' },
-          { text: 'Created At', value: 'created_at', class: 'text-left', width: '5%' },
-          { text: 'Updated At', value: 'updated_at', class: 'text-left', width: '5%' },
           { text: 'Actions', value: 'actions', sortable: false, class: 'text-center', width: '10%' },
         ],
         tableData: [],
@@ -168,6 +179,7 @@
       },
       closeFormDialog() {
         this.isFormRoleDialog = false
+        this.isEdit = false
       },
       async fetchData() {
         this.loading = true
@@ -190,10 +202,10 @@
         this.selectedItem = data
         this.isConfirmDeleteDialogOpen = true
       },
-      async handleSchedule(id, code_call_plan) {
+      async handleSchedule(id) {
         await this.$router.push({
           name: 'Call Plan Schedule',
-          params: { id, code_call_plan },
+          params: { id },
         });
       },
       closeConfirmDeleteDialog() {

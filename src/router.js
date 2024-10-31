@@ -59,6 +59,12 @@ const router = new Router({
           meta: { requiresAuth: true }, // Protect this route
         },
         {
+          name: 'Master Batch',
+          path: 'master/batch',
+          component: () => import('@/views/dashboard/pages/Batch/MasterBatch.vue'),
+          meta: { requiresAuth: true }, // Protect this route
+        },
+        {
           name: 'Call Plan',
           path: 'call-plan',
           component: () => import('@/views/dashboard/pages/CallPlan/CallPlan.vue'),
@@ -66,7 +72,7 @@ const router = new Router({
         },
         {
           name: 'Call Plan Schedule',
-          path: 'call-plan/schedule/:id/:code_call_plan',
+          path: 'call-plan/schedule/:id',
           component: () => import('@/views/dashboard/pages/CallPlan/CallPlanSchedule.vue'),
           meta: { requiresAuth: true }, // Protect this route
         },

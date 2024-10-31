@@ -6,7 +6,7 @@
   >
     <v-card>
       <v-card-title>
-        <span class="headline">{{ isEdit ? "Edit Call Plan" : "Add New Schedule Plan" }}</span>
+        <span class="headline">{{ isEdit ? "Edit Schedule Plan" : "New Schedule Plan" }}</span>
       </v-card-title>
 
       <v-card-text>
@@ -15,18 +15,28 @@
           v-model="formValid"
         >
           <v-row>
-            <v-col sm="6" md="6" lg="6" xl="6">
-              <v-text-field
-                v-model="code_call_plan"
-                label="Code Call Plan"
-                readonly
-                :rules="codeCallPlanRules"
-              ></v-text-field>
-              <v-text-field
-                v-model="call_plan_id"
-                style="display: none;"
-                label="Id Call Plan"
-              ></v-text-field>
+            <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
+              <v-autocomplete
+                v-model="itemData.user_id"
+                :items="userOptions"
+                item-text="email"
+                item-value="id"
+                label="Select User"
+                clearable
+                return-object
+                @change="onUserChange"
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-content>No users found</v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
               <!-- User Selection using v-autocomplete -->
               <v-autocomplete
                 v-model="itemData.outlet_id"
@@ -53,9 +63,14 @@
                 label="Notes"
                 value="This is clearable text."
                 :rules="notesRules"
-              ></v-textarea>
+              />
             </v-col>
-            <v-col sm="6" md="6" lg="6" xl="6">
+            <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
               <v-menu
                 ref="startPlanMenu"
                 v-model="startPlanMenu"
@@ -71,13 +86,13 @@
                     readonly
                     v-bind="attrs"
                     v-on="on"
-                  ></v-text-field>
+                  />
                 </template>
                 <v-date-picker
-                  style="margin: 0;"
                   v-model="itemData.start_plan"
+                  style="margin: 0;"
                   @input="startPlanMenu = false"
-                ></v-date-picker>
+                />
               </v-menu>
 
               <!-- End Plan -->
@@ -96,13 +111,13 @@
                     readonly
                     v-bind="attrs"
                     v-on="on"
-                  ></v-text-field>
+                  />
                 </template>
                 <v-date-picker
-                  style="margin: 0;"
                   v-model="itemData.end_plan"
+                  style="margin: 0;"
                   @input="endPlanMenu = false"
-                ></v-date-picker>
+                />
               </v-menu>
             </v-col>
           </v-row>
@@ -133,6 +148,8 @@
 
 <script>
 import { getOutletByType } from '@/api/masterOutletService'
+import {getAllRole} from "@/api/userService";
+
 export default {
   name: "FormCallPlanSchedule",
   props: {
@@ -142,9 +159,9 @@ export default {
   },
   data() {
     return {
-      code_call_plan: '',
       call_plan_id: '',
       itemData: {
+        user_id: null,
         outlet_id: 0,
         notes: '',
         start_plan: '',
@@ -154,6 +171,7 @@ export default {
       startPlanMenu: false,
       endPlanMenu: false,
       outletsOptions: [],
+      userOptions: [],
       notesRules: [
         (v) => !!v || "Notes is required",
       ],
@@ -162,11 +180,15 @@ export default {
       ],
     };
   },
+  computed :{
+    userLogin() {
+      return this.$store.getters.getUser
+    }
+  },
   watch: {
     dialog(newValue) {
       if (newValue) {
         this.call_plan_id = this.$route.params.id
-        this.code_call_plan = this.$route.params.code_call_plan
         if (this.outletsOptions.length === 0) {
           this.fetchOutlets()
         }
@@ -185,6 +207,7 @@ export default {
   },
   mounted() {
     this.fetchOutlets();
+    this.fetchUsers();
   },
   methods: {
     getOutletText(item) {
@@ -211,6 +234,10 @@ export default {
         this.closeDialog();
       }
     },
+    async fetchUsers () {
+      const response = await getAllRole(this.userLogin.region , this.userLogin.area)
+      this.userOptions = response.data
+    },
     async fetchOutlets () {
       const response = await getOutletByType();
       this.outletsOptions = response.data
@@ -220,6 +247,14 @@ export default {
         this.itemData.outlet_id = item.id; // Store the selected user ID
       } else {
         this.itemData.outlet_id = null; // Reset if no user selected
+      }
+    },
+    onUserChange(user) {
+      // Handle user selection change
+      if (user) {
+        this.itemData.user_id = user.id; // Store the selected user ID
+      } else {
+        this.itemData.user_id = null; // Reset if no user selected
       }
     },
   },

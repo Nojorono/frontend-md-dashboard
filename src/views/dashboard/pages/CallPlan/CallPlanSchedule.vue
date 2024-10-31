@@ -44,10 +44,11 @@
             />
           </v-col>
           <v-col cols="auto">
-            <v-btn color="secondary"
-                   @click="refreshData"
-                   small
-                   :loading="loading"
+            <v-btn
+              color="secondary"
+              small
+              :loading="loading"
+              @click="refreshData"
             >
               <v-icon>mdi-refresh</v-icon>
             </v-btn>
@@ -57,18 +58,35 @@
       <!-- Mapping Item Properties -->
       <template v-slot:item="{ item }">
         <tr>
+          <td>{{ item.callPlanUser?.email }}</td>
+          <td>
+            <span>
+              {{ item.callPlanOutlet?.outlet_code }}
+            </span>
+            <span>
+              {{ item.callPlanOutlet?.name }}
+            </span>
+          </td>
           <td>{{ item.code_call_plan }}</td>
-          <td>{{ item.callPlanOutlet.outlet_code }}</td>
           <td>{{ item.start_plan }}</td>
           <td>{{ item.end_plan }}</td>
           <td>{{ item.notes }}</td>
+          <td>{{ item.status }}</td>
           <td>{{ item.created_by }}</td>
-          <td>{{ item.created_at }}</td>
-          <td>{{ item.updated_by }}</td>
-          <td>{{ item.updated_at }}</td>
           <td>
-            <v-btn small @click="openHandleUpdate(item)"><v-icon>mdi-pencil</v-icon></v-btn>
-            <v-btn small @click="openConfirmDeleteDialog(item)"><v-icon>mdi-delete</v-icon></v-btn>
+            <v-btn
+              small
+              @click="openHandleUpdate(item)"
+            >
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn
+              small
+              color="error"
+              @click="openConfirmDeleteDialog(item)"
+            >
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
           </td>
         </tr>
       </template>
@@ -110,18 +128,16 @@ export default {
   },
   data() {
     return {
-      id: this.$route.params.id, // Accessing the route parameter
+      id: this.$route.params.id,
       tableHeaders: [
-        // { text: 'ID', value: 'id', class: 'text-left', width: '5%' },
+        { text: 'User', value: 'email', class: 'text-left', width: '10%' },
+        { text: 'Outlet', value: 'outlet_code', class: 'text-left', width: '10%' },
         { text: 'Code Call Plan', value: 'code_call_plan', class: 'text-left', width: '15%' },
-        { text: 'Outlet Code', value: 'outlet_code', class: 'text-left', width: '10%' },
         { text: 'Start Plan', value: 'start_plan', class: 'text-left', width: '10%' },
         { text: 'End Plan', value: 'end_plan', class: 'text-left', width: '10%' },
         { text: 'Notes', value: 'notes', class: 'text-left', width: '15%' },
+        { text: 'Status', value: 'notes', class: 'text-left', width: '15%' },
         { text: 'Created By', value: 'created_by', class: 'text-left', width: '10%' },
-        { text: 'Created At', value: 'created_at', class: 'text-left', width: '10%' },
-        { text: 'Updated By', value: 'updated_by', class: 'text-left', width: '10%' },
-        { text: 'Updated At', value: 'updated_at', class: 'text-left', width: '10%' },
         { text: 'Actions', value: 'actions', sortable: false, class: 'text-center', width: '10%' },
       ],
       tableData: [],
@@ -164,6 +180,7 @@ export default {
         end_plan: item.end_plan,
         start_plan: item.start_plan,
         outlet_id: item.outlet_id,
+        user_id: item.user_id,
       }
       this.isFormRoleDialog = true
     },
@@ -192,6 +209,7 @@ export default {
     },
     closeFormDialog() {
       this.isFormRoleDialog = false
+      this.isEdit = false
     },
     async fetchData(id) {
       this.loading = true
