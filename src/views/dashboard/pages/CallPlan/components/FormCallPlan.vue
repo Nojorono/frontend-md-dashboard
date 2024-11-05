@@ -15,7 +15,12 @@
           v-model="formValid"
         >
           <v-row>
-            <v-col sm="6" md="6" lg="6" xl="6">
+            <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
               <!-- Name Input -->
               <v-text-field
                 v-model="itemData.code_batch"
@@ -63,7 +68,12 @@
               </v-autocomplete>
               <!-- Area Input -->
             </v-col>
-            <v-col sm="6" md="6" lg="6" xl="6">
+            <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
               <v-menu
                 ref="startPlanMenu"
                 v-model="startPlanMenu"
@@ -79,13 +89,13 @@
                     readonly
                     v-bind="attrs"
                     v-on="on"
-                  ></v-text-field>
+                  />
                 </template>
                 <v-date-picker
-                  style="margin: 0;"
                   v-model="itemData.start_plan"
+                  style="margin: 0;"
                   @input="startPlanMenu = false"
-                ></v-date-picker>
+                />
               </v-menu>
 
               <!-- End Plan -->
@@ -104,13 +114,13 @@
                     readonly
                     v-bind="attrs"
                     v-on="on"
-                  ></v-text-field>
+                  />
                 </template>
                 <v-date-picker
-                  style="margin: 0;"
                   v-model="itemData.end_plan"
+                  style="margin: 0;"
                   @input="endPlanMenu = false"
-                ></v-date-picker>
+                />
               </v-menu>
             </v-col>
           </v-row>

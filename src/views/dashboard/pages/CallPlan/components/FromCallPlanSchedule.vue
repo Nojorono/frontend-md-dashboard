@@ -14,6 +14,26 @@
           ref="form"
           v-model="formValid"
         >
+          <!-- User Selection using v-autocomplete -->
+          <v-autocomplete
+            v-model="itemData.outlet_id"
+            :items="outletsOptions"
+            :item-text="getOutletText"
+            item-value="id"
+            label="Select Outlets"
+            chips
+            clearable
+            deletable-chips
+            multiple
+            small-chips
+            @change="selectOutlet"
+          >
+            <template v-slot:no-data>
+              <v-list-item>
+                <v-list-item-content>No outlets found</v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
           <v-row>
             <v-col
               sm="6"
@@ -34,24 +54,6 @@
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-content>No users found</v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-autocomplete>
-              <!-- User Selection using v-autocomplete -->
-              <v-autocomplete
-                v-model="itemData.outlet_id"
-                :items="outletsOptions"
-                :item-text="getOutletText"
-                item-value="id"
-                label="Select Outlets"
-                clearable
-                return-object
-                hide-selected
-                @change="selectOutlet"
-              >
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <v-list-item-content>No outlets found</v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
@@ -162,7 +164,7 @@ export default {
       call_plan_id: '',
       itemData: {
         user_id: null,
-        outlet_id: 0,
+        outlet_id: [],
         notes: '',
         start_plan: '',
         end_plan: '',
@@ -215,7 +217,7 @@ export default {
     },
     resetForm() {
       this.itemData = {
-        outlet_id: 0,
+        outlet_id: [],
         notes: '',
         start_plan: '',
         end_plan: '',

@@ -16,7 +16,7 @@ export const getAll = async (page = 1, limit = 10, searchTerm = '') => {
 
 export const getAllList = async () => {
   try {
-    const response = await axiosInstance.get('/roles');
+    const response = await axiosInstance.get('/roles/all');
     return response.data;
   } catch (error) {
     throw error.response;

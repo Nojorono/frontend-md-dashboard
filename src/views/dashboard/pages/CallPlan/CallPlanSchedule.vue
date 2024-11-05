@@ -5,7 +5,7 @@
       small
       fab
       outlined
-      color="secondary"
+      color="primary"
       @click="handleBack"
     >
       <v-icon>mdi-step-backward</v-icon>
@@ -31,7 +31,8 @@
       :items="tableData"
       :loading="loading"
       :search="search"
-      @update:="fetchData"
+      :options.sync="pagination"
+      @update:options="fetchData(id)"
     >
       <template v-slot:top>
         <v-row class="align-center">
@@ -40,12 +41,12 @@
               v-model="search"
               label="Search"
               class="mx-4"
-              @input="fetchData"
+              @input="fetchData(id)"
             />
           </v-col>
           <v-col cols="auto">
             <v-btn
-              color="secondary"
+              color="primary"
               small
               :loading="loading"
               @click="refreshData"
@@ -148,24 +149,21 @@ export default {
       isEdit: false,
       isConfirmDeleteDialogOpen: false,
       search: '',
+      pagination: {
+        page: 1,
+        itemsPerPage: 10,
+      },
     }
   },
-  watch: {
-    '$route.params.id': {
-      handler(newId) {
-        this.fetchData(newId); // Fetch data again if the id changes
-      },
-    },
-  },
-  created() {
-    this.fetchData(this.$route.params.id);
-  },
+  // mounted() {
+  //   this.fetchData(this.id);
+  // },
   methods: {
     handleBack(){
       this.$router.back();
     },
     refreshData(){
-      this.fetchData(this.$route.params.id);
+      this.fetchData(this.id);
     },
     openHandleAdd() {
       this.isEdit = false
@@ -199,12 +197,12 @@ export default {
             Vue.prototype.$toast.success(`Create data Successfully!`)
           }
         }
-        await this.fetchData(this.$route.params.id)
+        await this.fetchData(this.id)
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)
       } finally {
-        this.closeFormDialog(this.$route.params.id)
+        this.closeFormDialog(this.id)
       }
     },
     closeFormDialog() {
@@ -213,9 +211,16 @@ export default {
     },
     async fetchData(id) {
       this.loading = true
+      const { page, itemsPerPage } = this.pagination;
       try {
-        const response = await geListSchedule(id)
-        this.tableData = response.data
+        const response = await geListSchedule(id, {
+          page: page,
+          limit: itemsPerPage,
+          searchTerm: this.search,
+        });
+        this.tableData = response.data.data
+        this.pagination.page = response.data.page
+        this.pagination.limit = response.data.limit
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)

@@ -1,18 +1,6 @@
 <template>
   <v-container fluid>
     <v-row class="justify-end">
-      <!--      <v-col-->
-      <!--        cols="1"-->
-      <!--        style="max-width: none!important;"-->
-      <!--      >-->
-      <!--        <v-btn-->
-      <!--          color="primary"-->
-      <!--          style="margin: unset!important;"-->
-      <!--        >-->
-      <!--          <v-icon>mdi-plus-box-multiple</v-icon>-->
-      <!--          <span class="mx-1">Add</span>-->
-      <!--        </v-btn>-->
-      <!--      </v-col>-->
       <v-col
         cols="1"
         style="max-width: none!important;"
@@ -71,7 +59,7 @@
 
 <script>
   import AdvancedTable from '@/components/base/VTable.vue'
-  import { deleteOutlet, getAllOutlets, getOutletRegion, uploadOutlet } from '@/api/masterOutletService'
+  import { deleteOutlet, getAllOutlets, uploadOutlet } from '@/api/masterOutletService'
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
   import UploadFormDialog from '@/components/base/UploadFormDialog.vue'
   import Vue from "vue";
@@ -183,7 +171,6 @@
     },
     created () {
       this.fetchOutlets()
-      // this.fetchRegion();
     },
     methods: {
       // Fetch all outlets and update tableData
@@ -194,17 +181,6 @@
           this.tableData = response.data.data
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
-        } finally {
-          this.loading = false
-        }
-      },
-      async fetchRegion () {
-        this.loading = true
-        try {
-          const response = await getOutletRegion()
-          this.filterData = response.data
-        } catch (error) {
-          console.error('Error fetching outlets:', error)
         } finally {
           this.loading = false
         }

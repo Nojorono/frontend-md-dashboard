@@ -54,16 +54,18 @@ export const deleteData = async (id) => {
   }
 };
 
-export const geListSchedule = async (id) => {
+export const geListSchedule = async (id, { page, limit, searchTerm }) => {
   try {
-    const response = await axiosInstance.get(`/call-plan/schedule/${id}`);
+    console.log(id, { page, limit, searchTerm })
+    const response = await axiosInstance.get(`/call-plan/schedule/${id}`, {
+      params: { page, limit, searchTerm },
+    });
     return response.data;
   } catch (error) {
     throw error.response;
   }
 };
 
-// Function to create Scheudle
 export const createScheduleData = async (data) => {
   try {
     const response = await axiosInstance.post('/call-plan/schedule', data);

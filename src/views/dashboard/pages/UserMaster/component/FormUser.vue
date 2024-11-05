@@ -15,8 +15,12 @@
           v-model="formValid"
         >
           <v-row>
-
-            <v-col sm="6" md="6" lg="6" xl="6">
+            <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
               <!-- Username Input -->
               <v-text-field
                 v-model="itemData.username"
@@ -58,8 +62,12 @@
                 label="Type MD"
               />
             </v-col>
-            <v-col sm="6" md="6" lg="6" xl="6">
-
+            <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
               <!-- Region Input -->
               <v-autocomplete
                 v-model="itemData.region"
@@ -87,9 +95,10 @@
                 item-value="name"
                 label="Area"
                 clearable
+                multiple
                 return-object
+                chips
                 :rules="areaRules"
-                @change="onAreaChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -115,6 +124,54 @@
                   </v-list-item>
                 </template>
               </v-autocomplete>
+              <v-menu
+                ref="validStartMenu"
+                v-model="validStartMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="itemData.valid_from"
+                    label="Valid From"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <v-date-picker
+                  v-model="itemData.valid_from"
+                  style="margin: 0;"
+                  @input="validStartMenu = false"
+                />
+              </v-menu>
+
+              <!-- End Plan -->
+              <v-menu
+                ref="validEndMenu"
+                v-model="validEndMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="itemData.valid_to"
+                    label="Valid To"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <v-date-picker
+                  v-model="itemData.valid_to"
+                  style="margin: 0;"
+                  @input="validEndMenu = false"
+                />
+              </v-menu>
             </v-col>
           </v-row>
         </v-form>
@@ -162,8 +219,10 @@
           email: '',
           phone: '',
           type_md: '',
-          area: '',
+          area: [],
           region: '',
+          valid_from: '',
+          valid_to: '',
         },
         regionOptions: [],
         areaOptions: [],
@@ -172,6 +231,8 @@
           'MOTOR', 'MOBIL'
         ],
         formValid: false,
+        validStartMenu: false,
+        validEndMenu: false,
         usernameRules: [
           (v) => !!v || "Username is required",
           (v) => v.length >= 2 || "Username must be at least 2 characters",
@@ -210,8 +271,7 @@
         handler(newItem) {
           if (newItem) {
             this.itemData = {
-              ...newItem,
-              is_active: newItem.is_active === 1,
+              ...newItem
             };
           } else {
             this.resetForm();
@@ -226,7 +286,6 @@
     },
     methods: {
       isNumber(event) {
-        // Only allow numbers (0-9)
         const charCode = event.which ? event.which : event.keyCode;
         if (charCode < 48 || charCode > 57) {
           event.preventDefault();
@@ -247,8 +306,7 @@
         this.loading = true;
         try {
           const response = await getAllList();
-          console.log(response.data)
-          this.rolesOptions = response.data.data;
+          this.rolesOptions = response.data;
         } catch (error) {
           console.error("Error fetching :", error);
         } finally {
@@ -269,15 +327,21 @@
       resetForm() {
         this.itemData = {
           username: '',
+          user_role_id: '',
           fullname: '',
           email: '',
           phone: '',
           type_md: '',
-          area: '',
+          area: [],
           region: '',
-          is_active: true,
+          valid_from: '',
+          valid_to: '',
         };
         this.formValid = false;
+        // Check if the form reference exists before calling resetValidation
+        if (this.$refs.form) {
+          this.$refs.form.resetValidation();
+        }
       },
       closeDialog() {
         this.resetForm();
@@ -286,11 +350,9 @@
       saveItem() {
         if (this.$refs.form.validate()) {
           const formattedData = {
-            ...this.itemData,
-            is_active: this.itemData.is_active ? 1 : 0,
+            ...this.itemData
           };
           this.$emit("save", formattedData);
-          this.closeDialog();
         }
       },
       onRegionChange(item) {

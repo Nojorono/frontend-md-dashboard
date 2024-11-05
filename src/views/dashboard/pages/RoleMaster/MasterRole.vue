@@ -1,14 +1,5 @@
 <template>
   <v-container fluid>
-    <base-material-snackbar
-      v-model="snackbar.open"
-      :type="snackbar.type"
-      v-bind="{
-        ['top']: true,
-        ['right']: true
-      }"
-    ><span class="font-weight-bold">&nbsp;{{ snackbar.message }}&nbsp;</span>
-    </base-material-snackbar>
     <v-row class="justify-end">
       <v-col
         cols="1"
@@ -60,18 +51,13 @@
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
   import { createData, deleteData, getAll, updateData } from '@/api/masterRoleService'
   import FormRole from '@/views/dashboard/pages/RoleMaster/FormRole.vue'
-  import BaseMaterialSnackbar from '@/components/base/MaterialSnackbar.vue'
+  import Vue from "vue";
 
   export default {
     name: "MasterRoles",
-    components: { BaseMaterialSnackbar, ConfirmDeleteDialog, AdvancedTable, FormRole },
+    components: { ConfirmDeleteDialog, AdvancedTable, FormRole },
     data() {
       return {
-        snackbar: {
-          open : false,
-          type: 'info',
-          message: 'info',
-        },
         tableHeaders: [
           { text: "Name", value: "name" },
           { text: "Description", value: "description" },
@@ -113,14 +99,10 @@
             const { id, ...itemWithoutId } = item;
             const data = await updateData(id, itemWithoutId)
             if (data.statusCode === 200) {
-              this.snackbar.open = true;
-              this.snackbar.type = 'success';
-              this.snackbar.message = 'Update data Successfully!';
+              Vue.prototype.$toast.success(`Update data Successfully!`)
             }
           } catch (e) {
-            this.snackbar.open = true;
-            this.snackbar.type = 'error';
-            this.snackbar.message = 'Update data Error!';
+            Vue.prototype.$toast.error(`${e.data.message}`)
           } finally {
             this.closeFormDialog();
             await this.fetchData();
@@ -129,14 +111,10 @@
           try {
             const data = await createData(item);
             if (data.statusCode === 200) {
-              this.snackbar.open = true;
-              this.snackbar.type = 'success';
-              this.snackbar.message = 'Create data Successfully!';
+              Vue.prototype.$toast.success(`Create data Successfully!`)
             }
           } catch (e) {
-            this.snackbar.open = true;
-            this.snackbar.type = 'error';
-            this.snackbar.message = 'Create data Error!';
+            Vue.prototype.$toast.error(`${e.data.message}`)
           } finally {
             this.closeFormDialog();
             await this.fetchData();
@@ -155,9 +133,7 @@
           this.tableData = response.data.data;
         } catch (error) {
           console.error("Error fetching :", error);
-          this.snackbar.open = true;
-          this.snackbar.type = 'error';
-          this.snackbar.message = 'Error fetching!';
+          Vue.prototype.$toast.error(`${error.data.message}`)
         } finally {
           this.loading = false;
         }
@@ -180,14 +156,10 @@
         try {
           await deleteData(itemToDelete.data.id);
           this.tableData.splice(itemToDelete.index, 1);
-          this.snackbar.open = true;
-          this.snackbar.type = 'success';
-          this.snackbar.message = `Delete data ${itemToDelete.data.name} Successfully!`;
+          Vue.prototype.$toast.success(`Delete data ${itemToDelete.data.name} Successfully!`)
         } catch (error) {
           console.error("Error deleting outlet:", error);
-          this.snackbar.open = true;
-          this.snackbar.type = 'error';
-          this.snackbar.message = 'Error deleting outlet!';
+          Vue.prototype.$toast.error(`${error.data.message}`)
         } finally {
           this.loading = false;
         }
