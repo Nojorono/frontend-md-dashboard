@@ -1,110 +1,168 @@
 <template>
-  <v-container fluid>
-    <v-data-table
-      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
-      :headers="tableHeaders"
-      :items="tableData"
-      :server-items-length="totalItems"
-      :loading="loading"
-      :options.sync="options"
-      :search="search"
-      style="padding: 20px; border-radius: 20px"
-      @update:options="fetchData"
-    >
-      <template v-slot:top>
-        <v-row
-          class="justify-space-between"
-          style="align-items: baseline"
-        >
-          <v-col
-            cols="4"
-            style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+  <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading">
+    <v-container fluid>
+      <v-row style="height: 70px">
+        <v-col cols="3">
+          <v-tabs
+            v-model="activeTab"
+            dark
+            grow
+            class="rounded"
           >
-            <v-text-field
-              v-model="search"
-              label="Search"
-              class="mx-5"
-              clearable
-              append-icon="mdi-magnify"
-              @click:append="handleSearch"
-            />
-          </v-col>
-          <v-col>
-            <div class="d-flex justify-space-between">
-              <v-icon
-                style="
-                width: 40px; border-radius: 50%;"
-                color="primary"
-                size="2rem"
-                :loading="loading"
-                @click="fetchData"
-              >
-                mdi-refresh
-              </v-icon>
-              <v-btn
-                color="primary"
-                style="margin: unset!important;"
-                @click="openHandleAdd"
-              >
-                <v-icon>mdi-plus-box-multiple</v-icon>
-                <span class="mx-1">Add</span>
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </template>
-      <template v-slot:item="{ item }">
-        <tr>
-          <td>{{ item?.roles }}</td>
-          <td>{{ item?.username }}</td>
-          <td>{{ item?.email }}</td>
-          <td>{{ item?.phone }}</td>
-          <td>{{ item?.fullname }}</td>
-          <td>{{ item?.region }}</td>
-          <td>
-            <span
-              v-for="(area, index) in item?.area"
-              :key="index"
+            <v-tab
+              v-for="tab in tabs"
+              :key="tab.name"
+              active-class="active-tab"
             >
-              {{ area }}<span v-if="index < item.area.length - 1">, </span>
-            </span>
-          </td>
-          <td>{{ item?.type_md }}</td>
-          <td>{{ item?.status }}</td>
-          <td>{{ item?.last_login }}</td>
-          <td>
-            <v-btn
-              outlined
-              small
-              @click="openHandleUpdate(item)"
+              {{ tab.label }}
+            </v-tab>
+          </v-tabs>
+        </v-col>
+        <v-icon
+          color="primary"
+          size="2rem"
+          :loading="loading"
+          @click="fetchData"
+        >
+          mdi-refresh
+        </v-icon>
+      </v-row>
+
+      <!-- Tab Content -->
+      <v-tabs-items v-model="activeTab">
+        <!-- Tab 1: Outlet Table -->
+        <v-tab-item>
+          <v-card style="box-shadow: unset;">
+            <v-data-table
+              :headers="tableHeaders"
+              :items="tableData"
+              :server-items-length="totalItems"
+              :loading="loading"
+              :options.sync="options"
+              :search="search"
+              hide-default-footer
+              style="padding: 6px; border-radius: 20px"
+              @update:options="fetchData"
             >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-            <v-btn
-              color="error"
-              outlined
-              small
-              @click="openConfirmDeleteDialog(item)"
+              <template v-slot:top>
+                <v-row
+                  class="justify-space-between"
+                  style="align-items: baseline"
+                >
+                  <v-col
+                    cols="4"
+                    style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+                  >
+                    <v-text-field
+                      v-model="search"
+                      label="Search"
+                      class="mx-5"
+                      clearable
+                      append-icon="mdi-magnify"
+                      @click:append="handleSearch"
+                    />
+                  </v-col>
+                  <v-col>
+                    <div class="d-flex justify-end">
+                      <v-btn
+                        color="primary"
+                        @click="openHandleAdd"
+                      >
+                        <v-icon>mdi-plus-box-multiple</v-icon>
+                        <span class="mx-1">Import</span>
+                      </v-btn>
+                      <v-btn
+                        color="primary"
+                        @click="openHandleAdd"
+                      >
+                        <v-icon>mdi-plus-box-multiple</v-icon>
+                        <span class="mx-1">Export</span>
+                      </v-btn>
+                      <v-btn
+                        color="primary"
+                        @click="openHandleAdd"
+                      >
+                        <v-icon>mdi-plus-box-multiple</v-icon>
+                        <span class="mx-1">Add</span>
+                      </v-btn>
+                    </div>
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td>{{ item?.outlet_code }}</td>
+                  <td>{{ item?.name }}</td>
+                  <td>{{ item?.brand }}</td>
+                  <td>{{ item?.unique_name }}</td>
+                  <td>{{ item?.address_line }}</td>
+                  <td>{{ item?.sub_district }}</td>
+                  <td>{{ item?.district }}</td>
+                  <td>{{ item?.city_or_regency }}</td>
+                  <td>{{ item?.postal_code }}</td>
+                  <td>{{ item?.outlet_type }}</td>
+                  <td>{{ item?.region }}</td>
+                  <td>{{ item?.area }}</td>
+                  <td>{{ item?.cycle }}</td>
+                  <td>
+                    <v-btn
+                      outlined
+                      small
+                      @click="openHandleUpdate(item)"
+                    >
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                    <v-btn
+                      color="error"
+                      outlined
+                      small
+                      @click="openConfirmDeleteDialog(item)"
+                    >
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+            <v-row
+              justify="center"
+              class="py-3"
             >
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-    <!-- Confirm Delete Dialog -->
-    <confirm-delete-dialog
-      :dialog="isConfirmDeleteDialogOpen"
-      @confirm="handleDelete"
-      @close="closeConfirmDeleteDialog"
-    />
-    <!-- Import Delete Dialog -->
-    <upload-form-dialog
-      :dialog="isImportDialogOpen"
-      @close="handleImportDialog"
-      @upload="handleImportSubmit"
-    />
-  </v-container>
+              <v-pagination
+                v-model="page"
+                :length="totalPages"
+                :total-visible="7"
+                next-icon="mdi-menu-right"
+                prev-icon="mdi-menu-left"
+                @input="onPageChange"
+              />
+            </v-row>
+          </v-card>
+        </v-tab-item>
+
+        <!-- Tab 2: Settings -->
+        <v-tab-item>
+          <v-card>
+            <v-text-field>
+              test
+            </v-text-field>
+          </v-card>
+        </v-tab-item>
+      </v-tabs-items>
+      <!-- Confirm Delete Dialog -->
+      <confirm-delete-dialog
+        :dialog="isConfirmDeleteDialogOpen"
+        @confirm="handleDelete"
+        @close="closeConfirmDeleteDialog"
+      />
+      <!-- Import Delete Dialog -->
+      <upload-form-dialog
+        :dialog="isImportDialogOpen"
+        @close="handleImportDialog"
+        @upload="handleImportSubmit"
+      />
+    </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -122,6 +180,12 @@
     },
     data () {
       return {
+        activeTab: 0,
+        tabs: [
+          { name: 'Active', label: 'Active' },
+          { name: 'Non Active', label: 'Non Active' },
+          // Add more tabs here
+        ],
         tableHeaders: [
           {
             text: 'Outlet Code',
@@ -160,14 +224,6 @@
             value: 'postal_code',
           },
           {
-            text: 'Latitude',
-            value: 'latitude',
-          },
-          {
-            text: 'Longitude',
-            value: 'longitude',
-          },
-          {
             text: 'Outlet Type',
             value: 'outlet_type',
           },
@@ -184,28 +240,14 @@
             value: 'cycle',
           },
           {
-            text: 'Is Active',
-            value: 'is_active',
-          },
-          {
-            text: 'Visit Day',
-            value: 'visit_day',
-          },
-          {
-            text: 'Odd/Even',
-            value: 'odd_even',
-          },
-          {
-            text: 'Photos',
-            value: 'photos',
-          },
-          {
-            text: 'Remarks',
-            value: 'remarks',
+            text: 'Action',
+            value: 'Action',
           },
         ],
         tableData: [],
         totalItems: 0,
+        totalPages: 0,
+        page: 1, // Current page number
         options: { page: 1, itemsPerPage: 10 },
         loading: false,
         selectedItem: null,
@@ -221,10 +263,23 @@
         return this.tableData.map(r => r.region) // Extract the region names
       },
     },
+    watch: {
+      page(value) {
+        this.options.page = value;
+        this.fetchData();
+      },
+      itemsPerPage(value) {
+        this.options.itemsPerPage = value;
+        this.fetchData();
+      },
+    },
     created () {
       this.fetchData()
     },
     methods: {
+      onPageChange(newPage) {
+        this.page = newPage;
+      },
       openHandleAdd() {
         this.isEdit = false;
         this.selectedItem = null;
@@ -267,9 +322,9 @@
             limit: this.options.itemsPerPage,
             searchTerm: this.search,
           });
-          console.log(response.data)
           this.tableData = response.data.data;
-          this.totalItems = response.data.totalRecords;
+          this.totalItems = response.data.totalItems;
+          this.totalPages = response.data.totalPages;
           this.options.page = response.data.currentPage;
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
@@ -322,3 +377,12 @@
     },
   }
 </script>
+
+<style scoped>
+/* Customize the active tab style */
+.active-tab {
+  background-color: #4caf50 !important; /* Green background for active tab */
+  color: #fff !important; /* White text for active tab */
+  font-weight: bold; /* Bold text for active tab */
+}
+</style>
