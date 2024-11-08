@@ -14,7 +14,6 @@
             <div class="display-2 font-weight-light">
               Edit Profile
             </div>
-
             <div class="subtitle-1 font-weight-light">
               Complete your profile
             </div>
@@ -28,7 +27,8 @@
                   md="4"
                 >
                   <v-text-field
-                    label="Company (disabled)"
+                    label="Role (disabled)"
+                    :value="user.roles"
                     disabled
                   />
                 </v-col>
@@ -38,6 +38,7 @@
                   md="4"
                 >
                   <v-text-field
+                    v-model="user.username"
                     class="purple-input"
                     label="User Name"
                   />
@@ -48,6 +49,7 @@
                   md="4"
                 >
                   <v-text-field
+                    v-model="user.email"
                     label="Email Address"
                     class="purple-input"
                   />
@@ -58,24 +60,8 @@
                   md="6"
                 >
                   <v-text-field
-                    label="First Name"
-                    class="purple-input"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    label="Last Name"
-                    class="purple-input"
-                  />
-                </v-col>
-
-                <v-col cols="12">
-                  <v-text-field
-                    label="Adress"
+                    v-model="user.fullname"
+                    label="Full Name"
                     class="purple-input"
                   />
                 </v-col>
@@ -85,37 +71,17 @@
                   md="4"
                 >
                   <v-text-field
-                    label="City"
+                    v-model="user.region"
+                    label="Region"
                     class="purple-input"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-text-field
-                    label="Country"
-                    class="purple-input"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-text-field
-                    class="purple-input"
-                    label="Postal Code"
-                    type="number"
                   />
                 </v-col>
 
                 <v-col cols="12">
                   <v-textarea
+                    v-model="user.about"
                     class="purple-input"
                     label="About Me"
-                    value="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                   />
                 </v-col>
 
@@ -126,6 +92,7 @@
                   <v-btn
                     color="success"
                     class="mr-0"
+                    @click="updateProfile"
                   >
                     Update Profile
                   </v-btn>
@@ -146,17 +113,14 @@
         >
           <v-card-text class="text-center">
             <h6 class="display-1 mb-1 grey--text">
-              CEO / CO-FOUNDER
+              User Details
             </h6>
-
             <h4 class="display-2 font-weight-light mb-3 black--text">
-              Alec Thompson
+              {{ user.fullname }}
             </h4>
-
             <p class="font-weight-light grey--text">
-              Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
+              {{ user.about || "Add a bio..." }}
             </p>
-
             <v-btn
               color="success"
               rounded
@@ -172,7 +136,37 @@
 </template>
 
 <script>
-  export default {
-    //
-  }
+export default {
+  data() {
+    return {
+      user: {
+        roles: '',
+        username: '',
+        email: '',
+        fullname: '',
+        region: '',
+        about: '',
+      },
+    };
+  },
+  mounted() {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      this.user = { ...storedUser, about: 'Tell us about yourself...' };
+    }
+  },
+  methods: {
+    updateProfile() {
+      // You can add logic here to save updates to the user's profile
+      localStorage.setItem('user', JSON.stringify(this.user));
+      alert("Profile updated successfully!");
+    },
+  },
+};
 </script>
+
+<style scoped>
+.purple-input .v-input__control .v-input__slot {
+  background-color: #f3e5f5;
+}
+</style>

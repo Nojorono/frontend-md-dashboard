@@ -1,13 +1,35 @@
 <template>
-  <v-container fluid fill-height class="dark">
-    <v-row justify="center" align="center" style="justify-content: center">
-      <v-col cols="12" md="4">
-        <v-card class="elevation-12" color="grey darken-3" style="padding: 10px">
-          <v-card-title class="headline text-center black--text" style="padding: 10px">
+  <v-container
+    fluid
+    fill-height
+    class="dark"
+  >
+    <v-row
+      justify="center"
+      align="center"
+      style="justify-content: center"
+    >
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <v-card
+          class="elevation-12"
+          color="grey darken-3"
+          style="padding: 10px"
+        >
+          <v-card-title
+            class="headline text-center black--text"
+            style="padding: 10px"
+          >
             Login
           </v-card-title>
           <v-card-text>
-            <v-form ref="form" v-model="valid" lazy-validation>
+            <v-form
+              ref="form"
+              v-model="valid"
+              lazy-validation
+            >
               <v-text-field
                 v-model="email"
                 :rules="[rules.required, rules.email]"
@@ -16,7 +38,7 @@
                 required
                 class="black--text"
                 outlined
-              ></v-text-field>
+              />
               <v-text-field
                 v-model="password"
                 :rules="[rules.required]"
@@ -26,13 +48,13 @@
                 required
                 class="black--text"
                 outlined
-              ></v-text-field>
+              />
               <v-btn
                 :disabled="!valid"
-                @click="handleLogin"
                 color="grey darken-1"
                 large
                 block
+                @click="handleLogin"
               >
                 Login
               </v-btn>
@@ -79,8 +101,8 @@
               Vue.prototype.$toast.success('Login Successfully!')
               await this.login({ token : response.data.accessToken, user: response.data.user });
               setTimeout(async () => {
-                await this.$router.push('/');  // Redirect to the homepage or any route after 5 seconds
-              }, 4000);
+                await this.$router.push('/');
+              }, 2000);
             }
           } catch (error) {
             console.log(error)
@@ -106,7 +128,6 @@
   border-radius: 8px; /* Optional: Add rounded corners */
 }
 
-/* Style for outlined text fields to fit dark mode */
 .v-input--is-focused .v-input__control {
   border-color: #3f51b5; /* Adjust border color on focus */
 }

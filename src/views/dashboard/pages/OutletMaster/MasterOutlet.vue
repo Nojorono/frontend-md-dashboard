@@ -1,47 +1,97 @@
 <template>
   <v-container fluid>
-    <v-row class="justify-end">
-      <v-col
-        cols="1"
-        style="max-width: none!important;"
-      >
-        <v-btn
-          color="primary"
-          style="margin: unset!important;"
-          @click="handleImportDialog(true)"
-        >
-          <v-icon>mdi-file-import</v-icon>
-          <span class="mx-1">Import</span>
-        </v-btn>
-      </v-col>
-      <v-col
-        cols="1"
-        style="max-width: none!important;"
-      >
-        <v-btn
-          color="primary"
-          style="margin: unset!important;"
-        >
-          <v-icon>mdi-file-export</v-icon>
-          <span class="mx-1">Export</span>
-        </v-btn>
-      </v-col>
-    </v-row>
-    <advanced-table
+    <v-data-table
+      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
       :headers="tableHeaders"
-      :rows="tableData"
-      title="Master Outlet Table"
-      color="success"
-      dark
-      icon="mdi-application-cog"
-      :is-filter="true"
-      :is-search="true"
-      :filters="regionOptions"
+      :items="tableData"
+      :server-items-length="totalItems"
       :loading="loading"
-      :filter-flag="filterFlag"
-      @delete="openConfirmDeleteDialog"
-      @refresh="fetchOutlets"
-    />
+      :options.sync="options"
+      :search="search"
+      style="padding: 20px; border-radius: 20px"
+      @update:options="fetchData"
+    >
+      <template v-slot:top>
+        <v-row
+          class="justify-space-between"
+          style="align-items: baseline"
+        >
+          <v-col
+            cols="4"
+            style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+          >
+            <v-text-field
+              v-model="search"
+              label="Search"
+              class="mx-5"
+              clearable
+              append-icon="mdi-magnify"
+              @click:append="handleSearch"
+            />
+          </v-col>
+          <v-col>
+            <div class="d-flex justify-space-between">
+              <v-icon
+                style="
+                width: 40px; border-radius: 50%;"
+                color="primary"
+                size="2rem"
+                :loading="loading"
+                @click="fetchData"
+              >
+                mdi-refresh
+              </v-icon>
+              <v-btn
+                color="primary"
+                style="margin: unset!important;"
+                @click="openHandleAdd"
+              >
+                <v-icon>mdi-plus-box-multiple</v-icon>
+                <span class="mx-1">Add</span>
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </template>
+      <template v-slot:item="{ item }">
+        <tr>
+          <td>{{ item?.roles }}</td>
+          <td>{{ item?.username }}</td>
+          <td>{{ item?.email }}</td>
+          <td>{{ item?.phone }}</td>
+          <td>{{ item?.fullname }}</td>
+          <td>{{ item?.region }}</td>
+          <td>
+            <span
+              v-for="(area, index) in item?.area"
+              :key="index"
+            >
+              {{ area }}<span v-if="index < item.area.length - 1">, </span>
+            </span>
+          </td>
+          <td>{{ item?.type_md }}</td>
+          <td>{{ item?.status }}</td>
+          <td>{{ item?.last_login }}</td>
+          <td>
+            <v-btn
+              outlined
+              small
+              @click="openHandleUpdate(item)"
+            >
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn
+              color="error"
+              outlined
+              small
+              @click="openConfirmDeleteDialog(item)"
+            >
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
     <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
       :dialog="isConfirmDeleteDialogOpen"
@@ -58,17 +108,16 @@
 </template>
 
 <script>
-  import AdvancedTable from '@/components/base/VTable.vue'
   import { deleteOutlet, getAllOutlets, uploadOutlet } from '@/api/masterOutletService'
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
   import UploadFormDialog from '@/components/base/UploadFormDialog.vue'
   import Vue from "vue";
+  import {createData, updateData} from "@/api/userService";
 
   export default {
     name: 'MasterOutlet',
     components: {
       ConfirmDeleteDialog,
-      AdvancedTable,
       UploadFormDialog,
     },
     data () {
@@ -156,12 +205,15 @@
           },
         ],
         tableData: [],
-        availableRegion: [],
-        filterFlag: 'region',
-        isConfirmDeleteDialogOpen: false,
-        isImportDialogOpen: false,
+        totalItems: 0,
+        options: { page: 1, itemsPerPage: 10 },
         loading: false,
         selectedItem: null,
+        isImportDialogOpen: false,
+        isFormRoleDialog: false,
+        isEdit: false,
+        isConfirmDeleteDialogOpen: false,
+        search: '',
       }
     },
     computed: {
@@ -170,15 +222,55 @@
       },
     },
     created () {
-      this.fetchOutlets()
+      this.fetchData()
     },
     methods: {
+      openHandleAdd() {
+        this.isEdit = false;
+        this.selectedItem = null;
+        this.isFormRoleDialog = true;
+      },
+      openHandleUpdate(item) {
+        this.isEdit = true;
+        this.selectedItem = {
+          id: item.id,
+        }
+        this.isFormRoleDialog = true;
+      },
+      async handleSave(item) {
+        try {
+          if (this.isEdit) {
+            const { id, ...itemWithoutId } = item;
+            await updateData(id, itemWithoutId);
+            Vue.prototype.$toast.success(`Update data Successfully!`);
+          } else {
+            await createData(item);
+            Vue.prototype.$toast.success(`Create data Successfully!`);
+          }
+          this.closeFormDialog();
+        } catch (error) {
+          Vue.prototype.$toast.error(`${error.data.message}`);
+          console.error(error);
+        } finally {
+          await this.fetchData();
+        }
+      },
+      closeFormDialog() {
+        this.isFormRoleDialog = false;
+      },
       // Fetch all outlets and update tableData
-      async fetchOutlets () {
+      async fetchData () {
         this.loading = true
         try {
-          const response = await getAllOutlets()
-          this.tableData = response.data.data
+          const response = await getAllOutlets({
+            page: this.options.page,
+            limit: this.options.itemsPerPage,
+            searchTerm: this.search,
+          });
+          console.log(response.data)
+          this.tableData = response.data.data;
+          this.totalItems = response.data.totalRecords;
+          this.options.page = response.data.currentPage;
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
         } finally {
@@ -200,30 +292,31 @@
         } finally {
           this.loading = false
         }
-      }
-,
-      // DELETE
-      openConfirmDeleteDialog (index) {
-        this.selectedItem = {
-          index: index,
-          data: this.tableData[index],
-        }
-        this.isConfirmDeleteDialogOpen = true
       },
-      closeConfirmDeleteDialog () {
-        this.isConfirmDeleteDialogOpen = false
+      handleSearch() {
+        this.options.page = 1;
+        this.fetchData();
       },
-      async handleDelete () {
-        this.loading = true
-        const itemToDelete = this.selectedItem
+      openConfirmDeleteDialog(item) {
+        this.selectedItem = item;
+        this.isConfirmDeleteDialogOpen = true;
+      },
+      closeConfirmDeleteDialog() {
+        this.isConfirmDeleteDialogOpen = false;
+      },
+      async handleDelete() {
+        this.loading = true;
+        const data = this.selectedItem;
         try {
-          await deleteOutlet(itemToDelete.data.id)
-          this.tableData.splice(itemToDelete.index, 1)
-          await this.fetchOutlets()
+          await deleteOutlet(data.id);
+          Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`);
         } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
+          Vue.prototype.$toast.error(`${error.data?.message}`);
+          console.error(error);
         } finally {
-          this.loading = false
+          this.loading = false;
+          this.closeConfirmDeleteDialog();
+          this.fetchData();
         }
       },
     },

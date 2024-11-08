@@ -259,14 +259,14 @@
       },
       onRegionChange(item) {
         if (item) {
-          this.itemData.region = item.name;
+          this.itemData.region = item;
         } else {
           this.itemData.region = null;
         }
       },
       onAreaChange(item) {
         if (item) {
-          this.itemData.area = item.name;
+          this.itemData.area = item;
         } else {
           this.itemData.area = null;
         }

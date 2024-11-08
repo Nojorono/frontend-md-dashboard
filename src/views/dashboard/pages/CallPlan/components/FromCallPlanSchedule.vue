@@ -24,9 +24,9 @@
             chips
             clearable
             deletable-chips
-            multiple
-            small-chips
-            @change="selectOutlet"
+            :multiple="!isEdit"
+            small-chips-call
+            :rules="outletRules"
           >
             <template v-slot:no-data>
               <v-list-item>
@@ -49,6 +49,7 @@
                 label="Select User"
                 clearable
                 return-object
+                :rules="userRules"
                 @change="onUserChange"
               >
                 <template v-slot:no-data>
@@ -87,6 +88,7 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
+                    :rules="startPlanRules"
                     v-on="on"
                   />
                 </template>
@@ -112,6 +114,7 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
+                    :rules="endPlanRules"
                     v-on="on"
                   />
                 </template>
@@ -161,7 +164,7 @@ export default {
   },
   data() {
     return {
-      call_plan_id: '',
+      call_plan_id: this.$route.params.id,
       itemData: {
         user_id: null,
         outlet_id: [],
@@ -174,11 +177,28 @@ export default {
       endPlanMenu: false,
       outletsOptions: [],
       userOptions: [],
-      notesRules: [
-        (v) => !!v || "Notes is required",
+      // Validation rules
+      outletRules: [
+        v => {
+          if (Array.isArray(v)) {
+            return v.length > 0 || 'Please select at least one outlet';
+          } else {
+            return !!v || 'Please select an outlet';
+          }
+        },
       ],
-      codeCallPlanRules: [
-        (v) => !!v || "Code Call Plan is required",
+      userRules: [
+        v => !!v || 'User selection is required',
+      ],
+      notesRules: [
+        v => !!v && v.length <= 300 || 'Notes must be 300 characters or less',
+      ],
+      startPlanRules: [
+        v => !!v || 'Start plan date is required',
+      ],
+      endPlanRules: [
+        v => !!v || 'End plan date is required',
+        v => !this.itemData.start_plan || new Date(v) >= new Date(this.itemData.start_plan) || 'End plan must be after start plan',
       ],
     };
   },
@@ -201,6 +221,12 @@ export default {
       handler(newItem) {
         if (newItem) {
           this.itemData = { ...newItem };
+          // Ensure outlet_id format matches the selection type
+          if (this.isEdit && Array.isArray(this.itemData.outlet_id)) {
+            this.itemData.outlet_id = this.itemData.outlet_id[0] || null;
+          } else if (!this.isEdit && !Array.isArray(this.itemData.outlet_id)) {
+            this.itemData.outlet_id = this.itemData.outlet_id ? [this.itemData.outlet_id] : [];
+          }
         } else {
           this.resetForm();
         }
@@ -223,6 +249,10 @@ export default {
         end_plan: '',
       };
       this.formValid = false;
+      // Check if the form reference exists before calling resetValidation
+      if (this.$refs.form) {
+        this.$refs.form.resetValidation();
+      }
     },
     closeDialog() {
       this.resetForm();
@@ -231,9 +261,7 @@ export default {
     saveItem() {
       if (this.$refs.form.validate()) {
         this.itemData.call_plan_id = this.$route.params.id;
-        this.itemData.code_call_plan = this.$route.params.code_call_plan;
         this.$emit("save", { ...this.itemData });
-        this.closeDialog();
       }
     },
     async fetchUsers () {
@@ -245,18 +273,20 @@ export default {
       this.outletsOptions = response.data
     },
     selectOutlet(item) {
-      if (item) {
-        this.itemData.outlet_id = item.id; // Store the selected user ID
+      if (this.isEdit) {
+        // Single selection: Set `outlet_id` as a single number (item ID)
+        this.itemData.outlet_id = item ? item.id : null;
       } else {
-        this.itemData.outlet_id = null; // Reset if no user selected
+        // Multiple selection: Ensure `outlet_id` is an array
+        this.itemData.outlet_id = item ? [item.id] : [];
       }
     },
     onUserChange(user) {
       // Handle user selection change
       if (user) {
-        this.itemData.user_id = user.id; // Store the selected user ID
+        this.itemData.user_id = user.id;
       } else {
-        this.itemData.user_id = null; // Reset if no user selected
+        this.itemData.user_id = null;
       }
     },
   },

@@ -1,6 +1,7 @@
 <template>
   <v-container fluid>
     <v-data-table
+      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
       :headers="tableHeaders"
       :items="tableData"
       :server-items-length="totalItems"
@@ -17,13 +18,12 @@
         >
           <v-col
             cols="4"
+            style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
           >
             <v-text-field
-              rounded
               v-model="search"
               label="Search"
-              class="mx-4"
-              outlined
+              class="mx-5"
               clearable
               append-icon="mdi-magnify"
               @click:append="handleSearch"
@@ -66,7 +66,7 @@
               v-for="(area, index) in item?.area"
               :key="index"
             >
-              {{ area.name }}<span v-if="index < item.area.length - 1">, </span>
+              {{ area }}<span v-if="index < item.area.length - 1">, </span>
             </span>
           </td>
           <td>{{ item?.type_md }}</td>
@@ -124,7 +124,6 @@ export default {
   },
   data() {
     return {
-      snackbar: { open: false, type: 'info', message: 'info' },
       tableHeaders: [
         { text: 'Roles', value: 'roles', class: 'text-left', width: '5%' },
         { text: 'Username', value: 'username', class: 'text-left', width: '5%' },
@@ -218,7 +217,7 @@ export default {
         this.tableData = response.data.data;
         this.totalItems = response.data.totalRecords;
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`);
+        Vue.prototype.$toast.error(`${error.data?.message}`);
         console.error(error);
       } finally {
         this.loading = false;
@@ -238,12 +237,11 @@ export default {
     async handleDelete() {
       this.loading = true;
       const data = this.selectedItem;
-      console.log(data)
       try {
         await deleteData(data.id);
         Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`);
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`);
+        Vue.prototype.$toast.error(`${error.data?.message}`);
         console.error(error);
       } finally {
         this.loading = false;

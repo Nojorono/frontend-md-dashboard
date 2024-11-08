@@ -3,10 +3,10 @@
 import axiosInstance from '@/api/index';
 
 // Function to get all active outlets
-export const getAllOutlets = async (page = 1, limit = 10, searchTerm = '') => {
+export const getAllOutlets = async (params) => {
   try {
     const response = await axiosInstance.get('/outlets', {
-      params: { page, limit, searchTerm },
+      params: params,
     });
     return response.data;
   } catch (error) {

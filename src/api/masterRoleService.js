@@ -3,10 +3,10 @@
 import axiosInstance from '@/api/index';
 
 // Function to get all active outlets
-export const getAll = async (page = 1, limit = 10, searchTerm = '') => {
+export const getAll = async (params) => {
   try {
     const response = await axiosInstance.get('/roles', {
-      params: { page, limit, searchTerm },
+      params: params,
     });
     return response.data;
   } catch (error) {

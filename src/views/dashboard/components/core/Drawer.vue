@@ -51,8 +51,6 @@
       expand
       nav
     >
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
       <div />
 
       <template v-for="(item, i) in computedItems">
@@ -70,21 +68,8 @@
           :item="item"
         />
       </template>
-
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
       <div />
     </v-list>
-
-<!--    <template v-slot:append>-->
-<!--      <base-item-->
-<!--        :item="{-->
-<!--          title: $t('upgrade'),-->
-<!--          icon: 'mdi-package-up',-->
-<!--          to: '/upgrade',-->
-<!--        }"-->
-<!--      />-->
-<!--    </template>-->
   </v-navigation-drawer>
 </template>
 
@@ -136,11 +121,6 @@
           title: 'Call Plan',
           to: '/call-plan',
         },
-        // {
-        //   icon: 'mdi-account',
-        //   title: 'user',
-        //   to: '/pages/user',
-        // },
         {
           title: 'rtables',
           icon: 'mdi-clipboard-outline',
@@ -170,7 +150,7 @@
     }),
 
     computed: {
-      ...mapState(['barColor', 'barImage']),
+      ...mapState(['barColor', 'barImage', 'user']),
       drawer: {
         get () {
           return this.$store.state.drawer
@@ -180,7 +160,8 @@
         },
       },
       computedItems () {
-        return this.items.map(this.mapItem)
+        const filteredMenu = this.items.filter(item => this.isMenuItemAllowed(item))
+        return filteredMenu.map(this.mapItem)
       },
       profile () {
         return {
@@ -188,6 +169,8 @@
           title: this.$t('avatar'),
         }
       },
+    },
+    mounted(){
     },
 
     methods: {
@@ -197,6 +180,9 @@
           children: item.children ? item.children.map(this.mapItem) : undefined,
           title: this.$t(item.title),
         }
+      },
+      isMenuItemAllowed(path) {
+        return this.user?.menus.some(userMenuItem => userMenuItem.value === path.to)
       },
     },
   }

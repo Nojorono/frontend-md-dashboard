@@ -18,11 +18,15 @@ const router = new Router({
       path: '/logout',
       name: 'Logout',
       beforeEnter: (to, from, next) => {
-        // Perform the logout action before entering this route
         store.dispatch('logout') // Trigger Vuex logout action
         Vue.prototype.$toast.success(`Logout successfully`)
-        next('/login') // Redirect to login page after logout
+        next('/login')
       },
+    },
+    {
+      path: '/forgot-password',
+      name: 'Forgot Password',
+      component: () => import('@/views/auth/Login.vue'),
     },
     {
       path: '/',
@@ -30,79 +34,79 @@ const router = new Router({
       children: [
         {
           name: 'Dashboard',
-          path: '',
+          path: '/',
           component: () => import('@/views/dashboard/Dashboard'),
           meta: { requiresAuth: true }, // Add this to protect the route
         },
         {
           name: 'User Profile',
-          path: 'pages/user',
+          path: '/pages/user',
           component: () => import('@/views/dashboard/pages/UserProfile'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Master Outlet',
-          path: 'master/outlet',
+          path: '/master/outlet',
           component: () => import('@/views/dashboard/pages/OutletMaster/MasterOutlet.vue'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Master Users',
-          path: 'master/users',
+          path: '/master/users',
           component: () => import('@/views/dashboard/pages/UserMaster/MasterUser.vue'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Master Roles',
-          path: 'master/roles',
+          path: '/master/roles',
           component: () => import('@/views/dashboard/pages/RoleMaster/MasterRole.vue'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Master Batch',
-          path: 'master/batch',
+          path: '/master/batch',
           component: () => import('@/views/dashboard/pages/Batch/MasterBatch.vue'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Call Plan',
-          path: 'call-plan',
+          path: '/call-plan',
           component: () => import('@/views/dashboard/pages/CallPlan/CallPlan.vue'),
           meta: { requiresAuth: true},
         },
         {
           name: 'Call Plan Schedule',
-          path: 'call-plan/schedule/:id',
+          path: '/call-plan/schedule/:id',
           component: () => import('@/views/dashboard/pages/CallPlan/CallPlanSchedule.vue'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Notifications',
-          path: 'components/notifications',
+          path: '/components/notifications',
           component: () => import('@/views/dashboard/component/Notifications'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Icons',
-          path: 'components/icons',
+          path: '/components/icons',
           component: () => import('@/views/dashboard/component/Icons'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Typography',
-          path: 'components/typography',
+          path: '/components/typography',
           component: () => import('@/views/dashboard/component/Typography'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Regular Tables',
-          path: 'tables/regular-tables',
+          path: '/tables/regular-tables',
           component: () => import('@/views/dashboard/tables/RegularTables'),
           meta: { requiresAuth: true }, // Protect this route
         },
         {
           name: 'Google Maps',
-          path: 'maps/google-maps',
+          path: '/maps/google-maps',
           component: () => import('@/views/dashboard/maps/GoogleMaps'),
           meta: { requiresAuth: true }, // Protect this route
         },
