@@ -56,7 +56,7 @@ export const deleteData = async (id) => {
 
 export const geListSchedule = async (id, { page, limit, searchTerm }) => {
   try {
-    const response = await axiosInstance.get(`/call-plan/schedule/${id}`, {
+    const response = await axiosInstance.get(`/schedule-plan/${id}`, {
       params: { page, limit, searchTerm },
     });
     return response.data;
@@ -67,7 +67,7 @@ export const geListSchedule = async (id, { page, limit, searchTerm }) => {
 
 export const createScheduleData = async (data) => {
   try {
-    const response = await axiosInstance.post('/call-plan/schedule', data);
+    const response = await axiosInstance.post('/schedule-plan', data);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -77,7 +77,7 @@ export const createScheduleData = async (data) => {
 // Function to update
 export const updateScheduleData = async (id, data) => {
   try {
-    const response = await axiosInstance.put(`/call-plan/schedule/${id}`, data);
+    const response = await axiosInstance.put(`/schedule-plan/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -87,7 +87,7 @@ export const updateScheduleData = async (id, data) => {
 // Function to delete
 export const deleteScheduleData = async (id) => {
   try {
-    const response = await axiosInstance.delete(`/call-plan/schedule/${id}`);
+    const response = await axiosInstance.delete(`/schedule-plan/${id}`);
     return response.data;
   } catch (error) {
     throw error.response;

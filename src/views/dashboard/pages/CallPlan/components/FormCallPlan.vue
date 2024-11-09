@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="800"
+    max-width="600"
     @click:outside="closeDialog"
   >
     <v-card>
@@ -15,16 +15,10 @@
           v-model="formValid"
         >
           <v-row>
-            <v-col
-              sm="6"
-              md="6"
-              lg="6"
-              xl="6"
-            >
+            <v-col>
               <!-- Name Input -->
               <v-text-field
                 v-model="itemData.code_batch"
-                :rules="userRules"
                 label="Code Batch"
                 required
                 readonly
@@ -68,61 +62,6 @@
               </v-autocomplete>
               <!-- Area Input -->
             </v-col>
-            <v-col
-              sm="6"
-              md="6"
-              lg="6"
-              xl="6"
-            >
-              <v-menu
-                ref="startPlanMenu"
-                v-model="startPlanMenu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="itemData.start_plan"
-                    label="Start Plan"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-                <v-date-picker
-                  v-model="itemData.start_plan"
-                  style="margin: 0;"
-                  @input="startPlanMenu = false"
-                />
-              </v-menu>
-
-              <!-- End Plan -->
-              <v-menu
-                ref="endPlanMenu"
-                v-model="endPlanMenu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="itemData.end_plan"
-                    label="End Plan"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-                <v-date-picker
-                  v-model="itemData.end_plan"
-                  style="margin: 0;"
-                  @input="endPlanMenu = false"
-                />
-              </v-menu>
-            </v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -152,6 +91,7 @@
 <script>
   import { getOutletArea, getOutletRegion } from '@/api/masterOutletService'
   import {findLast} from "@/api/batchService";
+  import {mapGetters} from "vuex";
   export default {
     name: "FormCallPlan",
     props: {
@@ -165,22 +105,11 @@
           code_batch: '',
           area: '',
           region: '',
-          start_plan: '',
-          end_plan: '',
         },
         formValid: false,
-        startPlanMenu: false,
-        endPlanMenu: false,
         userOptions: [],
         regionOptions: [],
         areaOptions: [],
-        userRules: [
-          (v) => !!v || "User is required",
-        ],
-        codeCallPlanRules: [
-          (v) => !!v || "Code Call Plan is required",
-          (v) => v.length <= 20 || "Code must be less than 20 characters"
-        ],
         regionRules: [
           (v) => !!v || "Region is required",
         ],
@@ -188,6 +117,9 @@
           (v) => !!v || "Area is required",
         ],
       };
+    },
+    computed: {
+      ...mapGetters(['getUser']), // Map loading state getter
     },
     watch: {
       isEdit(newValue){
@@ -228,7 +160,14 @@
         this.loading = true;
         try {
           const response = await getOutletArea();
-          this.areaOptions = response.data;
+          // Check if user area array is defined and not empty; if so, filter based on areas
+          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+            this.areaOptions = response.data.filter(
+              (area) => this.getUser.area.includes(area)
+            );
+          } else {
+            this.areaOptions = response.data;
+          }
         } catch (error) {
           console.error("Error fetching :", error);
         } finally {
@@ -239,7 +178,13 @@
         this.loading = true;
         try {
           const response = await getOutletRegion();
-          this.regionOptions = response.data;
+          if (this.getUser.region) {
+            this.regionOptions = response.data.filter(
+              (region) => region === this.getUser.region
+            );
+          } else {
+            this.regionOptions = response.data; // No filtering if region is undefined
+          }
         } catch (error) {
           console.error("Error fetching :", error);
         } finally {

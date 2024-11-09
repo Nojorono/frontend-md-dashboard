@@ -8,6 +8,7 @@
       :loading="loading"
       :options.sync="options"
       :search="search"
+      hide-default-footer
       style="padding: 20px; border-radius: 20px"
       @update:options="fetchData"
     >
@@ -60,9 +61,7 @@
           <td>{{ item?.code_batch }}</td>
           <td>{{ item?.region }}</td>
           <td>{{ item?.area }}</td>
-          <td>{{ item?.start_plan }}</td>
-          <td>{{ item?.end_plan }}</td>
-          <td class="d-flex">
+          <td class="d-flex" style="align-items: center">
             <v-btn
               class="mx-1"
               color="warning"
@@ -93,6 +92,19 @@
         </tr>
       </template>
     </v-data-table>
+    <v-row
+      justify="center"
+      class="py-3"
+    >
+      <v-pagination
+        v-model="page"
+        :length="totalPages"
+        :total-visible="7"
+        next-icon="mdi-menu-right"
+        prev-icon="mdi-menu-left"
+        @input="onPageChange"
+      />
+    </v-row>
 
     <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
@@ -132,12 +144,12 @@
           { text: 'Code Batch', value: 'code_batch', class: 'text-left', width: '15%' },
           { text: 'Region', value: 'region', class: 'text-left', width: '20%' },
           { text: 'Area', value: 'area', class: 'text-left', width: '15%' },
-          { text: 'Start Plan', value: 'start_plan', class: 'text-left', width: '10%' },
-          { text: 'End Plan', value: 'end_plan', class: 'text-left', width: '10%' },
           { text: 'Actions', value: 'actions', sortable: false, class: 'text-center' },
         ],
         tableData: [],
         totalItems: 0,
+        totalPages: 0,
+        page: 1, // Current page number
         options: { page: 1, itemsPerPage: 10 },
         loading: false,
         selectedItem: null,
@@ -156,13 +168,13 @@
       },
     },
     methods: {
+      onPageChange(newPage) {
+        this.page = newPage;
+      },
       openHandleAdd() {
         this.isEdit = false
         this.selectedItem = null
         this.isFormRoleDialog = true
-      },
-      async refreshData() {
-        await this.fetchData();
       },
       openHandleUpdate(item) {
         this.isEdit = true
@@ -202,9 +214,11 @@
             page: this.options.page,
             limit: this.options.itemsPerPage,
             searchTerm: this.search,
-          })
-          this.tableData = response.data.data
-          this.totalItems = response.data.totalRecords
+          });
+          this.tableData = response.data.data;
+          this.totalItems = response.data.totalItems;
+          this.totalPages = response.data.totalPages;
+          this.options.page = response.data.currentPage;
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
           console.error(error)
@@ -231,7 +245,7 @@
         try {
           await deleteData(data.id)
           await this.fetchData()
-          Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`)
+          Vue.prototype.$toast.success(`Deleted Area ${data.area} successfully!`)
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
           console.error(error)
