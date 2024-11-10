@@ -153,7 +153,6 @@
       saveItem() {
         if (this.$refs.form.validate()) {
           this.$emit("save", { ...this.itemData });
-          this.closeDialog();
         }
       },
       async fetchArea() {

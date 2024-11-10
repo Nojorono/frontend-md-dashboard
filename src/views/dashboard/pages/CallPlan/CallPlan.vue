@@ -160,11 +160,13 @@
       }
     },
     watch: {
-      options: {
-        handler() {
-          this.fetchData()
-        },
-        deep: true,
+      page(value) {
+        this.options.page = value;
+        this.fetchData();
+      },
+      itemsPerPage(value) {
+        this.options.itemsPerPage = value;
+        this.fetchData();
       },
     },
     methods: {
@@ -185,18 +187,23 @@
         try {
           if (this.isEdit) {
             const { id, ...itemWithoutId } = item
-            await updateData(id, itemWithoutId)
-            Vue.prototype.$toast.success(`Update data Successfully!`)
+            const res  = await updateData(id, itemWithoutId)
+            if (res.statusCode === 200) {
+              Vue.prototype.$toast.success(`Update data Successfully!`)
+              this.closeFormDialog()
+            }
           } else {
-            await createData(item)
-            Vue.prototype.$toast.success(`Create data Successfully!`)
+            const res = await createData(item)
+            if (res.statusCode === 200) {
+              Vue.prototype.$toast.success(`Create data Successfully!`)
+              this.closeFormDialog()
+            }
           }
-          await this.fetchData()
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
           console.error(error)
         } finally {
-          this.closeFormDialog()
+          await this.fetchData()
         }
       },
       closeFormDialog() {
