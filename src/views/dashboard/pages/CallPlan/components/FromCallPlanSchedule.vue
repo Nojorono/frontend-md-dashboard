@@ -83,8 +83,8 @@
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
-                    v-model="itemData.start_plan"
-                    label="Start Plan"
+                    v-model="itemData.day_plan"
+                    label="Day Plan"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
@@ -93,35 +93,9 @@
                   />
                 </template>
                 <v-date-picker
-                  v-model="itemData.start_plan"
+                  v-model="itemData.day_plan"
                   style="margin: 0;"
                   @input="startPlanMenu = false"
-                />
-              </v-menu>
-
-              <!-- End Plan -->
-              <v-menu
-                ref="endPlanMenu"
-                v-model="endPlanMenu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="itemData.end_plan"
-                    label="End Plan"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    :rules="endPlanRules"
-                    v-on="on"
-                  />
-                </template>
-                <v-date-picker
-                  v-model="itemData.end_plan"
-                  style="margin: 0;"
-                  @input="endPlanMenu = false"
                 />
               </v-menu>
             </v-col>
@@ -169,8 +143,7 @@ export default {
         user_id: null,
         outlet_id: [],
         notes: '',
-        start_plan: '',
-        end_plan: '',
+        day_plan: '',
       },
       formValid: false,
       startPlanMenu: false,
@@ -271,15 +244,6 @@ export default {
     async fetchOutlets () {
       const response = await getOutletByType();
       this.outletsOptions = response.data
-    },
-    selectOutlet(item) {
-      if (this.isEdit) {
-        // Single selection: Set `outlet_id` as a single number (item ID)
-        this.itemData.outlet_id = item ? item.id : null;
-      } else {
-        // Multiple selection: Ensure `outlet_id` is an array
-        this.itemData.outlet_id = item ? [item.id] : [];
-      }
     },
     onUserChange(user) {
       // Handle user selection change

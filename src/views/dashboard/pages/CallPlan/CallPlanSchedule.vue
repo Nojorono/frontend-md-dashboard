@@ -7,7 +7,7 @@
       :server-items-length="totalItems"
       :loading="loading"
       :options.sync="options"
-      :search="search"
+      hide-default-footer
       style="padding: 20px; border-radius: 20px"
       @update:options="fetchData(id)"
     >
@@ -63,8 +63,9 @@
         </v-row>
       </template>
       <!-- Mapping Item Properties -->
-      <template v-slot:item="{ item }">
+      <template v-slot:item="{ item, index }">
         <tr>
+          <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
           <td>{{ item.email }}</td>
           <td>
             <span>
@@ -75,8 +76,7 @@
             </span>
           </td>
           <td>{{ item.code_call_plan }}</td>
-          <td>{{ item.start_plan }}</td>
-          <td>{{ item.end_plan }}</td>
+          <td>{{ item.day_plan | formatDate }}</td>
           <td>{{ item.notes }}</td>
           <td>{{ item.status }}</td>
           <td>{{ item.created_by }}</td>
@@ -102,6 +102,19 @@
         </tr>
       </template>
     </v-data-table>
+    <v-row
+      justify="center"
+      class="py-3"
+    >
+      <v-pagination
+        v-model="page"
+        :length="totalPages"
+        :total-visible="7"
+        next-icon="mdi-menu-right"
+        prev-icon="mdi-menu-left"
+        @input="onPageChange"
+      />
+    </v-row>
 
     <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
@@ -141,11 +154,11 @@ export default {
     return {
       id: this.$route.params.id,
       tableHeaders: [
+        { text: 'No', value: 'No', class: 'text-left', width: '5%' },
         { text: 'User', value: 'email', class: 'text-left', width: '10%' },
         { text: 'Outlet', value: 'outlet_code', class: 'text-left', width: '20%' },
         { text: 'Code Call Plan', value: 'code_call_plan', class: 'text-left', width: '15%' },
-        { text: 'Start Plan', value: 'start_plan', class: 'text-left', width: '10%' },
-        { text: 'End Plan', value: 'end_plan', class: 'text-left', width: '10%' },
+        { text: 'Day Plan', value: 'start_plan', class: 'text-left', width: '10%' },
         { text: 'Notes', value: 'notes', class: 'text-left', width: '10%' },
         { text: 'Status', value: 'notes', class: 'text-left', width: '5%' },
         { text: 'Created By', value: 'created_by', class: 'text-left', width: '10%' },
@@ -153,16 +166,31 @@ export default {
       ],
       tableData: [],
       totalItems: 0,
+      totalPages: 0,
+      page: 1, // Current page number
+      options: { page: 1, itemsPerPage: 10 },
       loading: false,
       selectedItem: null,
       isFormRoleDialog: false,
       isEdit: false,
       isConfirmDeleteDialogOpen: false,
       search: '',
-      options: { page: 1, itemsPerPage: 10 },
     }
   },
+  watch: {
+    page(value) {
+      this.options.page = value;
+      this.fetchData(this.id);
+    },
+    itemsPerPage(value) {
+      this.options.itemsPerPage = value;
+      this.fetchData(this.id);
+    },
+  },
   methods: {
+    onPageChange(newPage) {
+      this.page = newPage;
+    },
     handleBack(){
       this.$router.back();
     },
@@ -176,8 +204,7 @@ export default {
       this.selectedItem = {
         id: item.id,
         notes: item.notes,
-        end_plan: item.end_plan,
-        start_plan: item.start_plan,
+        day_plan: item.day_plan,
         outlet_id: [item.outlet_id],
         user_id: item.user_id,
       }
@@ -222,8 +249,10 @@ export default {
           limit: this.options.itemsPerPage,
           searchTerm: this.search,
         });
-        this.tableData = response.data.data
-        this.totalItems = response.data.totalRecords
+        this.tableData = response.data.data;
+        this.totalItems = response.data.totalItems;
+        this.totalPages = response.data.totalPages;
+        this.options.page = response.data.currentPage;
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)
@@ -243,13 +272,14 @@ export default {
       const data = this.selectedItem
       try {
         await deleteScheduleData(data.id)
-        Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`)
+        Vue.prototype.$toast.success(`Deleted ${data.email} successfully!`)
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)
       } finally {
         this.loading = false
         this.closeConfirmDeleteDialog()
+        await this.fetchData(this.id);
       }
     },
   },

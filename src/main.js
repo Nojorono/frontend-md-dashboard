@@ -20,11 +20,21 @@ import './plugins/chartist'
 import './plugins/vee-validate'
 import vuetify from './plugins/vuetify'
 import i18n from './i18n'
+import moment from 'moment'
+import 'moment/locale/id'
 
 // Import Vue Toastification and CSS
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
-
+// Set the global locale to Indonesian
+moment.locale('id')
+// Add a global filter to format dates with Moment.js
+Vue.filter('formatDate', function(value, format = 'dddd, MMM YYYY') {
+  if (value) {
+    return moment(value).format(format)
+  }
+  return ''
+})
 // Customize Toastification options if needed
 const toastOptions = {
   position: "top-right",

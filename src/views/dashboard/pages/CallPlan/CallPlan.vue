@@ -141,9 +141,9 @@
         refreshDataTrigger : false,
         tableHeaders: [
           { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
-          { text: 'Code Batch', value: 'code_batch', class: 'text-left', width: '15%' },
-          { text: 'Region', value: 'region', class: 'text-left', width: '20%' },
-          { text: 'Area', value: 'area', class: 'text-left', width: '15%' },
+          { text: 'Code Batch', value: 'code_batch', sortable: false, class: 'text-left', width: '15%' },
+          { text: 'Region', value: 'region', sortable: false, class: 'text-left', width: '20%' },
+          { text: 'Area', value: 'area', sortable: false, class: 'text-left', width: '15%' },
           { text: 'Actions', value: 'actions', sortable: false, class: 'text-center' },
         ],
         tableData: [],
@@ -251,7 +251,6 @@
         const data = this.selectedItem
         try {
           await deleteData(data.id)
-          await this.fetchData()
           Vue.prototype.$toast.success(`Deleted Area ${data.area} successfully!`)
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
@@ -259,6 +258,7 @@
         } finally {
           this.loading = false
           this.closeConfirmDeleteDialog()
+          await this.fetchData()
         }
       },
     },
