@@ -1,120 +1,156 @@
 <template>
   <v-container fluid>
-    <v-data-table
+    <v-card
       class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
-      :headers="tableHeaders"
-      :items="tableData"
-      :server-items-length="totalItems"
-      :loading="loading"
-      :options.sync="options"
-      hide-default-footer
       style="padding: 20px; border-radius: 20px"
-      @update:options="fetchData(id)"
     >
-      <template v-slot:top>
-        <v-row
-          class="justify-space-between"
-          style="align-items: baseline"
-        >
-          <v-col
-            cols="4"
-            style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+      <v-data-table
+        :headers="tableHeaders"
+        :items="tableData"
+        :server-items-length="totalItems"
+        :loading="loading"
+        :options.sync="options"
+        hide-default-footer
+        @update:options="fetchData(id)"
+      >
+        <template v-slot:top>
+          <v-row
+            class="justify-space-between"
+            style="align-items: baseline"
           >
-            <v-btn
-              small
-              fab
-              outlined
-              color="primary"
-              @click="handleBack"
+            <v-col
+              cols="5"
+              style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
             >
-              <v-icon>mdi-backburger</v-icon>
-            </v-btn>
-            <v-text-field
-              v-model="search"
-              label="Search"
-              class="mx-5"
-              clearable
-              append-icon="mdi-magnify"
-              @click:append="handleSearch"
-            />
-          </v-col>
-          <v-col>
-            <div class="d-flex justify-space-between">
-              <v-icon
-                style="
+              <div class="mr-3">
+                <v-btn
+                  small
+                  fab
+                  outlined
+                  color="primary"
+                  @click="handleBack"
+                >
+                  <v-icon>mdi-backburger</v-icon>
+                </v-btn>
+              </div>
+              <v-autocomplete
+                item-text="name"
+                item-value="name"
+                label="Area"
+                clearable
+                return-object
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-content>Area not found</v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+              <v-autocomplete
+                item-text="name"
+                item-value="name"
+                label="Area"
+                clearable
+                return-object
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-content>Area not found</v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="search"
+                label="Search"
+                class="mx-5"
+                clearable
+                append-icon="mdi-magnify"
+                @click:append="handleSearch"
+              />
+            </v-col>
+            <v-col cols="3">
+              <div
+                class="d-flex justify-space-between"
+                style="align-self: center;"
+              >
+                <v-icon
+                  style="
                 width: 40px; border-radius: 50%;"
-                color="primary"
-                size="2rem"
-                :loading="loading"
-                @click="fetchData(id)"
-              >
-                mdi-refresh
-              </v-icon>
+                  color="primary"
+                  size="2rem"
+                  :loading="loading"
+                  @click="fetchData(id)"
+                >
+                  mdi-refresh
+                </v-icon>
+                <v-btn
+                  color="primary"
+                  style="margin: unset!important;"
+                  @click="openHandleAdd"
+                >
+                  <v-icon>mdi-plus-box-multiple</v-icon>
+                  <span class="mx-1">Add</span>
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
+        </template>
+        <!-- Mapping Item Properties -->
+        <template v-slot:item="{ item, index }">
+          <tr>
+            <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+            <td>{{ item.email }}</td>
+            <td>
+              <span>
+                {{ item.outlet_code }}
+              </span>
+              <span>
+                {{ item.outlet_name }}
+              </span>
+            </td>
+            <td>{{ item.code_call_plan }}</td>
+            <td>{{ item.day_plan | formatDate }}</td>
+            <td>{{ item.notes }}</td>
+            <td>{{ item.status }}</td>
+            <td>{{ item.created_by }}</td>
+            <td class="d-flex">
               <v-btn
-                color="primary"
-                style="margin: unset!important;"
-                @click="openHandleAdd"
+                class="mx-1"
+                outlined
+                small
+                @click="openHandleUpdate(item)"
               >
-                <v-icon>mdi-plus-box-multiple</v-icon>
-                <span class="mx-1">Add</span>
+                <v-icon>mdi-pencil</v-icon>
               </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </template>
-      <!-- Mapping Item Properties -->
-      <template v-slot:item="{ item, index }">
-        <tr>
-          <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
-          <td>{{ item.email }}</td>
-          <td>
-            <span>
-              {{ item.outlet_code }}
-            </span>
-            <span>
-              {{ item.outlet_name }}
-            </span>
-          </td>
-          <td>{{ item.code_call_plan }}</td>
-          <td>{{ item.day_plan | formatDate }}</td>
-          <td>{{ item.notes }}</td>
-          <td>{{ item.status }}</td>
-          <td>{{ item.created_by }}</td>
-          <td class="d-flex">
-            <v-btn
-              class="mx-1"
-              outlined
-              small
-              @click="openHandleUpdate(item)"
-            >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-            <v-btn
-              class="mx-1"
-              color="error"
-              outlined
-              small
-              @click="openConfirmDeleteDialog(item)"
-            >
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-    <v-row
-      justify="center"
-      class="py-3"
-    >
-      <v-pagination
-        v-model="page"
-        :length="totalPages"
-        :total-visible="7"
-        next-icon="mdi-menu-right"
-        prev-icon="mdi-menu-left"
-        @input="onPageChange"
-      />
-    </v-row>
+              <v-btn
+                class="mx-1"
+                color="error"
+                outlined
+                small
+                @click="openConfirmDeleteDialog(item)"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+      <v-row
+        justify="center"
+        class="py-3"
+      >
+        <v-pagination
+          v-model="page"
+          :length="totalPages"
+          :total-visible="7"
+          next-icon="mdi-menu-right"
+          prev-icon="mdi-menu-left"
+          @input="onPageChange"
+        />
+      </v-row>
+    </v-card>
 
     <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
