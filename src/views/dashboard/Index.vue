@@ -58,7 +58,7 @@
       alertMessage: '',
     }),
     computed: {
-      ...mapGetters(['getUser']), // Map loading state getter
+      ...mapGetters(['getUser']),
     },
     watch: {
       getUser(newUser) {

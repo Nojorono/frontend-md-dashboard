@@ -1,80 +1,97 @@
 <template>
-  <v-container
-    fluid
-    fill-height
-    class="dark"
-  >
-    <v-row
-      justify="center"
-      align="center"
-      style="justify-content: center"
+  <v-app>
+    <v-container
+      fluid
+      fill-height
     >
-      <v-col
-        cols="12"
-        md="4"
-      >
-        <v-card
-          class="elevation-12"
-          color="grey darken-3"
-          style="padding: 10px"
+      <v-row>
+        <v-col
+          class="img-filled"
+          cols="6"
+          md="6"
         >
-          <v-card-title
-            class="headline text-center black--text"
-            style="padding: 10px"
+          <v-img
+            :src="imagePath"
+            cover
+            class="responsive-cover-img"
+            style="border-radius: 20px;"
+          />
+        </v-col>
+        <v-col
+          justify="center"
+          class="login-filled"
+          style="justify-content: center; align-content: center; text-align: -webkit-center;"
+        >
+          <v-card
+            class="elevation-12"
+            style="padding: 10px; max-width: 600px; border-radius: 20px;"
           >
-            Login
-          </v-card-title>
-          <v-card-text>
-            <v-form
-              ref="form"
-              v-model="valid"
-              lazy-validation
+            <v-card-title
+              class="headline text-center black--text"
+              style="padding: 10px; justify-content: center;"
             >
-              <v-text-field
-                v-model="email"
-                :rules="[rules.required, rules.email]"
-                label="Email"
-                prepend-icon="mdi-email"
-                required
-                class="black--text"
-                outlined
+              <v-img
+                :src="imagePathLogo"
+                max-width="250"
+                max-height="100"
               />
-              <v-text-field
-                v-model="password"
-                :rules="[rules.required]"
-                label="Password"
-                type="password"
-                prepend-icon="mdi-lock"
-                required
-                class="black--text"
-                outlined
-              />
-              <v-btn
-                :disabled="!valid"
-                color="grey darken-1"
-                large
-                block
-                @click="handleLogin"
+            </v-card-title>
+            <v-card-text>
+              <v-form
+                ref="form"
+                v-model="valid"
+                lazy-validation
               >
-                Login
-              </v-btn>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+                <v-text-field
+                  v-model="email"
+                  :rules="[rules.required, rules.email]"
+                  label="Email"
+                  prepend-icon="mdi-email"
+                  required
+                  class="black--text"
+                  outlined
+                />
+                <v-text-field
+                  v-model="password"
+                  :rules="[rules.required]"
+                  label="Password"
+                  type="password"
+                  prepend-icon="mdi-lock"
+                  required
+                  class="black--text"
+                  outlined
+                />
+                <v-btn
+                  :disabled="!valid"
+                  color="primary1"
+                  large
+                  block
+                  @click="handleLogin"
+                >
+                  Login
+                </v-btn>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-app>
 </template>
 
 <script>
   import { mapActions } from 'vuex';
   import { Login } from '@/api/authService'
   import Vue from "vue";
+  import loginImage from '@/assets/login-nna.png';
+
 
   export default {
     name: 'Login',
     data() {
       return {
+        imagePathLogo: '/logo-nna.png',
+        imagePath: loginImage,
         email: '',
         password: '',
         valid: false,
@@ -119,15 +136,27 @@
 </script>
 
 <style scoped>
-.dark-theme {
-  background-color: #121212; /* Dark background color */
-  color: white; /* Text color for dark mode */
+.responsive-cover-img {
+  height: 96vh; /* Set a default height */
 }
 
-.v-card {
-  border-radius: 8px; /* Optional: Add rounded corners */
+@media (max-width: 768px) { /* Adjust height for tablets and smaller screens */
+  .responsive-cover-img {
+    display: none;
+  }
+  .img-filled{
+    display: none;
+  }
 }
 
+@media (max-width: 480px) { /* Adjust height for mobile devices */
+  .responsive-cover-img {
+    display: none;
+  }
+  .img-filled{
+    display: none;
+  }
+}
 .v-input--is-focused .v-input__control {
   border-color: #3f51b5; /* Adjust border color on focus */
 }

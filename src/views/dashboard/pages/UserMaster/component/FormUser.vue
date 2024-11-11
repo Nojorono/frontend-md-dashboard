@@ -202,6 +202,7 @@
 <script>
   import { getOutletArea, getOutletRegion } from '@/api/masterOutletService'
   import { getAllList } from '@/api/masterRoleService'
+  import {mapGetters} from "vuex";
 
   export default {
     name: "FormUser",
@@ -265,6 +266,9 @@
         ],
       };
     },
+    computed: {
+      ...mapGetters(['getUser']),
+    },
     watch: {
       item: {
         immediate: true,
@@ -291,11 +295,35 @@
           event.preventDefault();
         }
       },
+      async fetchArea() {
+        this.loading = true;
+        try {
+          const response = await getOutletArea();
+          // Check if user area array is defined and not empty; if so, filter based on areas
+          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+            this.areaOptions = response.data.filter(
+              (area) => this.getUser.area.includes(area)
+            );
+          } else {
+            this.areaOptions = response.data;
+          }
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
+        }
+      },
       async fetchRegion() {
         this.loading = true;
         try {
           const response = await getOutletRegion();
-          this.regionOptions = response.data;
+          if (this.getUser.region) {
+            this.regionOptions = response.data.filter(
+              (region) => region === this.getUser.region
+            );
+          } else {
+            this.regionOptions = response.data; // No filtering if region is undefined
+          }
         } catch (error) {
           console.error("Error fetching :", error);
         } finally {
@@ -307,17 +335,6 @@
         try {
           const response = await getAllList();
           this.rolesOptions = response.data;
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      async fetchArea() {
-        this.loading = true;
-        try {
-          const response = await getOutletArea();
-          this.areaOptions = response.data;
         } catch (error) {
           console.error("Error fetching :", error);
         } finally {
@@ -356,8 +373,9 @@
         }
       },
       onRegionChange(item) {
+        console.log(item)
         if (item) {
-          this.itemData.region = item.name;
+          this.itemData.region = item;
         } else {
           this.itemData.region = null;
         }

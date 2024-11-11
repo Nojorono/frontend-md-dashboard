@@ -39,16 +39,6 @@ export default new Vuex.Store({
     SET_LOADING(state, payload) {
       state.loading = payload
     },
-    SHOW_SNACKBAR(state, { message, type }) {
-      state.visible = true;
-      state.message = message;
-      state.type = type;
-    },
-    HIDE_SNACKBAR(state) {
-      state.visible = false;
-      state.message = '';
-      state.type = '';
-    },
   },
   actions: {
     // Action to log in
@@ -68,7 +58,6 @@ export default new Vuex.Store({
     checkAuth({ commit }) {
       const token = localStorage.getItem('token')
       if (token) {
-        // You could also fetch user info here if necessary
         commit('SET_TOKEN', token)
       }
     },
@@ -77,12 +66,6 @@ export default new Vuex.Store({
     },
     hideLoading({ commit }) {
       commit('SET_LOADING', false)
-    },
-    showSnackbar({ commit }, payload) {
-      commit('SHOW_SNACKBAR', payload);
-      setTimeout(() => {
-        commit('HIDE_SNACKBAR');
-      }, 3000); // Adjust duration as necessary
     },
   },
   getters: {

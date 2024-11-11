@@ -89,28 +89,138 @@
                   </v-col>
                 </v-row>
               </template>
-              <template v-slot:item="{ item }">
+              <template v-slot:item="{ item, index }">
                 <tr>
-                  <td>{{ item?.outlet_code }}</td>
-                  <td>{{ item?.name }}</td>
-                  <td>{{ item?.brand }}</td>
-                  <td>{{ item?.unique_name }}</td>
-                  <td>{{ item?.address_line }}</td>
-                  <td>{{ item?.sub_district }}</td>
-                  <td>{{ item?.district }}</td>
-                  <td>{{ item?.city_or_regency }}</td>
-                  <td>{{ item?.postal_code }}</td>
-                  <td>{{ item?.outlet_type }}</td>
-                  <td>{{ item?.region }}</td>
-                  <td>{{ item?.area }}</td>
-                  <td>{{ item?.cycle }}</td>
+                  <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.region }}
+                        </span>
+                      </template>
+                      <span>{{ item?.region }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.area }}
+                        </span>
+                      </template>
+                      <span>{{ item?.area }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.district }}
+                        </span>
+                      </template>
+                      <span>{{ item?.district }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.outlet_code }}
+                        </span>
+                      </template>
+                      <span>{{ item?.outlet_code }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.name }}
+                        </span>
+                      </template>
+                      <span>{{ item?.name }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.brand }}
+                        </span>
+                      </template>
+                      <span>{{ item?.brand }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.outlet_type }}
+                        </span>
+                      </template>
+                      <span>{{ item?.outlet_type }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.cycle }}
+                        </span>
+                      </template>
+                      <span>{{ item?.cycle }}</span>
+                    </v-tooltip>
+                  </td>
                   <td>
                     <v-btn
                       outlined
                       small
-                      @click="openHandleUpdate(item)"
+                      color="warning"
+                      @click="handleDetail(item.id)"
                     >
-                      <v-icon>mdi-pencil</v-icon>
+                      <v-icon>mdi-details</v-icon>
+                      detail
                     </v-btn>
                     <v-btn
                       color="error"
@@ -187,6 +297,19 @@
           // Add more tabs here
         ],
         tableHeaders: [
+          { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
+          {
+            text: 'Region',
+            value: 'region',
+          },
+          {
+            text: 'Area',
+            value: 'area',
+          },
+          {
+            text: 'District',
+            value: 'district',
+          },
           {
             text: 'Outlet Code',
             value: 'outlet_code',
@@ -200,40 +323,8 @@
             value: 'brand',
           },
           {
-            text: 'Unique Name',
-            value: 'unique_name',
-          },
-          {
-            text: 'Address',
-            value: 'address_line',
-          },
-          {
-            text: 'Sub District',
-            value: 'sub_district',
-          },
-          {
-            text: 'District',
-            value: 'district',
-          },
-          {
-            text: 'City or Regency',
-            value: 'city_or_regency',
-          },
-          {
-            text: 'Postal Code',
-            value: 'postal_code',
-          },
-          {
-            text: 'Outlet Type',
+            text: 'Outlet Sio Type',
             value: 'outlet_type',
-          },
-          {
-            text: 'Region',
-            value: 'region',
-          },
-          {
-            text: 'Area',
-            value: 'area',
           },
           {
             text: 'Cycle',
@@ -260,7 +351,7 @@
     },
     computed: {
       regionOptions () {
-        return this.tableData.map(r => r.region) // Extract the region names
+        return this.tableData.map(r => r.region)
       },
     },
     watch: {
@@ -277,6 +368,12 @@
       this.fetchData()
     },
     methods: {
+      async handleDetail(id) {
+        await this.$router.push({
+          name: 'Outlet Detail',
+          params: { id },
+        });
+      },
       onPageChange(newPage) {
         this.page = newPage;
       },

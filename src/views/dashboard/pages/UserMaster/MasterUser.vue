@@ -1,97 +1,113 @@
 <template>
   <v-container fluid>
-    <v-data-table
-      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
-      :headers="tableHeaders"
-      :items="tableData"
-      :server-items-length="totalItems"
-      :loading="loading"
-      :options.sync="options"
-      :search="search"
+    <v-card
       style="padding: 20px; border-radius: 20px"
-      @update:options="fetchData"
+      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
     >
-      <template v-slot:top>
-        <v-row
-          class="justify-space-between"
-          style="align-items: baseline"
-        >
-          <v-col
-            cols="4"
-            style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+      <v-data-table
+        :headers="tableHeaders"
+        :items="tableData"
+        :server-items-length="totalItems"
+        :loading="loading"
+        :options.sync="options"
+        hide-default-footer
+        @update:options="fetchData"
+      >
+        <template v-slot:top>
+          <v-row
+            class="justify-space-between"
+            style="align-items: baseline"
           >
-            <v-text-field
-              v-model="search"
-              label="Search"
-              class="mx-5"
-              clearable
-              append-icon="mdi-magnify"
-              @click:append="handleSearch"
-            />
-          </v-col>
-          <v-col>
-            <div class="d-flex justify-space-between">
-              <v-icon
-                style="
+            <v-col
+              cols="4"
+              style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+            >
+              <v-text-field
+                v-model="search"
+                label="Search"
+                class="mx-5"
+                clearable
+                append-icon="mdi-magnify"
+                @click:append="handleSearch"
+              />
+            </v-col>
+            <v-col>
+              <div class="d-flex justify-space-between">
+                <v-icon
+                  style="
                 width: 40px; border-radius: 50%;"
-                color="primary"
-                size="2rem"
-                :loading="loading"
-                @click="fetchData"
+                  color="primary"
+                  size="2rem"
+                  :loading="loading"
+                  @click="fetchData"
+                >
+                  mdi-refresh
+                </v-icon>
+                <v-btn
+                  color="primary"
+                  style="margin: unset!important;"
+                  @click="openHandleAdd"
+                >
+                  <v-icon>mdi-plus-box-multiple</v-icon>
+                  <span class="mx-1">Add</span>
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
+        </template>
+        <template v-slot:item="{ item }">
+          <tr>
+            <td>{{ item?.roles }}</td>
+            <td>{{ item?.username }}</td>
+            <td>{{ item?.email }}</td>
+            <td>{{ item?.phone }}</td>
+            <td>{{ item?.fullname }}</td>
+            <td>{{ item?.region }}</td>
+            <td>
+              <span
+                v-for="(area, index) in item?.area"
+                :key="index"
               >
-                mdi-refresh
-              </v-icon>
+                {{ area }}<span v-if="index < item.area.length - 1">, </span>
+              </span>
+            </td>
+            <td>{{ item?.type_md }}</td>
+            <td>{{ item?.status }}</td>
+            <td>{{ item?.last_login }}</td>
+            <td>
               <v-btn
-                color="primary"
-                style="margin: unset!important;"
-                @click="openHandleAdd"
+                outlined
+                small
+                @click="openHandleUpdate(item)"
               >
-                <v-icon>mdi-plus-box-multiple</v-icon>
-                <span class="mx-1">Add</span>
+                <v-icon>mdi-pencil</v-icon>
               </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </template>
-      <template v-slot:item="{ item }">
-        <tr>
-          <td>{{ item?.roles }}</td>
-          <td>{{ item?.username }}</td>
-          <td>{{ item?.email }}</td>
-          <td>{{ item?.phone }}</td>
-          <td>{{ item?.fullname }}</td>
-          <td>{{ item?.region }}</td>
-          <td>
-            <span
-              v-for="(area, index) in item?.area"
-              :key="index"
-            >
-              {{ area }}<span v-if="index < item.area.length - 1">, </span>
-            </span>
-          </td>
-          <td>{{ item?.type_md }}</td>
-          <td>{{ item?.status }}</td>
-          <td>{{ item?.last_login }}</td>
-          <td>
-            <v-btn
-              outlined
-              small
-              @click="openHandleUpdate(item)"
-            >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-            <v-btn
-              color="error"
-              outlined
-              small
-              @click="openConfirmDeleteDialog(item)"
-            >
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+              <v-btn
+                color="error"
+                outlined
+                small
+                @click="openConfirmDeleteDialog(item)"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+      <v-row
+        justify="center"
+        class="py-5"
+      >
+        <v-pagination
+          v-model="page"
+          :length="totalPages"
+          :total-visible="7"
+          next-icon="mdi-menu-right"
+          prev-icon="mdi-menu-left"
+          @input="onPageChange"
+        />
+      </v-row>
+    </v-card>
 
     <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
@@ -139,6 +155,8 @@ export default {
       ],
       tableData: [],
       totalItems: 0,
+      totalPages: 0,
+      page: 1, // Current page number
       options: { page: 1, itemsPerPage: 10 },
       loading: false,
       selectedItem: null,
@@ -150,11 +168,13 @@ export default {
   },
 
   watch: {
-    options: {
-      handler() {
-        this.fetchData();
-      },
-      deep: true,
+    page(value) {
+      this.options.page = value;
+      this.fetchData();
+    },
+    itemsPerPage(value) {
+      this.options.itemsPerPage = value;
+      this.fetchData();
     },
   },
 
@@ -163,6 +183,9 @@ export default {
   },
 
   methods: {
+    onPageChange(newPage) {
+      this.page = newPage;
+    },
     openHandleAdd() {
       this.isEdit = false;
       this.selectedItem = null;
@@ -215,7 +238,9 @@ export default {
           searchTerm: this.search,
         });
         this.tableData = response.data.data;
-        this.totalItems = response.data.totalRecords;
+        this.totalItems = response.data.totalItems;
+        this.totalPages = response.data.totalPages;
+        this.options.page = response.data.currentPage;
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data?.message}`);
         console.error(error);
@@ -239,14 +264,14 @@ export default {
       const data = this.selectedItem;
       try {
         await deleteData(data.id);
-        Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`);
+        Vue.prototype.$toast.success(`Deleted ${data.email} successfully!`);
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data?.message}`);
         console.error(error);
       } finally {
         this.loading = false;
         this.closeConfirmDeleteDialog();
-        this.fetchData();
+        await this.fetchData();
       }
     },
   },

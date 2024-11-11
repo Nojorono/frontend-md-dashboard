@@ -10,7 +10,6 @@
         :server-items-length="totalItems"
         :loading="loading"
         :options.sync="options"
-        :search="search"
         hide-default-footer
         @update:options="fetchData"
       >

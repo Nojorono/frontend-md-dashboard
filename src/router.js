@@ -48,7 +48,13 @@ const router = new Router({
           name: 'Master Outlet',
           path: '/master/outlet',
           component: () => import('@/views/dashboard/pages/OutletMaster/MasterOutlet.vue'),
-          meta: { requiresAuth: true }, // Protect this route
+          meta: { requiresAuth: true },
+        },
+        {
+          name: 'Outlet Detail',
+          path: '/master/outlet/detail/:id',
+          component: () => import('@/views/dashboard/pages/OutletMaster/components/DetailOutlet.vue'),
+          meta: { requiresAuth: true },
         },
         {
           name: 'Master Users',
