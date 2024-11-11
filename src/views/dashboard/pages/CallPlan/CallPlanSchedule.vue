@@ -19,7 +19,7 @@
             style="align-items: baseline"
           >
             <v-col
-              cols="5"
+              cols="1"
               style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
             >
               <div class="mr-3">
@@ -33,34 +33,25 @@
                   <v-icon>mdi-backburger</v-icon>
                 </v-btn>
               </div>
+            </v-col>
+            <v-col>
               <v-autocomplete
-                item-text="name"
-                item-value="name"
-                label="Area"
+                item-text="email"
+                item-value="id"
+                label="User"
+                :items="userOptions"
                 clearable
                 return-object
+                @change="onUserChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content>Area not found</v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-autocomplete>
-              <v-autocomplete
-                item-text="name"
-                item-value="name"
-                label="Area"
-                clearable
-                return-object
-              >
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <v-list-item-content>Area not found</v-list-item-content>
+                    <v-list-item-content>User not found</v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="5">
               <v-text-field
                 v-model="search"
                 label="Search"
@@ -68,9 +59,10 @@
                 clearable
                 append-icon="mdi-magnify"
                 @click:append="handleSearch"
+                @click:clear="handleClear"
               />
             </v-col>
-            <v-col cols="3">
+            <v-col cols="2">
               <div
                 class="d-flex justify-space-between"
                 style="align-self: center;"
@@ -114,7 +106,6 @@
             <td>{{ item.day_plan | formatDate }}</td>
             <td>{{ item.notes }}</td>
             <td>{{ item.status }}</td>
-            <td>{{ item.created_by }}</td>
             <td class="d-flex">
               <v-btn
                 class="mx-1"
@@ -179,6 +170,7 @@ import {
   updateScheduleData,
   deleteScheduleData
 } from '@/api/callPlanService'
+import {getAllRole} from "@/api/userService";
 
 export default {
   name: 'CallPlanSchedule',
@@ -190,17 +182,17 @@ export default {
     return {
       id: this.$route.params.id,
       tableHeaders: [
-        { text: 'No', value: 'No', class: 'text-left', width: '5%' },
-        { text: 'User', value: 'email', class: 'text-left', width: '10%' },
-        { text: 'Outlet', value: 'outlet_code', class: 'text-left', width: '20%' },
-        { text: 'Code Call Plan', value: 'code_call_plan', class: 'text-left', width: '15%' },
-        { text: 'Day Plan', value: 'start_plan', class: 'text-left', width: '10%' },
-        { text: 'Notes', value: 'notes', class: 'text-left', width: '10%' },
+        { text: 'No', value: 'No', sortable: false, class: 'text-left', width: '5%' },
+        { text: 'User', value: 'email', sortable: false, class: 'text-left', width: '10%' },
+        { text: 'Outlet', value: 'outlet_code', sortable: false, class: 'text-left', width: '20%' },
+        { text: 'Code Call Plan', value: 'code_call_plan', sortable: false, class: 'text-left', width: '10%' },
+        { text: 'Day Plan', value: 'day_plan', sortable: false, class: 'text-left', width: '15%' },
+        { text: 'Notes', value: 'notes', sortable: false, class: 'text-left', width: '10%' },
         { text: 'Status', value: 'notes', class: 'text-left', width: '5%' },
-        { text: 'Created By', value: 'created_by', class: 'text-left', width: '10%' },
         { text: 'Actions', value: 'actions', sortable: false, class: 'text-center', width: '10%' },
       ],
       tableData: [],
+      userOptions: [],
       totalItems: 0,
       totalPages: 0,
       page: 1, // Current page number
@@ -211,6 +203,12 @@ export default {
       isEdit: false,
       isConfirmDeleteDialogOpen: false,
       search: '',
+      userId: null,
+    }
+  },
+  computed :{
+    userLogin() {
+      return this.$store.getters.getUser
     }
   },
   watch: {
@@ -222,6 +220,9 @@ export default {
       this.options.itemsPerPage = value;
       this.fetchData(this.id);
     },
+  },
+  mounted() {
+    this.fetchUsers()
   },
   methods: {
     onPageChange(newPage) {
@@ -277,6 +278,15 @@ export default {
       this.options.page = 1;
       this.fetchData(this.id);
     },
+    handleClear() {
+      this.search = '';
+      this.options.page = 1;
+      this.fetchData(this.id);
+    },
+    async fetchUsers () {
+      const response = await getAllRole(this.userLogin.region , this.userLogin.area)
+      this.userOptions = response.data
+    },
     async fetchData(id) {
       this.loading = true
       try {
@@ -284,6 +294,7 @@ export default {
           page: this.options.page,
           limit: this.options.itemsPerPage,
           searchTerm: this.search,
+          userId: this.userId
         });
         this.tableData = response.data.data;
         this.totalItems = response.data.totalItems;
@@ -318,6 +329,15 @@ export default {
         await this.fetchData(this.id);
       }
     },
+    onUserChange(user) {
+      if (user) {
+        this.userId = user.id;
+        this.fetchData(this.id);
+      } else {
+        this.userId = null
+        this.fetchData(this.id);
+      }
+    }
   },
 }
 </script>

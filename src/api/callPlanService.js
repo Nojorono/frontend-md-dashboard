@@ -54,10 +54,10 @@ export const deleteData = async (id) => {
   }
 };
 
-export const geListSchedule = async (id, { page, limit, searchTerm }) => {
+export const geListSchedule = async (id, { page, limit, searchTerm, userId }) => {
   try {
     const response = await axiosInstance.get(`/schedule-plan/${id}`, {
-      params: { page, limit, searchTerm },
+      params: { page, limit, searchTerm, userId },
     });
     return response.data;
   } catch (error) {

@@ -19,15 +19,11 @@ export const getAll = async (params) => {
 export const getAllRole = async (region, area) => {
   // Construct params object based on the presence of region and area
   const params = {};
-  if (region) {
-    params.region = region === 'ALL' ? undefined : region; // If 'ALL', do not include it
-  }
-  if (area) {
-    params.area = area === 'ALL' ? undefined : area; // If 'ALL', do not include it
-  }
+  params.region = region
+  params.area = area
 
   try {
-    const response = await axiosInstance.get('/user/get-role', {
+    const response = await axiosInstance.get('/user/get-md', {
       params: params,
     });
     return response.data;

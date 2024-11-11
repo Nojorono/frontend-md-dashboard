@@ -29,7 +29,7 @@ import 'vue-toastification/dist/index.css'
 // Set the global locale to Indonesian
 moment.locale('id')
 // Add a global filter to format dates with Moment.js
-Vue.filter('formatDate', function(value, format = 'dddd, MMM YYYY') {
+Vue.filter('formatDate', function(value, format = 'dddd, DD MMM YYYY') {
   if (value) {
     return moment(value).format(format)
   }

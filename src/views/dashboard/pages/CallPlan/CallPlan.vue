@@ -26,13 +26,14 @@
               <v-autocomplete
                 item-text="name"
                 item-value="name"
-                label="Area"
+                label="Region"
+                :items="regionOptions"
                 clearable
                 return-object
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content>Area not found</v-list-item-content>
+                    <v-list-item-content>Region not found</v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
@@ -40,6 +41,7 @@
                 item-text="name"
                 item-value="name"
                 label="Area"
+                :items="areaOptions"
                 clearable
                 return-object
               >
@@ -166,6 +168,8 @@
   import { createData, deleteData, updateData, getAll } from '@/api/callPlanService'
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
   import Vue from "vue";
+  import {getOutletArea, getOutletRegion} from "@/api/masterOutletService";
+  import {mapGetters} from "vuex";
 
   export default {
     name: 'CallPlan',
@@ -194,7 +198,12 @@
         isEdit: false,
         isConfirmDeleteDialogOpen: false,
         search: '',
+        regionOptions: [],
+        areaOptions: [],
       }
+    },
+    computed: {
+      ...mapGetters(['getUser']),
     },
     watch: {
       page(value) {
@@ -205,6 +214,10 @@
         this.options.itemsPerPage = value;
         this.fetchData();
       },
+    },
+    mounted() {
+      this.fetchRegion();
+      this.fetchArea();
     },
     methods: {
       onPageChange(newPage) {
@@ -250,6 +263,41 @@
       handleSearch() {
         this.options.page = 1;
         this.fetchData();
+      },
+      async fetchArea() {
+        this.loading = true;
+        try {
+          const response = await getOutletArea();
+          // Check if user area array is defined and not empty; if so, filter based on areas
+          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+            this.areaOptions = response.data.filter(
+              (area) => this.getUser.area.includes(area)
+            );
+          } else {
+            this.areaOptions = response.data;
+          }
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
+        }
+      },
+      async fetchRegion() {
+        this.loading = true;
+        try {
+          const response = await getOutletRegion();
+          if (this.getUser.region) {
+            this.regionOptions = response.data.filter(
+              (region) => region === this.getUser.region
+            );
+          } else {
+            this.regionOptions = response.data; // No filtering if region is undefined
+          }
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
+        }
       },
       async fetchData() {
         this.loading = true
