@@ -3,11 +3,20 @@
 import axiosInstance from '@/api/index';
 
 // Function to get all active outlets
-export const getAll = async (page = 1, limit = 10, searchTerm = '') => {
+export const getAll = async (params) => {
   try {
     const response = await axiosInstance.get('/batch', {
-      params: { page, limit, searchTerm },
+      params: params,
     });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const getAllTarget = async (batchId) => {
+  try {
+    const response = await axiosInstance.get(`/batch-target/${batchId}`);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -64,8 +73,9 @@ export const updateData = async (id, data) => {
 
 // Function to delete
 export const deleteData = async (id) => {
+  console.log(id)
   try {
-    const response = await axiosInstance.delete(`/roles/${id}`);
+    const response = await axiosInstance.delete(`/batch/${id}`);
     return response.data;
   } catch (error) {
     throw error.response;

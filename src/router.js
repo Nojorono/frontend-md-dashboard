@@ -79,6 +79,12 @@ const router = new Router({
           meta: { requiresAuth: true }, // Protect this route
         },
         {
+          name: 'Batch Target',
+          path: '/master/batch/target/:id',
+          component: () => import('@/views/dashboard/pages/Batch/BatchTarget.vue'),
+          meta: { requiresAuth: true }, // Protect this route
+        },
+        {
           name: 'Call Plan',
           path: '/call-plan',
           component: () => import('@/views/dashboard/pages/CallPlan/CallPlan.vue'),

@@ -66,7 +66,7 @@
                     <div class="d-flex justify-end">
                       <v-btn
                         color="primary"
-                        @click="openHandleAdd"
+                        @click="openImportDialog()"
                       >
                         <v-icon>mdi-plus-box-multiple</v-icon>
                         <span class="mx-1">Import</span>
@@ -266,9 +266,9 @@
         @close="closeConfirmDeleteDialog"
       />
       <!-- Import Delete Dialog -->
-      <upload-form-dialog
+      <import-outlet
         :dialog="isImportDialogOpen"
-        @close="handleImportDialog"
+        @close="closeImportDialog"
         @upload="handleImportSubmit"
       />
     </v-container>
@@ -278,15 +278,15 @@
 <script>
   import { deleteOutlet, getAllOutlets, uploadOutlet } from '@/api/masterOutletService'
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-  import UploadFormDialog from '@/components/base/UploadFormDialog.vue'
   import Vue from "vue";
   import {createData, updateData} from "@/api/userService";
+  import ImportOutlet from "@/views/dashboard/pages/OutletMaster/components/ImportOutlet.vue";
 
   export default {
     name: 'MasterOutlet',
     components: {
+      ImportOutlet,
       ConfirmDeleteDialog,
-      UploadFormDialog,
     },
     data () {
       return {
@@ -430,8 +430,11 @@
         }
       },
       // IMPORT
-      handleImportDialog (e) {
-        this.isImportDialogOpen = e
+      openImportDialog () {
+        this.isImportDialogOpen = true
+      },
+      closeImportDialog () {
+        this.isImportDialogOpen = false
       },
       async handleImportSubmit (data)
       {

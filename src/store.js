@@ -70,5 +70,6 @@ export default new Vuex.Store({
   },
   getters: {
     getUser: (state) => state.user,
+    getLoading: (state) => state.loading,
   },
 })
