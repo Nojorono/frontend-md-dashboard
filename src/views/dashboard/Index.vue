@@ -2,7 +2,7 @@
   <v-app>
     <!-- Show loading indicator while menu is loading -->
     <v-overlay
-      v-if="loadMenusUser"
+      v-if="loading"
       absolute
       :opacity="0.8"
     >
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
+import {mapActions, mapGetters, mapState} from "vuex";
   export default {
     name: 'DashboardIndex',
 
@@ -53,12 +53,12 @@
     },
     data: () => ({
       expandOnHover: false,
-      loadMenusUser: true,
       showAlert: false,
       alertMessage: '',
     }),
     computed: {
       ...mapGetters(['getUser']),
+      ...mapState(['loading']),
     },
     watch: {
       getUser(newUser) {
@@ -69,10 +69,12 @@
       this.checkUserMenuLoaded(this.getUser);
     },
     methods: {
+      ...mapActions(['showLoading', 'hideLoading']),
       checkUserMenuLoaded(user) {
+        this.showLoading()
         if (user && user?.menus) {
           setTimeout(() => {
-            this.loadMenusUser = false;
+            this.hideLoading()
           }, 2000);
         } else {
           this.alertMessage = 'User data or menus could not be loaded. Please try again.';

@@ -55,7 +55,7 @@
                   v-model="password"
                   :rules="[rules.required]"
                   label="Password"
-                  type="password"
+                  :type="showPassword ? 'text' : 'password'"
                   prepend-icon="mdi-lock"
                   required
                   class="black--text"
@@ -71,6 +71,13 @@
                   Login
                 </v-btn>
               </v-form>
+              <v-row justify="end" class="mt-3">
+                <v-col cols="auto" class="text-center">
+                  <router-link to="/forgot-password" class="forgot-password-link">
+                    Forgot Password?
+                  </router-link>
+                </v-col>
+              </v-row>
             </v-card-text>
           </v-card>
         </v-col>
@@ -95,6 +102,7 @@
         email: '',
         password: '',
         valid: false,
+        showPassword: false,
         rules: {
           required: value => !!value || 'Required.',
           email: value => /.+@.+\..+/.test(value) || 'E-mail must be valid.',
@@ -103,6 +111,9 @@
     },
     methods: {
       ...mapActions(['login', 'showLoading', 'hideLoading']),
+      togglePassword() {
+        this.showPassword = !this.showPassword; // Toggle the visibility
+      },
 
       async handleLogin() {
         this.snackbar = false
@@ -163,5 +174,18 @@
 
 .v-input--is-focused .v-input__slot {
   background-color: rgba(255, 255, 255, 0.1); /* Adjust background color on focus */
+}
+
+.forgot-password-link {
+  font-size: 14px;
+  color: #3f51b5; /* Use a soft, primary color */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.forgot-password-link:hover {
+  color: #1a237e; /* Darken the color on hover */
+  text-decoration: underline;
 }
 </style>

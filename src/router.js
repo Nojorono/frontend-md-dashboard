@@ -13,7 +13,6 @@ const router = new Router({
       name: 'Login',
       component: () => import('@/views/auth/Login.vue'),
     },
-    // Add logout route
     {
       path: '/logout',
       name: 'Logout',
@@ -26,7 +25,12 @@ const router = new Router({
     {
       path: '/forgot-password',
       name: 'Forgot Password',
-      component: () => import('@/views/auth/Login.vue'),
+      component: () => import('@/views/auth/ForgotPassword.vue'),
+    },
+    {
+      path: '/reset-password',
+      name: 'Reset Password',
+      component: () => import('@/views/auth/PasswordReset.vue'),
     },
     {
       path: '/',

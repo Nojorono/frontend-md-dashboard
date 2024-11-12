@@ -13,10 +13,22 @@ export const Login = async (email, password) => {
   }
 };
 
-export const validateToken = async (token) => {
+export const ForgotPassword = async (email) => {
   try {
-    const response = await axiosInstance.post('/auth/validate-token', {
-      token
+    const response = await axiosInstance.post('/auth/forgot-password', {
+      email
+    });
+    return response.data;
+  }catch(error) {
+    return error.response
+  }
+};
+
+export const ResetPassword = async (token, newPassword) => {
+  try {
+    const response = await axiosInstance.post('/auth/reset-password', {
+      token,
+      newPassword
     });
     return response.data;
   }catch(error) {
