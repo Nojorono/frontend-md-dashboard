@@ -132,6 +132,7 @@ import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
 import { createData, deleteData, getAll, updateData } from '@/api/batchService'
 import FormBatch from '@/views/dashboard/pages/Batch/FormBatch.vue'
 import Vue from "vue";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
   name: "MasterBatch",
@@ -163,6 +164,9 @@ export default {
       search: '',
     };
   },
+  computed: {
+    ...mapGetters(['getUser', 'getLoading']),
+  },
   watch: {
     page(value) {
       this.options.page = value;
@@ -172,11 +176,18 @@ export default {
       this.options.itemsPerPage = value;
       this.fetchData();
     },
+    getUser(newUser) {
+      this.checkUserMenuLoaded(newUser);
+    },
+    getLoading(state) {
+      this.loading =  state;
+    },
   },
   created() {
     this.fetchData();
   },
   methods: {
+    ...mapActions(['showLoading', 'hideLoading']),
     async handleBatchTarget(id) {
       await this.$router.push({
         name: 'Batch Target',
@@ -201,6 +212,7 @@ export default {
       this.isFormRoleDialog = true
     },
     async handleSave(item) {
+      this.showLoading()
       try {
         if (this.isEdit) {
           const { id, ...itemWithoutId } = item
@@ -220,6 +232,7 @@ export default {
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)
       } finally {
+        this.hideLoading()
         await this.fetchData()
       }
     },

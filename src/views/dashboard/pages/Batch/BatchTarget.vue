@@ -113,7 +113,7 @@
       @close="closeConfirmDeleteDialog"
     />
     <!-- Create & Update Dialog -->
-    <form-call-plan-schedule
+    <form-batch-target
       :dialog="isFormRoleDialog"
       :is-edit="isEdit"
       :item="selectedItem"
@@ -126,14 +126,19 @@
 <script>
 import Vue from "vue";
 import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-import FormCallPlanSchedule from "@/views/dashboard/pages/CallPlan/components/FromCallPlanSchedule.vue";
-import {createData, deleteData, getAllTarget, updateData} from '@/api/batchService'
+import {
+  createBatchTarget,
+  deleteBatchTarget,
+  getAllTarget,
+  updateBatchTarget,
+} from '@/api/batchService'
+import FormBatchTarget from "@/views/dashboard/pages/Batch/components/FormBatchTarget.vue";
 
 
 export default {
   name: 'BatchTarget',
   components: {
-    FormCallPlanSchedule,
+    FormBatchTarget,
     ConfirmDeleteDialog,
   },
   data() {
@@ -178,13 +183,13 @@ export default {
       try {
         if (this.isEdit) {
           const { id, ...itemWithoutId } = item
-          const res = await updateData(id, itemWithoutId)
+          const res = await updateBatchTarget(id, itemWithoutId)
           if (res.statusCode === 200){
             Vue.prototype.$toast.success(`Update data Successfully!`)
             this.closeFormDialog()
           }
         } else {
-          const res = await createData(item)
+          const res = await createBatchTarget(item)
           if (res.statusCode === 200){
             Vue.prototype.$toast.success(`Create data Successfully!`)
             this.closeFormDialog()
@@ -234,8 +239,8 @@ export default {
       this.loading = true
       const data = this.selectedItem
       try {
-        await deleteData(data.id)
-        Vue.prototype.$toast.success(`Deleted ${data.email} successfully!`)
+        await deleteBatchTarget(data.id)
+        Vue.prototype.$toast.success(`Deleted ${data.amo_brand_type} successfully!`)
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)

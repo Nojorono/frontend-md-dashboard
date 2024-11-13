@@ -132,9 +132,6 @@ export default {
         if (newItem) {
           this.itemData = {
             ...newItem,
-            is_active: newItem.is_active === 1,
-            is_mobile: newItem.is_mobile === 1,
-            is_web: newItem.is_web === 1,
           };
         } else {
           this.resetForm();
@@ -150,6 +147,9 @@ export default {
         end_plan: '',
       };
       this.formValid = false;
+      if (this.$refs.form) {
+        this.$refs.form.resetValidation();
+      }
     },
     closeDialog() {
       this.resetForm();

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters, mapState} from "vuex";
+import {mapActions, mapGetters} from "vuex";
   export default {
     name: 'DashboardIndex',
 
@@ -55,18 +55,23 @@ import {mapActions, mapGetters, mapState} from "vuex";
       expandOnHover: false,
       showAlert: false,
       alertMessage: '',
+      loading: false,
     }),
     computed: {
-      ...mapGetters(['getUser']),
-      ...mapState(['loading']),
+      ...mapGetters(['getUser', 'getLoading']),
     },
     watch: {
       getUser(newUser) {
         this.checkUserMenuLoaded(newUser);
       },
+      getLoading(state) {
+        this.loading =  state;
+      },
     },
     created() {
       this.checkUserMenuLoaded(this.getUser);
+    },
+    mounted() {
     },
     methods: {
       ...mapActions(['showLoading', 'hideLoading']),
@@ -74,7 +79,7 @@ import {mapActions, mapGetters, mapState} from "vuex";
         this.showLoading()
         if (user && user?.menus) {
           setTimeout(() => {
-            this.hideLoading()
+            this.hideLoading();
           }, 2000);
         } else {
           this.alertMessage = 'User data or menus could not be loaded. Please try again.';

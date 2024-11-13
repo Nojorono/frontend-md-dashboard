@@ -61,10 +61,28 @@ export const createData = async (data) => {
   }
 };
 
+export const createBatchTarget = async (data) => {
+  try {
+    const response = await axiosInstance.post('/batch-target', data);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
 // Function to update
 export const updateData = async (id, data) => {
   try {
     const response = await axiosInstance.post(`/batch/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const updateBatchTarget = async (id, data) => {
+  try {
+    const response = await axiosInstance.post(`/batch-target/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -76,6 +94,16 @@ export const deleteData = async (id) => {
   console.log(id)
   try {
     const response = await axiosInstance.delete(`/batch/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const deleteBatchTarget = async (id) => {
+  console.log(id)
+  try {
+    const response = await axiosInstance.delete(`/batch-target/${id}`);
     return response.data;
   } catch (error) {
     throw error.response;

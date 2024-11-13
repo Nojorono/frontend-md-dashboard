@@ -30,7 +30,6 @@
 
       <!-- Tab Content -->
       <v-tabs-items v-model="activeTab">
-        <!-- Tab 1: Outlet Table -->
         <v-tab-item>
           <v-card style="box-shadow: unset;">
             <v-data-table
@@ -41,6 +40,7 @@
               :options.sync="options"
               :search="search"
               hide-default-footer
+              class="small-table"
               style="padding: 6px; border-radius: 20px"
               @update:options="fetchData"
             >
@@ -71,20 +71,20 @@
                         <v-icon>mdi-plus-box-multiple</v-icon>
                         <span class="mx-1">Import</span>
                       </v-btn>
-                      <v-btn
-                        color="primary"
-                        @click="openHandleAdd"
-                      >
-                        <v-icon>mdi-plus-box-multiple</v-icon>
-                        <span class="mx-1">Export</span>
-                      </v-btn>
-                      <v-btn
-                        color="primary"
-                        @click="openHandleAdd"
-                      >
-                        <v-icon>mdi-plus-box-multiple</v-icon>
-                        <span class="mx-1">Add</span>
-                      </v-btn>
+<!--                      <v-btn-->
+<!--                        color="primary"-->
+<!--                        @click="openHandleAdd"-->
+<!--                      >-->
+<!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
+<!--                        <span class="mx-1">Export</span>-->
+<!--                      </v-btn>-->
+<!--                      <v-btn-->
+<!--                        color="primary"-->
+<!--                        @click="openHandleAdd"-->
+<!--                      >-->
+<!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
+<!--                        <span class="mx-1">Add</span>-->
+<!--                      </v-btn>-->
                     </div>
                   </v-col>
                 </v-row>
@@ -131,10 +131,10 @@
                           style="max-width: 150px; display: inline-block;"
                           v-on="on"
                         >
-                          {{ item?.district }}
+                          {{ item?.address_line }}
                         </span>
                       </template>
-                      <span>{{ item?.district }}</span>
+                      <span>{{ item?.address_line }}</span>
                     </v-tooltip>
                   </td>
                   <td>
@@ -307,8 +307,8 @@
             value: 'area',
           },
           {
-            text: 'District',
-            value: 'district',
+            text: 'Address',
+            value: 'address_line',
           },
           {
             text: 'Outlet Code',
@@ -364,7 +364,7 @@
         this.fetchData();
       },
     },
-    created () {
+    mounted () {
       this.fetchData()
     },
     methods: {
@@ -441,11 +441,12 @@
         this.loading = true
         try {
           await uploadOutlet(data);
-          await this.fetchOutlets()
+          Vue.prototype.$toast.success(`Upload data Successfully!`);
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)
         } finally {
           this.loading = false
+          await this.fetchData()
         }
       },
       handleSearch() {
@@ -471,7 +472,7 @@
         } finally {
           this.loading = false;
           this.closeConfirmDeleteDialog();
-          this.fetchData();
+          await this.fetchData();
         }
       },
     },
@@ -484,5 +485,23 @@
   background-color: #4caf50 !important; /* Green background for active tab */
   color: #fff !important; /* White text for active tab */
   font-weight: bold; /* Bold text for active tab */
+}
+
+.small-table {
+  font-size: 12px;
+}
+
+.small-table th,
+.small-table td {
+  padding: 4px 8px;
+  height: 30px;
+}
+
+.small-table th {
+  font-weight: bold;
+}
+
+.small-table td {
+  font-weight: normal;
 }
 </style>
