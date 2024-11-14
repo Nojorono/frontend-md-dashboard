@@ -73,6 +73,12 @@ const router = new Router({
           meta: { requiresAuth: true }, // Protect this route
         },
         {
+          name: 'Master Brand',
+          path: '/master/brand',
+          component: () => import('@/views/dashboard/pages/Brand/MasterBrand.vue'),
+          meta: { requiresAuth: true }, // Protect this route
+        },
+        {
           name: 'Master Batch',
           path: '/master/batch',
           component: () => import('@/views/dashboard/pages/Batch/MasterBatch.vue'),

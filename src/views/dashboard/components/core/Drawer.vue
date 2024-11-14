@@ -106,6 +106,11 @@
         },
         {
           icon: 'mdi-account-cog',
+          title: 'Master Brand',
+          to: '/master/brand',
+        },
+        {
+          icon: 'mdi-account-cog',
           title: 'Master Batch',
           to: '/master/batch',
         },

@@ -4,7 +4,6 @@ import axiosInstance from '@/api/index';
 
 // Function to get all active outlets
 export const getAllOutlets = async (params) => {
-  console.log(params)
   try {
     const response = await axiosInstance.get('/outlets', {
       params: params,

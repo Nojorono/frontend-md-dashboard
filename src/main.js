@@ -18,11 +18,14 @@ import store from './store'
 import './plugins/base'
 import './plugins/chartist'
 import './plugins/vee-validate'
+import 'leaflet/dist/leaflet.css';
 import vuetify from './plugins/vuetify'
 import i18n from './i18n'
 import moment from 'moment'
 import 'moment/locale/id'
-
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 // Import Vue Toastification and CSS
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
