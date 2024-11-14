@@ -111,6 +111,11 @@
         },
         {
           icon: 'mdi-account-cog',
+          title: 'Master Sio',
+          to: '/master/sio',
+        },
+        {
+          icon: 'mdi-account-cog',
           title: 'Master Batch',
           to: '/master/batch',
         },

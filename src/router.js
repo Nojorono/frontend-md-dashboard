@@ -79,6 +79,12 @@ const router = new Router({
           meta: { requiresAuth: true }, // Protect this route
         },
         {
+          name: 'Master Sio',
+          path: '/master/sio',
+          component: () => import('@/views/dashboard/pages/Sio/MasterSio.vue'),
+          meta: { requiresAuth: true }, // Protect this route
+        },
+        {
           name: 'Master Batch',
           path: '/master/batch',
           component: () => import('@/views/dashboard/pages/Batch/MasterBatch.vue'),
