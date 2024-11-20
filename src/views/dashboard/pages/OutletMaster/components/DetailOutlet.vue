@@ -27,10 +27,25 @@
             <v-card-subtitle class="text-caption grey--text text-center mb-4">
               {{ data.address_line }}, {{ data.sub_district }} - {{ data.region }}
             </v-card-subtitle>
+            <v-row>
+              <v-col
+                cols="12"
+                class="d-flex justify-space-between align-center"
+              >
+                <v-chip
+                  :color="data.is_active ? 'green' : 'red'"
+                  outlined
+                  class="ma-2"
+                >
+                  {{ data.is_active ? 'Active' : 'Inactive' }}
+                </v-chip>
+                <div><strong>Remarks :</strong> {{ data.remarks || 'None' }}</div>
+              </v-col>
+            </v-row>
           </v-card-title>
 
           <!-- General Information Section -->
-          <v-divider class="mb-4" />
+          <v-divider class="my-4" />
           <v-card-text>
             <v-row>
               <v-col
@@ -80,21 +95,6 @@
 
             <!-- Status and Remarks -->
             <v-divider class="my-4" />
-            <v-row>
-              <v-col
-                cols="12"
-                class="d-flex justify-space-between align-center"
-              >
-                <v-chip
-                  :color="data.is_active ? 'green' : 'red'"
-                  outlined
-                  class="ma-2"
-                >
-                  {{ data.is_active ? 'Active' : 'Inactive' }}
-                </v-chip>
-                <div><strong>Remarks :</strong> {{ data.remarks || 'None' }}</div>
-              </v-col>
-            </v-row>
 
             <!-- Location with Map Link -->
             <v-row class="mt-4">
@@ -124,23 +124,25 @@
             <!-- Photos Section -->
             <v-divider class="my-4" />
             <v-row>
-              <v-col cols="12">
-                <h3 class="text-h6 font-weight-medium mb-3">
+              <v-col cols="6">
+                <h3 class="text-h4 font-weight-medium mb-3">
                   Photos
                 </h3>
                 <v-row>
                   <v-col
-                    v-for="(photo, index) in data.photos"
-                    :key="index"
-                    cols="6"
-                    md="3"
+                    cols="12"
                   >
-                    <img
-                      :src="decodeURIComponent(photo)"
-                      alt="Outlet Photo"
-                      class="rounded"
-                      style="width: 100%; height: auto;"
-                    >
+                    <template>
+                      <v-carousel>
+                        <v-carousel-item
+                          v-for="(photo, index) in data.photos"
+                          :key="index"
+                          :src="`${decodeURIComponent(photo)}`"
+                          reverse-transition="fade-transition"
+                          transition="fade-transition"
+                        />
+                      </v-carousel>
+                    </template>
                   </v-col>
                 </v-row>
               </v-col>
@@ -150,8 +152,12 @@
           <!-- Footer Info -->
           <v-divider class="my-4" />
           <v-card-actions class="justify-end grey--text text--darken-1">
-            <div class="mx-2"><strong>Created By:</strong> {{ data.created_by }}</div>
-            <div class="mx-2"><strong>Created At:</strong> {{ new Date(data.created_at).toLocaleString() }}</div>
+            <div class="mx-2">
+              <strong>Created By:</strong> {{ data.created_by }}
+            </div>
+            <div class="mx-2">
+              <strong>Created At:</strong> {{ new Date(data.created_at).toLocaleString() }}
+            </div>
           </v-card-actions>
         </v-card>
       </v-col>
