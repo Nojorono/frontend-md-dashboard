@@ -45,21 +45,21 @@
     >
       <div />
 
-<!--      <template v-for="(item, i) in computedItems">-->
-<!--        <base-item-group-->
-<!--          v-if="item.children"-->
-<!--          :key="`group-${i}`"-->
-<!--          :item="item"-->
-<!--        >-->
-<!--          &lt;!&ndash;  &ndash;&gt;-->
-<!--        </base-item-group>-->
+      <template v-for="(item, i) in computedItems">
+        <base-item-group
+          v-if="item.children"
+          :key="`group-${i}`"
+          :item="item"
+        >
+          <!--  -->
+        </base-item-group>
 
-<!--        <base-item-->
-<!--          v-else-->
-<!--          :key="`item-${i}`"-->
-<!--          :item="item"-->
-<!--        />-->
-<!--      </template>-->
+        <base-item
+          v-else
+          :key="`item-${i}`"
+          :item="item"
+        />
+      </template>
       <div />
     </v-list>
   </v-navigation-drawer>
