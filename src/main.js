@@ -28,6 +28,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 // Import Vue Toastification and CSS
 import Toast from 'vue-toastification'
+import Swal from 'sweetalert2'
 import 'vue-toastification/dist/index.css'
 // Set the global locale to Indonesian
 moment.locale('id')
@@ -47,6 +48,7 @@ const toastOptions = {
 }
 
 Vue.use(Toast, toastOptions)
+Vue.prototype.$swal = Swal;
 
 Vue.config.productionTip = false
 

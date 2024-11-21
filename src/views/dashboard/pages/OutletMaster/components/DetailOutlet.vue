@@ -32,13 +32,12 @@
                 cols="12"
                 class="d-flex justify-space-between align-center"
               >
-                <v-chip
+                <v-switch
+                  v-model="data.is_active"
+                  :label="data.is_active ? 'Active' : 'Inactive'"
                   :color="data.is_active ? 'green' : 'red'"
-                  outlined
-                  class="ma-2"
-                >
-                  {{ data.is_active ? 'Active' : 'Inactive' }}
-                </v-chip>
+                  @change="handleSwitchChange(data, data.is_active)"
+                ></v-switch>
                 <div><strong>Remarks :</strong> {{ data.remarks || 'None' }}</div>
               </v-col>
             </v-row>
@@ -104,10 +103,6 @@
                 </h3>
                 <v-row class="align-center">
                   <v-col cols="6">
-                    <p><strong>Latitude:</strong> {{ data.latitude }}</p>
-                    <p><strong>Longitude:</strong> {{ data.longitude }}</p>
-                  </v-col>
-                  <v-col cols="6">
                     <v-btn
                       color="primary"
                       outlined
@@ -125,26 +120,102 @@
             <v-divider class="my-4" />
             <v-row>
               <v-col cols="6">
-                <h3 class="text-h4 font-weight-medium mb-3">
-                  Photos
-                </h3>
-                <v-row>
-                  <v-col
-                    cols="12"
-                  >
-                    <template>
-                      <v-carousel>
-                        <v-carousel-item
-                          v-for="(photo, index) in data.photos"
-                          :key="index"
-                          :src="`${decodeURIComponent(photo)}`"
-                          reverse-transition="fade-transition"
-                          transition="fade-transition"
-                        />
-                      </v-carousel>
-                    </template>
-                  </v-col>
-                </v-row>
+                <v-card outlined>
+                  <v-card-title class="d-flex justify-space-between">
+                    <h3 class="text-h3 font-weight-medium mb-3">
+                      Photos
+                    </h3>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                    >
+                      <template>
+                        <v-carousel>
+                          <v-carousel-item
+                            v-for="(photo, index) in data.photos"
+                            :key="index"
+                            :src="`${decodeURIComponent(photo)}`"
+                            reverse-transition="fade-transition"
+                            transition="fade-transition"
+                          />
+                        </v-carousel>
+                      </template>
+                    </v-col>
+                  </v-row>
+                </v-card>
+              </v-col>
+              <v-col cols="6">
+                <v-card outlined>
+                  <v-card-title class="d-flex justify-space-between">
+                    <h3 class="text-h3 font-weight-medium mb-3">
+                      Activity
+                    </h3>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <!-- Activity List -->
+                    <v-list dense>
+                      <v-list-item v-for="(activity, index) in activities" :key="index">
+                        <v-list-item-content>
+                          <v-list-item-title class="font-weight-bold">
+                            {{ activity.text }}
+                          </v-list-item-title>
+                          <v-list-item-subtitle>
+                            {{ formatDate(activity.timestamp) }}
+                          </v-list-item-subtitle>
+
+                          <!-- Comments Section -->
+                          <v-list dense>
+                            <v-list-item
+                              v-for="(comment, commentIndex) in visibleComments(activity)"
+                              :key="commentIndex"
+                            >
+                              <v-list-item-content>
+                                <v-list-item-title>
+                                  <v-icon small class="mr-2">mdi-account</v-icon> {{ comment.user }}
+                                </v-list-item-title>
+                                <v-list-item-subtitle>{{ comment.text }}</v-list-item-subtitle>
+                              </v-list-item-content>
+                            </v-list-item>
+
+                            <!-- Expand Comments Button -->
+                            <v-btn
+                              v-if="activity.comments.length > 2"
+                              text
+                              @click="toggleComments(index)"
+                            >
+                              {{ activity.showAllComments ? 'Show less comments' : 'Show more comments' }}
+                            </v-btn>
+                          </v-list>
+
+                          <!-- Add Comment -->
+                          <v-row class="mt-2">
+                            <v-col cols="9">
+                              <v-text-field
+                                v-model="activity.newComment"
+                                label="Add a comment"
+                                outlined
+                                dense
+                                clearable
+                              ></v-text-field>
+                            </v-col>
+                            <v-col cols="3">
+                              <v-btn
+                                color="primary"
+                                @click="addComment(index)"
+                                :disabled="!activity.newComment"
+                              >
+                                Add Comment
+                              </v-btn>
+                            </v-col>
+                          </v-row>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list>
+                  </v-card-text>
+                </v-card>
               </v-col>
             </v-row>
           </v-card-text>
@@ -176,6 +247,29 @@ export default {
       id: this.$route.params.id,
       data: {},
       loading: false,
+      activities: [
+        {
+          text: "Activity 1",
+          timestamp: new Date(),
+          comments: [
+            { user: "Admin", text: "Welcome back!" },
+            { user: "User1", text: "Thanks!" },
+            { user: "User2", text: "Good to see you!" },
+            { user: "User3", text: "Happy to be here!" },
+          ],
+          newComment: "",
+          showAllComments: false,
+        },
+        {
+          text: "Activity 2",
+          timestamp: new Date(),
+          comments: [
+            { user: "Admin", text: "Profile updated successfully" },
+          ],
+          newComment: "",
+          showAllComments: false,
+        },
+      ],
     };
   },
 
@@ -204,6 +298,35 @@ export default {
   },
 
   methods: {
+    addComment(activityIndex) {
+      const activity = this.activities[activityIndex];
+      if (activity.newComment.trim()) {
+        activity.comments.push({
+          user: "User", // Replace with dynamic username
+          text: activity.newComment,
+        });
+        activity.newComment = ""; // Clear input
+      }
+    },
+    toggleActivity(activityIndex) {
+      const activity = this.activities[activityIndex];
+      activity.showAllComments = !activity.showAllComments; // Toggle the visibility
+    },
+    toggleComments(activityIndex) {
+      const activity = this.activities[activityIndex];
+      activity.showAllComments = !activity.showAllComments; // Toggle the visibility
+    },
+    visibleComments(activity) {
+      return activity.showAllComments
+        ? activity.comments
+        : activity.comments.slice(0, 2); // Show first 2 comments only
+    },
+    formatDate(date) {
+      return new Intl.DateTimeFormat("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(date);
+    },
     async fetchData(id) {
       this.loading = true;
       try {
@@ -219,6 +342,25 @@ export default {
     },
     handleBack(){
       this.$router.back();
+    },
+    handleSwitchChange(data, isActive) {
+      console.log(data, isActive)
+      // Show SweetAlert confirmation before changing the switch state
+      this.$swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, do it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$swal.fire("Success!", "Your action was completed.", "success");
+        } else {
+          this.$swal.fire("Cancelled", "Your action has been cancelled.", "error");
+        }
+      });
     },
     openInMaps() {
       const { latitude, longitude } = this.data;

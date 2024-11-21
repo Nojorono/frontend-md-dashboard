@@ -71,20 +71,20 @@
                         <v-icon>mdi-plus-box-multiple</v-icon>
                         <span class="mx-1">Import</span>
                       </v-btn>
-<!--                      <v-btn-->
-<!--                        color="primary"-->
-<!--                        @click="openHandleAdd"-->
-<!--                      >-->
-<!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
-<!--                        <span class="mx-1">Export</span>-->
-<!--                      </v-btn>-->
-<!--                      <v-btn-->
-<!--                        color="primary"-->
-<!--                        @click="openHandleAdd"-->
-<!--                      >-->
-<!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
-<!--                        <span class="mx-1">Add</span>-->
-<!--                      </v-btn>-->
+                      <!--                      <v-btn-->
+                      <!--                        color="primary"-->
+                      <!--                        @click="openHandleAdd"-->
+                      <!--                      >-->
+                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
+                      <!--                        <span class="mx-1">Export</span>-->
+                      <!--                      </v-btn>-->
+                      <!--                      <v-btn-->
+                      <!--                        color="primary"-->
+                      <!--                        @click="openHandleAdd"-->
+                      <!--                      >-->
+                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
+                      <!--                        <span class="mx-1">Add</span>-->
+                      <!--                      </v-btn>-->
                     </div>
                   </v-col>
                 </v-row>
@@ -222,14 +222,6 @@
                       <v-icon>mdi-details</v-icon>
                       detail
                     </v-btn>
-                    <v-btn
-                      color="error"
-                      outlined
-                      small
-                      @click="openConfirmDeleteDialog(item)"
-                    >
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
                   </td>
                 </tr>
               </template>
@@ -252,10 +244,214 @@
 
         <!-- Tab 2: Settings -->
         <v-tab-item>
-          <v-card>
-            <v-text-field>
-              test
-            </v-text-field>
+          <v-card style="box-shadow: unset;">
+            <v-data-table
+              :headers="tableHeaders"
+              :items="tableData"
+              :server-items-length="totalItems"
+              :loading="loading"
+              :options.sync="options"
+              :search="search"
+              hide-default-footer
+              class="small-table"
+              style="padding: 6px; border-radius: 20px"
+              @update:options="fetchData"
+            >
+              <template v-slot:top>
+                <v-row
+                  class="justify-space-between"
+                  style="align-items: baseline"
+                >
+                  <v-col
+                    cols="4"
+                    style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+                  >
+                    <v-text-field
+                      v-model="search"
+                      label="Search"
+                      class="mx-5"
+                      clearable
+                      append-icon="mdi-magnify"
+                      @click:append="handleSearch"
+                    />
+                  </v-col>
+                  <v-col>
+                    <div class="d-flex justify-end">
+                      <v-btn
+                        color="primary"
+                        @click="openImportDialog()"
+                      >
+                        <v-icon>mdi-plus-box-multiple</v-icon>
+                        <span class="mx-1">Import</span>
+                      </v-btn>
+                      <!--                      <v-btn-->
+                      <!--                        color="primary"-->
+                      <!--                        @click="openHandleAdd"-->
+                      <!--                      >-->
+                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
+                      <!--                        <span class="mx-1">Export</span>-->
+                      <!--                      </v-btn>-->
+                      <!--                      <v-btn-->
+                      <!--                        color="primary"-->
+                      <!--                        @click="openHandleAdd"-->
+                      <!--                      >-->
+                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
+                      <!--                        <span class="mx-1">Add</span>-->
+                      <!--                      </v-btn>-->
+                    </div>
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-slot:item="{ item, index }">
+                <tr>
+                  <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.region }}
+                        </span>
+                      </template>
+                      <span>{{ item?.region }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.area }}
+                        </span>
+                      </template>
+                      <span>{{ item?.area }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.address_line }}
+                        </span>
+                      </template>
+                      <span>{{ item?.address_line }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.outlet_code }}
+                        </span>
+                      </template>
+                      <span>{{ item?.outlet_code }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.name }}
+                        </span>
+                      </template>
+                      <span>{{ item?.name }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.brand }}
+                        </span>
+                      </template>
+                      <span>{{ item?.brand }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.outlet_type }}
+                        </span>
+                      </template>
+                      <span>{{ item?.outlet_type }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.cycle }}
+                        </span>
+                      </template>
+                      <span>{{ item?.cycle }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-btn
+                      outlined
+                      small
+                      color="warning"
+                      @click="handleDetail(item.id)"
+                    >
+                      <v-icon>mdi-details</v-icon>
+                      detail
+                    </v-btn>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+            <v-row
+              justify="center"
+              class="py-3"
+            >
+              <v-pagination
+                v-model="page"
+                :length="totalPages"
+                :total-visible="7"
+                next-icon="mdi-menu-right"
+                prev-icon="mdi-menu-left"
+                @input="onPageChange"
+              />
+            </v-row>
           </v-card>
         </v-tab-item>
       </v-tabs-items>
@@ -290,10 +486,10 @@
     },
     data () {
       return {
-        activeTab: 0,
+        activeTab: 1,
         tabs: [
-          { name: 'Active', label: 'Active' },
-          { name: 'Non Active', label: 'Non Active' },
+          { name: 'Non Active', label: 'Non Active', value: 0 },
+          { name: 'Active', label: 'Active', value: 1 },
           // Add more tabs here
         ],
         tableHeaders: [
@@ -350,9 +546,6 @@
       }
     },
     computed: {
-      regionOptions () {
-        return this.tableData.map(r => r.region)
-      },
     },
     watch: {
       page(value) {
@@ -361,6 +554,10 @@
       },
       itemsPerPage(value) {
         this.options.itemsPerPage = value;
+        this.fetchData();
+      },
+      activeTab(newValue) {
+        console.log(newValue)
         this.fetchData();
       },
     },
@@ -418,6 +615,7 @@
             page: this.options.page,
             limit: this.options.itemsPerPage,
             searchTerm: this.search,
+            isActive: this.activeTab,
           });
           this.tableData = response.data.data;
           this.totalItems = response.data.totalItems;
