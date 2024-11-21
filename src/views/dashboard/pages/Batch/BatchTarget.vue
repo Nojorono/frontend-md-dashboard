@@ -171,12 +171,27 @@ export default {
     },
     openHandleAdd() {
       this.isEdit = false
-      this.selectedItem = null
+      this.selectedItem = {
+        batch_id: this.id,
+        regional: '',
+        amo: '',
+        brand_type_sio: '',
+        amo_brand_type: '',
+        allocation_ho: 0,
+      }
       this.isFormRoleDialog = true
     },
     openHandleUpdate(item) {
       this.isEdit = true
-      this.selectedItem = item
+      this.selectedItem = {
+        id: item.id,
+        batch_id: item.batch_id,
+        regional: item.regional,
+        amo: item.amo,
+        brand_type_sio: item.brand_type_sio,
+        amo_brand_type: item.amo_brand_type,
+        allocation_ho: item.allocation_ho,
+      }
       this.isFormRoleDialog = true
     },
     async handleSave(item) {

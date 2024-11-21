@@ -33,7 +33,7 @@ export default {
   methods: {
     initMap() {
       // Initialize map centered on Indonesia
-      this.map = L.map('map').setView([-2.5489, 118.0149], 5);
+      this.map = L.map('map').setView([-2.5489, 119.0149], 5);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
       this.map.addLayer(this.markersLayer);
     },
