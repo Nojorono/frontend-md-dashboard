@@ -44,7 +44,7 @@ export default new Vuex.Store({
     // Action to log in
     login({ commit }, { token, user }) {
       localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user)) // Store user in localStorage
+      localStorage.setItem('user', JSON.stringify(user))
       commit('SET_USER', user)
       commit('SET_TOKEN', token)
     },

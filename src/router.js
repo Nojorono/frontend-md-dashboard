@@ -85,6 +85,18 @@ const router = new Router({
           meta: { requiresAuth: true }, // Protect this route
         },
         {
+          name: 'Master Region',
+          path: '/master/region',
+          component: () => import('@/views/dashboard/pages/RegionArea/MasterRegion.vue'),
+          meta: { requiresAuth: true }, // Protect this route
+        },
+        {
+          name: 'Master Area',
+          path: '/master/region/area/:id',
+          component: () => import('@/views/dashboard/pages/RegionArea/MasterArea.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
           name: 'Master Batch',
           path: '/master/batch',
           component: () => import('@/views/dashboard/pages/Batch/MasterBatch.vue'),
