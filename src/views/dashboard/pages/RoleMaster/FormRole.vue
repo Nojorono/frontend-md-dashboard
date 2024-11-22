@@ -164,10 +164,7 @@ export default {
     loadMenuOptions() {
       const rootRoute = this.$router.options.routes.find(route => route.path === '/');
       if (rootRoute && rootRoute.children) {
-        this.menusOptions = rootRoute.children.map(childRoute => ({
-          name: childRoute.name,
-          value: childRoute.path,
-        }));
+        this.menusOptions = rootRoute.children;
       }
     },
     resetForm() {

@@ -2,7 +2,6 @@
   <v-navigation-drawer
     id="core-navigation-drawer"
     v-model="drawer"
-    :dark="barColor !== 'rgba(228, 226, 226, 1), rgba(255, 255, 255, 0.7)'"
     :expand-on-hover="expandOnHover"
     :right="$vuetify.rtl"
     :src="barImage"
@@ -17,7 +16,7 @@
         v-bind="props"
       />
     </template>
-
+    <!-- Sidebar Header -->
     <v-list
       dense
       nav
@@ -39,19 +38,59 @@
 
     <v-divider class="mb-2" />
 
+    <!-- Dynamic Menu Items -->
+<!--    <v-list-->
+<!--      dense-->
+<!--      nav-->
+<!--    >-->
+<!--      <template v-for="(item, index) in menuItems">-->
+<!--        &lt;!&ndash; Check if the item has children &ndash;&gt;-->
+<!--        <v-list-group-->
+<!--          v-if="item.children"-->
+<!--          :key="`group-${index}`"-->
+<!--          :prepend-icon="item.icon"-->
+<!--          :value="item.expanded"-->
+<!--        >-->
+<!--          <template #activator>-->
+<!--            <v-list-item-title>{{ item.title }}</v-list-item-title>-->
+<!--          </template>-->
+
+<!--          <v-list-item-->
+<!--            v-for="(child, childIndex) in item.children"-->
+<!--            :key="`child-${index}-${childIndex}`"-->
+<!--            :to="child.to"-->
+<!--          >-->
+<!--            <v-list-item-icon>-->
+<!--              <v-icon>{{ child.icon }}</v-icon>-->
+<!--            </v-list-item-icon>-->
+<!--            <v-list-item-title>{{ child.title }}</v-list-item-title>-->
+<!--          </v-list-item>-->
+<!--        </v-list-group>-->
+
+<!--        <v-list-item-->
+<!--          v-if="!item.children"-->
+<!--          :key="`item-${index}`"-->
+<!--          :to="item.to"-->
+<!--          :class="{ 'v-list-item&#45;&#45;active': $route.path === child.to }"-->
+<!--        >-->
+<!--          <v-list-item-icon>-->
+<!--            <v-icon>{{ item.icon }}</v-icon>-->
+<!--          </v-list-item-icon>-->
+<!--          <v-list-item-title>{{ item.title }}</v-list-item-title>-->
+<!--        </v-list-item>-->
+<!--      </template>-->
+<!--    </v-list>-->
     <v-list
-      expand
+      dense
       nav
     >
       <div />
-
-      <template v-for="(item, i) in computedItems">
+      <template v-for="(item, i) in menuItems">
         <base-item-group
           v-if="item.children"
           :key="`group-${i}`"
           :item="item"
         >
-          <!--  -->
         </base-item-group>
 
         <base-item
@@ -66,189 +105,113 @@
 </template>
 
 <script>
-  // Utilities
-  import {
-    mapState,
-  } from 'vuex'
+import {mapState} from "vuex";
 
-  export default {
-    name: 'DashboardCoreDrawer',
-
-    props: {
-      expandOnHover: {
-        type: Boolean,
-        default: false,
+export default {
+  name: 'DashboardCoreDrawer',
+  props: {
+    expandOnHover: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data: () => ({
+    imagePath: '/logo-nna.png',
+    menuItems: [
+      { title: 'Dashboard', icon: 'mdi-view-dashboard', to: '/' },
+      {
+        title: 'Master Data',
+        icon: 'mdi-folder-multiple',
+        expanded: true,
+        children: [
+          { title: 'Outlet', icon: 'mdi-account', to: '/master/outlet' },
+          { title: 'Users', icon: 'mdi-account', to: '/master/users' },
+          { title: 'Roles', icon: 'mdi-key', to: '/master/roles' },
+          { title: 'Brands', icon: 'mdi-cube', to: '/master/brand' },
+          { title: 'Sio', icon: 'mdi-cube', to: '/master/sio' },
+          { title: 'Batch', icon: 'mdi-cube', to: '/master/batch' },
+          { title: 'Region & Area', icon: 'mdi-cube', to: '/master/region' },
+        ],
+      },
+      { title: 'Call Plan', icon: 'mdi-calendar', to: '/call-plan' },
+      {
+        title: 'Settings',
+        icon: 'mdi-cog',
+        expanded: true,
+        children: [
+          { title: 'Profile', icon: 'mdi-account-circle', to: '/settings/profile' },
+          { title: 'Notifications', icon: 'mdi-bell', to: '/settings/notifications' },
+        ],
+      },
+    ],
+  }),
+  computed: {
+    ...mapState(['barColor', 'barImage', 'user']),
+    drawer: {
+      get () {
+        return this.$store.state.drawer
+      },
+      set (val) {
+        this.$store.commit('SET_DRAWER', val)
       },
     },
-
-    data: () => ({
-      imagePath: '/logo-nna.png',
-      items: [
-        {
-          icon: 'mdi-view-dashboard',
-          title: 'dashboard',
-          to: '/',
-        },
-        {
-          icon: 'mdi-application-cog',
-          title: 'Master Outlet',
-          to: '/master/outlet',
-        },
-        {
-          icon: 'mdi-clipboard-account',
-          title: 'Master Users',
-          to: '/master/users',
-        },
-        {
-          icon: 'mdi-account-cog',
-          title: 'Master Roles',
-          to: '/master/roles',
-        },
-        {
-          icon: 'mdi-account-cog',
-          title: 'Master Brand',
-          to: '/master/brand',
-        },
-        {
-          icon: 'mdi-account-cog',
-          title: 'Master Region',
-          to: '/master/region',
-        },
-        {
-          icon: 'mdi-account-cog',
-          title: 'Master Sio',
-          to: '/master/sio',
-        },
-        {
-          icon: 'mdi-account-cog',
-          title: 'Master Batch',
-          to: '/master/batch',
-        },
-        {
-          icon: 'mdi-account-group',
-          title: 'Call Plan',
-          to: '/call-plan',
-        },
-        {
-          title: 'rtables',
-          icon: 'mdi-clipboard-outline',
-          to: '/tables/regular-tables',
-        },
-        {
-          title: 'typography',
-          icon: 'mdi-format-font',
-          to: '/components/typography',
-        },
-        {
-          title: 'icons',
-          icon: 'mdi-chart-bubble',
-          to: '/components/icons',
-        },
-        {
-          title: 'google',
-          icon: 'mdi-map-marker',
-          to: '/maps/google-maps',
-        },
-        {
-          title: 'notifications',
-          icon: 'mdi-bell',
-          to: '/components/notifications',
-        },
-      ],
-    }),
-
-    computed: {
-      ...mapState(['barColor', 'barImage', 'user']),
-      drawer: {
-        get () {
-          return this.$store.state.drawer
-        },
-        set (val) {
-          this.$store.commit('SET_DRAWER', val)
-        },
-      },
-      computedItems () {
-        const filteredMenu = this.items.filter(item => this.isMenuItemAllowed(item))
-        return filteredMenu.map(this.mapItem)
-      },
-      profile () {
-        return {
-          avatar: true,
-          title: this.$t('avatar'),
-        }
-      },
-    },
-    mounted(){
-    },
-
-    methods: {
-      mapItem (item) {
-        return {
-          ...item,
-          children: item.children ? item.children.map(this.mapItem) : undefined,
-          title: this.$t(item.title),
-        }
-      },
-      isMenuItemAllowed(path) {
-        return this.user?.menus.some(userMenuItem => userMenuItem.value === path.to)
-      },
-    },
-  }
+  },
+}
 </script>
 
 <style lang="sass">
-  @import '~vuetify/src/styles/tools/_rtl.sass'
+@import '~vuetify/src/styles/tools/_rtl.sass'
 
-  #core-navigation-drawer
-    .v-list-group__header.v-list-item--active:before
-      opacity: .24
+#core-navigation-drawer
+  .v-list-group__header.v-list-item--active:before
+    opacity: .12
 
+  .v-list-item
+    &__icon--text,
+    &__icon:first-child
+      justify-content: center
+      text-align: center
+      width: 20px
+
+      +ltr()
+        margin-right: 24px
+        margin-left: 12px !important
+
+      +rtl()
+        margin-left: 24px
+        margin-right: 12px !important
+
+  .v-list--dense
     .v-list-item
       &__icon--text,
       &__icon:first-child
-        justify-content: center
-        text-align: center
-        width: 20px
+        margin-top: 10px
+
+  .v-list-group--sub-group
+    .v-list-item
+      +ltr()
+        padding-left: 8px
+
+      +rtl()
+        padding-right: 8px
+
+    .v-list-group__header
+      +ltr()
+        padding-right: 0
+
+      +rtl()
+        padding-right: 0
+
+      .v-list-item__icon--text
+        margin-top: 19px
+        order: 0
+
+      .v-list-group__header__prepend-icon
+        order: 2
 
         +ltr()
-          margin-right: 24px
-          margin-left: 12px !important
+          margin-right: 8px
 
         +rtl()
-          margin-left: 24px
-          margin-right: 12px !important
-
-    .v-list--dense
-      .v-list-item
-        &__icon--text,
-        &__icon:first-child
-          margin-top: 10px
-
-    .v-list-group--sub-group
-      .v-list-item
-        +ltr()
-          padding-left: 8px
-
-        +rtl()
-          padding-right: 8px
-
-      .v-list-group__header
-        +ltr()
-          padding-right: 0
-
-        +rtl()
-          padding-right: 0
-
-        .v-list-item__icon--text
-          margin-top: 19px
-          order: 0
-
-        .v-list-group__header__prepend-icon
-          order: 2
-
-          +ltr()
-            margin-right: 8px
-
-          +rtl()
-            margin-left: 8px
+          margin-left: 8px
 </style>

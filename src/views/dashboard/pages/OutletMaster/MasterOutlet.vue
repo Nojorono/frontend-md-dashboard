@@ -1,6 +1,7 @@
 <template>
   <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading">
     <v-container fluid>
+      <router-view />
       <v-row style="height: 70px">
         <v-col cols="3">
           <v-tabs

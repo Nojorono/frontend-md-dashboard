@@ -4,7 +4,8 @@
     :prepend-icon="item.icon"
     :sub-group="subGroup"
     append-icon="mdi-menu-down"
-    :color="barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
+    :color="isGroupActive ? 'primary' : barColor"
+    :value="item.expanded || isGroupActive"
   >
     <template v-slot:activator>
       <v-list-item-icon
@@ -13,15 +14,6 @@
         v-text="computedText"
       />
 
-      <v-list-item-avatar
-        v-else-if="item.avatar"
-        class="align-self-center"
-        color="white"
-        contain
-      >
-        <v-img src="https://demos.creative-tim.com/vuetify-material-dashboard/favicon.ico" />
-      </v-list-item-avatar>
-
       <v-list-item-content>
         <v-list-item-title v-text="item.title" />
       </v-list-item-content>
@@ -29,95 +21,92 @@
 
     <template v-for="(child, i) in children">
       <base-item-sub-group
-        v-if="child.children"
-        :key="`sub-group-${i}`"
+        v-if="child.children && child.children.length"
         :item="child"
+        :key="`child-${i}`"
       />
-
       <base-item
         v-else
         :key="`item-${i}`"
         :item="child"
-        text
       />
     </template>
   </v-list-group>
 </template>
 
 <script>
-  // Utilities
-  import kebabCase from 'lodash/kebabCase'
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex';
 
-  export default {
-    name: 'ItemGroup',
+export default {
+  name: 'ItemGroup',
 
-    inheritAttrs: false,
-
-    props: {
-      item: {
-        type: Object,
-        default: () => ({
-          avatar: undefined,
-          group: undefined,
-          title: undefined,
-          children: [],
-        }),
-      },
-      subGroup: {
-        type: Boolean,
-        default: false,
-      },
-      text: {
-        type: Boolean,
-        default: false,
-      },
+  props: {
+    item: {
+      type: Object,
+      required: true,
     },
+    subGroup: {
+      type: Boolean,
+      default: false,
+    },
+    text: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
-    computed: {
-      ...mapState(['barColor']),
-      children () {
-        return this.item.children.map(item => ({
-          ...item,
-          to: !item.to ? undefined : `${this.item.group}/${item.to}`,
-        }))
-      },
-      computedText () {
-        if (!this.item || !this.item.title) return ''
+  computed: {
+    ...mapState(['barColor']),
+    children() {
+      return this.item.children || [];
+    },
+    computedText() {
+      if (!this.item || !this.item.title) return '';
+      return this.item.title
+        .split(' ')
+        .map(word => word[0])
+        .join('');
+    },
+    group() {
+      return this.generateGroupPaths(this.children);
+    },
+    isGroupActive() {
+      return this.checkActive(this.item);
+    },
+  },
 
-        let text = ''
+  watch: {
+    isGroupActive(newVal) {
+      if (newVal) {
+        this.item.expanded = true;
+      }
+    },
+  },
 
-        this.item.title.split(' ').forEach(val => {
-          text += val.substring(0, 1)
+  methods: {
+    generateGroupPaths(children) {
+      return children
+        .filter(child => child.to)
+        .map(child => {
+          const baseGroup = this.item.group || '';
+          const childGroup = child.group || `${baseGroup}/${child.to}`;
+          return child.children
+            ? `${childGroup}|${this.generateGroupPaths(child.children)}`
+            : childGroup;
         })
-
-        return text
-      },
-      group () {
-        return this.genGroup(this.item.children)
-      },
+        .join('|');
     },
-
-    methods: {
-      genGroup (children) {
-        return children
-          .filter(item => item.to)
-          .map(item => {
-            const parent = item.group || this.item.group
-            let group = `${parent}/${kebabCase(item.to)}`
-
-            if (item.children) {
-              group = `${group}|${this.genGroup(item.children)}`
-            }
-
-            return group
-          }).join('|')
-      },
+    checkActive(item) {
+      if (item.to && this.$route && this.$route.path === item.to) return true;
+      return item.children
+        ? item.children.some(child => this.checkActive(child))
+        : false;
     },
-  }
+  },
+};
 </script>
 
-<style>
+<style scoped>
 .v-list-group__activator p {
   margin-bottom: 0;
 }

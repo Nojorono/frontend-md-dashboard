@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import logo from '../public/logo-nna.png'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    barColor: 'rgba(0, 0, 0, .8), rgba(0, 0, 0, .8)',
-    barImage: 'https://demos.creative-tim.com/material-dashboard/assets/img/sidebar-1.jpg',
+    barColor: 'rgb(228, 226, 226, 9), rgb(105, 105, 105)',
+    barImage: logo,
     drawer: null,
     user: JSON.parse(localStorage.getItem('user')) || null,
     token: localStorage.getItem('token') || null,
