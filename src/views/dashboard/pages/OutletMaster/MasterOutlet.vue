@@ -1,9 +1,8 @@
 <template>
   <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading">
     <v-container fluid>
-      <router-view />
       <v-row style="height: 70px">
-        <v-col cols="3">
+        <v-col cols="4">
           <v-tabs
             v-model="activeTab"
             dark
@@ -405,10 +404,10 @@
                           style="max-width: 150px; display: inline-block;"
                           v-on="on"
                         >
-                          {{ item?.outlet_type }}
+                          {{ item?.sio_type }}
                         </span>
                       </template>
-                      <span>{{ item?.outlet_type }}</span>
+                      <span>{{ item?.sio_type }}</span>
                     </v-tooltip>
                   </td>
                   <td>

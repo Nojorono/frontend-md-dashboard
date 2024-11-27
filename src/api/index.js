@@ -1,8 +1,8 @@
 // src/api/axiosInstance.ts
 import axios from 'axios'
-
+const baseURL = process.env.VUE_APP_API_URL || 'http://localhost:9001/api/v1'; // Fallback to default URL if not set
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:9001/api/v1', // Set your API base URL here
+  baseURL: baseURL,
   timeout: 10000,
 })
 

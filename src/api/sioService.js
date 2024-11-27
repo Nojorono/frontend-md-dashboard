@@ -1,13 +1,19 @@
-// src/services/MasterRoleService.js
-
 import axiosInstance from '@/api/index';
 
-// Function to get all active outlets
 export const getAll = async (params) => {
   try {
     const response = await axiosInstance.get('/sio', {
       params: params,
     });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const getAllSio = async () => {
+  try {
+    const response = await axiosInstance.get('/sio/all');
     return response.data;
   } catch (error) {
     throw error.response;

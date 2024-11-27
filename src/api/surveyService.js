@@ -5,18 +5,9 @@ import axiosInstance from '@/api/index';
 // Function to get all active outlets
 export const getAll = async (params) => {
   try {
-    const response = await axiosInstance.get('/brand', {
+    const response = await axiosInstance.get('/survey', {
       params: params,
     });
-    return response.data;
-  } catch (error) {
-    throw error.response;
-  }
-};
-
-export const getAllBrand = async () => {
-  try {
-    const response = await axiosInstance.get('/brand/all');
     return response.data;
   } catch (error) {
     throw error.response;
@@ -26,7 +17,7 @@ export const getAllBrand = async () => {
 // Function to get a single outlet by ID
 export const getById = async (id) => {
   try {
-    const response = await axiosInstance.get(`/brand/${id}`);
+    const response = await axiosInstance.get(`/survey/${id}`);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -36,7 +27,7 @@ export const getById = async (id) => {
 // Function to create
 export const createData = async (data) => {
   try {
-    const response = await axiosInstance.post('/brand', data);
+    const response = await axiosInstance.post('/survey', data);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -46,7 +37,7 @@ export const createData = async (data) => {
 // Function to update
 export const updateData = async (id, data) => {
   try {
-    const response = await axiosInstance.post(`/brand/${id}`, data);
+    const response = await axiosInstance.post(`/survey/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -56,7 +47,7 @@ export const updateData = async (id, data) => {
 // Function to delete
 export const deleteData = async (id) => {
   try {
-    const response = await axiosInstance.delete(`/brand/${id}`);
+    const response = await axiosInstance.delete(`/survey/${id}`);
     return response.data;
   } catch (error) {
     throw error.response;

@@ -26,20 +26,17 @@ import 'moment/locale/id'
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-// Import Vue Toastification and CSS
 import Toast from 'vue-toastification'
 import Swal from 'sweetalert2'
 import 'vue-toastification/dist/index.css'
-// Set the global locale to Indonesian
 moment.locale('id')
-// Add a global filter to format dates with Moment.js
+
 Vue.filter('formatDate', function(value, format = 'dddd, DD MMM YYYY') {
   if (value) {
     return moment(value).format(format)
   }
   return ''
 })
-// Customize Toastification options if needed
 const toastOptions = {
   position: "top-right",
   timeout: 5000,

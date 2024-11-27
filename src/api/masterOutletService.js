@@ -14,6 +14,15 @@ export const getAllOutlets = async (params) => {
   }
 };
 
+export const getAllOutletSurvey = async () => {
+  try {
+    const response = await axiosInstance.get('/outlets/survey-list');
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
 // Function to get a single outlet by ID
 export const getOutletById = async (id) => {
   try {

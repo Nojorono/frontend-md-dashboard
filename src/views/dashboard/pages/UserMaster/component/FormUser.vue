@@ -52,6 +52,7 @@
                 type="tel"
                 maxlength="20"
                 @keypress="isNumber"
+                required
               />
 
               <!-- Type MD Input -->
@@ -98,6 +99,7 @@
                 multiple
                 return-object
                 chips
+                required
                 :rules="areaRules"
               >
                 <template v-slot:no-data>
@@ -116,6 +118,7 @@
                 clearable
                 return-object
                 :rules="roleRules"
+                required
                 @change="onRoleChange"
               >
                 <template v-slot:no-data>
@@ -138,12 +141,14 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
+                    :rules="dateRules"
                     v-on="on"
                   />
                 </template>
                 <v-date-picker
                   v-model="itemData.valid_from"
                   style="margin: 0;"
+                  required
                   @input="validStartMenu = false"
                 />
               </v-menu>
@@ -163,12 +168,14 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
+                    :rules="dateRules"
                     v-on="on"
                   />
                 </template>
                 <v-date-picker
                   v-model="itemData.valid_to"
                   style="margin: 0;"
+                  required
                   @input="validEndMenu = false"
                 />
               </v-menu>
@@ -263,6 +270,9 @@
         ],
         roleRules: [
           (v) => !!v || "Role is required",
+        ],
+        dateRules: [
+          (v) => !!v || "Valid is required",
         ],
       };
     },

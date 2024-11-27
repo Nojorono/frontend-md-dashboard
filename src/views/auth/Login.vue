@@ -63,7 +63,7 @@
                 />
                 <v-btn
                   :disabled="!valid"
-                  color="primary1"
+                  color="primary"
                   large
                   block
                   @click="handleLogin"

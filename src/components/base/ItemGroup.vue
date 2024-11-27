@@ -5,7 +5,7 @@
     :sub-group="subGroup"
     append-icon="mdi-menu-down"
     :color="isGroupActive ? 'primary' : barColor"
-    :value="item.expanded || isGroupActive"
+    :value="item.expanded"
   >
     <template v-slot:activator>
       <v-list-item-icon
@@ -78,6 +78,7 @@ export default {
   watch: {
     isGroupActive(newVal) {
       if (newVal) {
+        console.log(newVal)
         this.item.expanded = true;
       }
     },

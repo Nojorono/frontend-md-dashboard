@@ -1,4 +1,3 @@
-// src/services/MasterRoleService.js
 
 import axiosInstance from '@/api/index';
 
@@ -8,6 +7,26 @@ export const getAll = async (params) => {
     const response = await axiosInstance.get('/region', {
       params: params,
     });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const getAllRegion = async (params) => {
+  try {
+    const response = await axiosInstance.get('/region/all', {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const getAllArea = async () => {
+  try {
+    const response = await axiosInstance.get(`/area/all`);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -91,7 +110,6 @@ export const updateChildData = async (id, data) => {
 
 // Function to delete
 export const deleteData = async (id) => {
-  console.log(id)
   try {
     const response = await axiosInstance.delete(`/region/${id}`);
     return response.data;
@@ -101,7 +119,6 @@ export const deleteData = async (id) => {
 };
 
 export const deleteChildData = async (id) => {
-  console.log(id)
   try {
     const response = await axiosInstance.delete(`/area/${id}`);
     return response.data;

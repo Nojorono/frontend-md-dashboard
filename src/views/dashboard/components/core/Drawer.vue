@@ -88,7 +88,7 @@
       <template v-for="(item, i) in menuItems">
         <base-item-group
           v-if="item.children"
-          :key="`group-${i}`"
+          :key="`child-${i}`"
           :item="item"
         >
         </base-item-group>
@@ -122,7 +122,7 @@ export default {
       {
         title: 'Master Data',
         icon: 'mdi-folder-multiple',
-        expanded: true,
+        expanded: null,
         children: [
           { title: 'Outlet', icon: 'mdi-account', to: '/master/outlet' },
           { title: 'Users', icon: 'mdi-account', to: '/master/users' },
@@ -133,11 +133,13 @@ export default {
           { title: 'Region & Area', icon: 'mdi-cube', to: '/master/region' },
         ],
       },
+      { title: 'Survey New Outlet', icon: 'mdi-calendar', to: '/survey' },
       { title: 'Call Plan', icon: 'mdi-calendar', to: '/call-plan' },
+      { title: 'Activity MD', icon: 'mdi-calendar', to: '/activity' },
       {
         title: 'Settings',
         icon: 'mdi-cog',
-        expanded: true,
+        expanded: null,
         children: [
           { title: 'Profile', icon: 'mdi-account-circle', to: '/settings/profile' },
           { title: 'Notifications', icon: 'mdi-bell', to: '/settings/notifications' },

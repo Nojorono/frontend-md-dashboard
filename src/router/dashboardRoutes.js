@@ -78,6 +78,18 @@ export default [
         meta: requiresAuth, // Protect this route
       },
       {
+        name: 'Survey Outlet',
+        path: '/survey',
+        component: () => import('@/views/dashboard/pages/SurveyNewOutlet/SurveyNewOutlet.vue'),
+        meta: requiresAuth,
+      },
+      {
+        name: 'Activity',
+        path: '/activity',
+        component: () => import('@/views/dashboard/pages/Activity/Activity.vue'),
+        meta: requiresAuth,
+      },
+      {
         name: 'Call Plan',
         path: '/call-plan',
         component: () => import('@/views/dashboard/pages/CallPlan/CallPlan.vue'),
