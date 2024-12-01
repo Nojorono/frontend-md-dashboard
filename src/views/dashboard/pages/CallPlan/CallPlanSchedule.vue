@@ -93,13 +93,14 @@
         <template v-slot:item="{ item, index }">
           <tr>
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+            <td>{{ item.type === 0 ? 'Visit Outlet' : 'Survey Outlet' }}</td>
             <td>{{ item.email }}</td>
             <td>
               <span>
-                {{ item.outlet_code }}
+                {{ item.outlet_code ? item.outlet_code : item.survey_outlet_code }}
               </span>
               <span>
-                {{ item.outlet_name }}
+                {{ item.outlet_name ? item.outlet_name : item.survey_outlet_name }}
               </span>
             </td>
             <td>{{ item.code_call_plan }}</td>
@@ -244,6 +245,8 @@ export default {
         day_plan: item.day_plan,
         outlet_id: [item.outlet_id],
         user_id: item.user_id,
+        survey_outlet_id: item.survey_outlet_id,
+        type: item.type,
       }
       this.isFormRoleDialog = true
     },

@@ -14,8 +14,47 @@
           ref="form"
           v-model="formValid"
         >
+        <v-row>
+          <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
+              <v-select
+                v-model="itemData.type"
+                :items="typeOptions"
+                label="Type"
+              />
+            </v-col>
+            <v-col
+              sm="6"
+              md="6"
+              lg="6"
+              xl="6"
+            >
+            <v-autocomplete
+                v-model="itemData.user_id"
+                :items="userOptions"
+                item-text="email"
+                item-value="id"
+                label="Select User"
+                clearable
+                return-object
+                :rules="userRules"
+                @change="onUserChange"
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-content>No users found</v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </v-col>
+        </v-row>
           <!-- User Selection using v-autocomplete -->
-          <v-autocomplete
+           <template v-if="itemData.type === 0">
+            <v-autocomplete
             v-model="itemData.outlet_id"
             :items="outletsOptions"
             :item-text="getOutletText"
@@ -34,6 +73,29 @@
               </v-list-item>
             </template>
           </v-autocomplete>
+        </template>
+        <template v-if="itemData.type === 1">
+          <v-autocomplete
+            v-model="itemData.survey_outlet_id"
+            :items="surveyOutletOptions"
+            :item-text="getOutletText"
+            item-value="id"
+            label="Select Survey Outlets"
+            chips
+            clearable
+            deletable-chips
+            small-chips-call
+            :rules="outletRules"
+            @change="onSurveyOutletChange"
+          >
+            <template v-slot:no-data>
+              <v-list-item>
+                <v-list-item-content>No outlets found</v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+        </template>
+          
           <v-row>
             <v-col
               sm="6"
@@ -41,23 +103,6 @@
               lg="6"
               xl="6"
             >
-              <v-autocomplete
-                v-model="itemData.user_id"
-                :items="userOptions"
-                item-text="email"
-                item-value="id"
-                label="Select User"
-                clearable
-                return-object
-                :rules="userRules"
-                @change="onUserChange"
-              >
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <v-list-item-content>No users found</v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-autocomplete>
 
               <v-textarea
                 v-model="itemData.notes"
@@ -128,6 +173,7 @@
 <script>
 import { getOutletByType } from '@/api/masterOutletService'
 import {getAllRole} from "@/api/userService";
+import { getAllSurveyOutlet } from '@/api/surveyService';
 
 export default {
   name: "FormCallPlanSchedule",
@@ -144,12 +190,25 @@ export default {
         outlet_id: [],
         notes: '',
         day_plan: '',
+        type: 0,
+        survey_outlet_id: null,
       },
       formValid: false,
       startPlanMenu: false,
       endPlanMenu: false,
       outletsOptions: [],
+      surveyOutletOptions: [],
       userOptions: [],
+      typeOptions: [
+        {
+          text: 'Visit',
+          value: 0,
+        },
+        {
+          text: 'Survey',
+          value: 1,
+        },
+      ],
       // Validation rules
       outletRules: [
         v => {
@@ -200,6 +259,7 @@ export default {
           } else if (!this.isEdit && !Array.isArray(this.itemData.outlet_id)) {
             this.itemData.outlet_id = this.itemData.outlet_id ? [this.itemData.outlet_id] : [];
           }
+
         } else {
           this.resetForm();
         }
@@ -209,17 +269,28 @@ export default {
   mounted() {
     this.fetchOutlets();
     this.fetchUsers();
+    this.fetchSurveyOutlet();
   },
   methods: {
     getOutletText(item) {
       return `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area}`;
     },
+    onSurveyOutletChange(surveyOutlet) {
+      console.log(surveyOutlet)
+      if (surveyOutlet) {
+        this.itemData.survey_outlet_id = surveyOutlet;
+      } else {
+        this.itemData.survey_outlet_id = null;
+      }
+    },
     resetForm() {
       this.itemData = {
         outlet_id: [],
         notes: '',
-        start_plan: '',
-        end_plan: '',
+        day_plan: '',
+        survey_outlet_id: null,
+        type: 0,
+        user_id: null,
       };
       this.formValid = false;
       // Check if the form reference exists before calling resetValidation
@@ -244,6 +315,10 @@ export default {
     async fetchOutlets () {
       const response = await getOutletByType();
       this.outletsOptions = response.data
+    },
+    async fetchSurveyOutlet () {
+      const response = await getAllSurveyOutlet();
+      this.surveyOutletOptions = response.data
     },
     onUserChange(user) {
       // Handle user selection change

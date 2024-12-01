@@ -65,6 +65,7 @@
                 item-value="name"
                 label="Region"
                 clearable
+                @change="onRegionChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -81,6 +82,7 @@
                 item-value="area"
                 label="Area"
                 clearable
+                @change="onAreaChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -131,20 +133,21 @@
               />
 
               <!-- Photos -->
-              <template>
+              <!-- <template>
                 <v-text-field
                   label="Photos"
                   readonly
                 />
                 <div>
                   <vue-dropzone
+                    v-model="itemData.photos"
                     id="dropzone"
                     :options="dropzoneOptions"
                     @vdropzone-success="handleDropzoneSuccess"
                     @vdropzone-removed-file="handleFileRemove"
                   />
                 </div>
-              </template>
+              </template> -->
             </v-col>
 
             <!-- Right Column -->
@@ -264,8 +267,8 @@
 import { getAllArea, getAllRegion} from '@/api/regionAreaService'
 import {mapGetters} from "vuex";
 import {findLast} from "@/api/batchService";
-import Vue2Dropzone from 'vue2-dropzone'
-import 'vue2-dropzone/dist/vue2Dropzone.min.css'
+// import Vue2Dropzone from 'vue2-dropzone'
+// import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import {deleteImageS3} from "@/api/S3Service";
 import {getAllSio} from "@/api/sioService";
 import {getAllBrand} from "@/api/brandService";
@@ -276,7 +279,7 @@ import {getAllOutletSurvey} from "@/api/masterOutletService";
 export default {
   name: "FormSurveyNewOutlet",
   components: {
-    vueDropzone: Vue2Dropzone
+    // vueDropzone: Vue2Dropzone
   },
   props: {
     dialog: Boolean,
@@ -449,15 +452,12 @@ export default {
       this.loading = true;
       try {
         const response = await getAllArea();
-        if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+        if (this.getUser.area) {
           this.areaOptions = response.data.data.filter(
-            (area) => this.getUser.area.includes(area)
+            (area) => this.getUser.area.includes(area.area)
           );
         } else {
           this.areaOptions = response.data.data;
-        }
-        if (this.areaOptions.length === 1) {
-          this.itemData.area = [this.areaOptions[0]];
         }
       } catch (error) {
         console.error("Error fetching :", error);
@@ -504,13 +504,10 @@ export default {
         const response = await getAllRegion();
         if (this.getUser.region) {
           this.regionOptions = response.data.data.filter(
-            (name) => name === this.getUser.region
+            (region) => region.name === this.getUser.region
           );
         } else {
           this.regionOptions = response.data.data;
-        }
-        if (this.regionOptions.length === 1) {
-          this.itemData.region = this.regionOptions[0];
         }
       } catch (error) {
         console.error("Error fetching :", error);
@@ -566,6 +563,20 @@ export default {
     closeDialog() {
       this.resetForm();
       this.$emit("close");
+    },
+    onRegionChange(item) {
+      if (item) {
+        this.itemData.region = item;
+      } else {
+        this.itemData.region = null;
+      }
+    },
+    onAreaChange(item) {
+      if (item) {
+        this.itemData.area = item;
+      } else {
+        this.itemData.area = null;
+      }
     },
     saveItem() {
       if (this.$refs.form.validate()) {

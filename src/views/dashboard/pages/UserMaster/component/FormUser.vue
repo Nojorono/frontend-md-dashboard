@@ -96,10 +96,10 @@
                 item-value="area"
                 label="Area"
                 clearable
-                multiple
                 return-object
                 chips
                 required
+                @change="onAreaChange"
                 :rules="areaRules"
               >
                 <template v-slot:no-data>
@@ -227,7 +227,7 @@ import {mapGetters} from "vuex";
           email: '',
           phone: '',
           type_md: '',
-          area: [],
+          area: '',
           region: '',
           valid_from: '',
           valid_to: '',
@@ -364,7 +364,7 @@ import {mapGetters} from "vuex";
           email: '',
           phone: '',
           type_md: '',
-          area: [],
+          area: '',
           region: '',
           valid_from: '',
           valid_to: '',
@@ -382,24 +382,24 @@ import {mapGetters} from "vuex";
       saveItem() {
         if (this.$refs.form.validate()) {
           const formattedData = {
-            ...this.itemData
+            ...this.itemData,
+            area: [this.itemData.area],
           };
           this.$emit("save", formattedData);
         }
       },
       onRegionChange(item) {
-        console.log(item)
         if (item) {
-          this.itemData.region = item;
+          this.itemData.region = item.name;
         } else {
           this.itemData.region = null;
         }
       },
       onAreaChange(item) {
         if (item) {
-          this.itemData.area = item.name;
+          this.itemData.area = item.area;
         } else {
-          this.itemData.area = null;
+          this.itemData.area = [];
         }
       },
       onRoleChange(item) {

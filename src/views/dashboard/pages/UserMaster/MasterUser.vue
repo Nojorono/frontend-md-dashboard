@@ -229,10 +229,9 @@ export default {
     ...mapGetters(['getUser']),
   },
 
-  created() {
-    this.fetchData();
-    this.fetchArea();
+  mounted() {
     this.fetchRegion();
+    this.fetchArea();
   },
 
   methods: {

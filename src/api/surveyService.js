@@ -3,6 +3,15 @@
 import axiosInstance from '@/api/index';
 
 // Function to get all active outlets
+export const getAllSurveyOutlet = async () => {
+  try {
+    const response = await axiosInstance.get('/survey/schedule');
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
 export const getAll = async (params) => {
   try {
     const response = await axiosInstance.get('/survey', {
@@ -37,7 +46,7 @@ export const createData = async (data) => {
 // Function to update
 export const updateData = async (id, data) => {
   try {
-    const response = await axiosInstance.post(`/survey/${id}`, data);
+    const response = await axiosInstance.put(`/survey/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response;
