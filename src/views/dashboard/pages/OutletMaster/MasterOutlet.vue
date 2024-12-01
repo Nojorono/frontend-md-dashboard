@@ -64,27 +64,39 @@
                   </v-col>
                   <v-col>
                     <div class="d-flex justify-end">
-                      <v-btn
-                        color="primary"
-                        @click="openImportDialog()"
+                      <v-col
+                        cols="6"
+                        style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
                       >
-                        <v-icon>mdi-plus-box-multiple</v-icon>
-                        <span class="mx-1">Import</span>
-                      </v-btn>
-                      <!--                      <v-btn-->
-                      <!--                        color="primary"-->
-                      <!--                        @click="openHandleAdd"-->
-                      <!--                      >-->
-                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
-                      <!--                        <span class="mx-1">Export</span>-->
-                      <!--                      </v-btn>-->
-                      <!--                      <v-btn-->
-                      <!--                        color="primary"-->
-                      <!--                        @click="openHandleAdd"-->
-                      <!--                      >-->
-                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
-                      <!--                        <span class="mx-1">Add</span>-->
-                      <!--                      </v-btn>-->
+                        <v-autocomplete
+                          item-text="name"
+                          item-value="name"
+                          label="Region"
+                          :items="regionOptions"
+                          clearable
+                          return-object
+                        >
+                          <template v-slot:no-data>
+                            <v-list-item>
+                              <v-list-item-content>Region not found</v-list-item-content>
+                            </v-list-item>
+                          </template>
+                        </v-autocomplete>
+                        <v-autocomplete
+                          item-text="name"
+                          item-value="name"
+                          label="Area"
+                          :items="areaOptions"
+                          clearable
+                          return-object
+                        >
+                          <template v-slot:no-data>
+                            <v-list-item>
+                              <v-list-item-content>Area not found</v-list-item-content>
+                            </v-list-item>
+                          </template>
+                        </v-autocomplete>
+                      </v-col>
                     </div>
                   </v-col>
                 </v-row>
@@ -275,30 +287,50 @@
                       @click:append="handleSearch"
                     />
                   </v-col>
-                  <v-col>
+                  <v-col
+                        cols="6"
+                        style="display: flex; justify-content: flex-end; align-items: center; padding-right: unset; padding-left: 10px"
+                      >
                     <div class="d-flex justify-end">
-                      <v-btn
+                        <v-autocomplete
+                          item-text="name"
+                          item-value="name"
+                          label="Region"
+                          :items="regionOptions"
+                          clearable
+                          @change="handleRegionChange"
+                        >
+                          <template v-slot:no-data>
+                            <v-list-item>
+                              <v-list-item-content>Region not found</v-list-item-content>
+                            </v-list-item>
+                          </template>
+                        </v-autocomplete>
+                        <v-autocomplete
+                          item-text="name"
+                          item-value="name"
+                          label="Area"
+                          :items="areaOptions"
+                          clearable
+                          @change="handleAreaChange"
+                        >
+                          <template v-slot:no-data>
+                            <v-list-item>
+                              <v-list-item-content>Area not found</v-list-item-content>
+                            </v-list-item>
+                          </template>
+                        </v-autocomplete>
+                    
+                    </div>
+                  </v-col>
+                  <v-col cols="2" class="d-flex justify-end">
+                  <v-btn
                         color="primary"
                         @click="openImportDialog()"
                       >
                         <v-icon>mdi-plus-box-multiple</v-icon>
                         <span class="mx-1">Import</span>
                       </v-btn>
-                      <!--                      <v-btn-->
-                      <!--                        color="primary"-->
-                      <!--                        @click="openHandleAdd"-->
-                      <!--                      >-->
-                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
-                      <!--                        <span class="mx-1">Export</span>-->
-                      <!--                      </v-btn>-->
-                      <!--                      <v-btn-->
-                      <!--                        color="primary"-->
-                      <!--                        @click="openHandleAdd"-->
-                      <!--                      >-->
-                      <!--                        <v-icon>mdi-plus-box-multiple</v-icon>-->
-                      <!--                        <span class="mx-1">Add</span>-->
-                      <!--                      </v-btn>-->
-                    </div>
                   </v-col>
                 </v-row>
               </template>
@@ -473,10 +505,12 @@
 
 <script>
   import { deleteOutlet, getAllOutlets, uploadOutlet } from '@/api/masterOutletService'
+  import { mapGetters } from "vuex";
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
   import Vue from "vue";
   import {createData, updateData} from "@/api/userService";
   import ImportOutlet from "@/views/dashboard/pages/OutletMaster/components/ImportOutlet.vue";
+  import { getOutletRegion, getOutletArea } from "@/api/masterOutletService";
 
   export default {
     name: 'MasterOutlet',
@@ -543,9 +577,16 @@
         isEdit: false,
         isConfirmDeleteDialogOpen: false,
         search: '',
+        regionOptions: [],
+        areaOptions: [],
+        filter: {
+          region: '',
+          area: '',
+        },
       }
     },
     computed: {
+      ...mapGetters(['getUser']),
     },
     watch: {
       page(value) {
@@ -556,15 +597,60 @@
         this.options.itemsPerPage = value;
         this.fetchData();
       },
-      activeTab(newValue) {
-        console.log(newValue)
+      activeTab() {
         this.fetchData();
       },
     },
     mounted () {
       this.fetchData()
+      this.fetchRegion()
+      this.fetchArea()
     },
     methods: {
+      async fetchArea() {
+        this.loading = true;
+        try {
+          const response = await getOutletArea();
+          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+            this.areaOptions = response.data.filter(
+              (area) => this.getUser.area.includes(area)
+            );
+          } else {
+            this.areaOptions = response.data;
+          }
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
+        }
+      },
+      async fetchRegion() {
+        this.loading = true;
+        try {
+          const response = await getOutletRegion();
+          if (this.getUser.region) {
+            this.regionOptions = response.data.filter(
+              (region) => region === this.getUser.region
+            );
+          } else {
+            this.regionOptions = response.data;
+          }
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
+        }
+      },
+      handleRegionChange(value) {
+        this.filter.region = value;
+        this.options.page = 1;
+        this.fetchData();
+      },
+      handleAreaChange(value) {
+        this.filter.area = value;
+        this.options.page = 1;
+        this.fetchData();
+      },
       async handleDetail(id) {
         await this.$router.push({
           name: 'Outlet Detail',
@@ -616,6 +702,7 @@
             limit: this.options.itemsPerPage,
             searchTerm: this.search,
             isActive: this.activeTab,
+            filter: this.filter,
           });
           this.tableData = response.data.data;
           this.totalItems = response.data.totalItems;
@@ -703,3 +790,4 @@
   font-weight: normal;
 }
 </style>
+    

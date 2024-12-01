@@ -167,8 +167,8 @@
   import { createData, deleteData, updateData, getAll } from '@/api/callPlanService'
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
   import Vue from "vue";
-  import {getOutletArea, getOutletRegion} from "@/api/masterOutletService";
-  import {mapGetters} from "vuex";
+  import { getOutletArea, getOutletRegion } from "@/api/masterOutletService";
+  import { mapGetters } from "vuex";
 
   export default {
     name: 'CallPlan',
