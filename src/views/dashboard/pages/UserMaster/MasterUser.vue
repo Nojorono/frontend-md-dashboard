@@ -53,6 +53,44 @@
                 </v-btn>
               </div>
             </v-col>
+            <v-col
+              cols="6"
+              style="display: flex; justify-content: flex-end; align-items: center; padding-right: unset; padding-left: 10px"
+            >
+              <div class="d-flex justify-end">
+                <v-autocomplete
+                  item-text="name"
+                  item-value="name"
+                  label="Region"
+                  v-model="filter.region"
+                  :items="regionOptions"
+                  clearable
+                  @change="handleRegionChange"
+                >
+                  <template v-slot:no-data>
+                    <v-list-item>
+                      <v-list-item-content>Region not found</v-list-item-content>
+                    </v-list-item>
+                  </template>
+                </v-autocomplete>
+                <v-autocomplete
+                  item-text="name"
+                  item-value="name"
+                  label="Area"
+                  v-model="filter.area"
+                  :items="areaOptions"
+                  clearable
+                  :disabled="!filter.region"
+                  @change="handleAreaChange"
+                >
+                  <template v-slot:no-data>
+                    <v-list-item>
+                      <v-list-item-content>Area not found</v-list-item-content>
+                    </v-list-item>
+                  </template>
+                </v-autocomplete>
+              </div>
+            </v-col>
           </v-row>
         </template>
         <template v-slot:item="{ item }">
@@ -127,10 +165,12 @@
 </template>
 
 <script>
-import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue';
-import { createData, deleteData, updateData, getAll } from '@/api/userService';
-import FormUser from '@/views/dashboard/pages/UserMaster/component/FormUser.vue';
-import Vue from "vue";
+  import { mapGetters } from "vuex";
+  import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue';
+  import { createData, deleteData, updateData, getAll } from '@/api/userService';
+  import FormUser from '@/views/dashboard/pages/UserMaster/component/FormUser.vue';
+  import { getOutletRegion, getOutletArea } from "@/api/masterOutletService";
+  import Vue from "vue";
 
 export default {
   name: 'MasterUser',
@@ -164,6 +204,12 @@ export default {
       isEdit: false,
       isConfirmDeleteDialogOpen: false,
       search: '',
+      regionOptions: [],
+      areaOptions: [],
+      filter: {
+        region: '',
+        area: '',
+      },
     }
   },
 
@@ -178,11 +224,65 @@ export default {
     },
   },
 
+  computed: {
+    ...mapGetters(['getUser']),
+  },
+
   created() {
     this.fetchData();
+    this.fetchArea();
+    this.fetchRegion();
   },
 
   methods: {
+    async fetchArea() {
+      this.loading = true;
+      try {
+        const response = await getOutletArea();
+        if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+          this.areaOptions = response.data.filter(
+            (area) => this.getUser.area.includes(area)
+          );
+        } else {
+          this.areaOptions = response.data;
+        }
+      } catch (error) {
+        console.error("Error fetching :", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchRegion() {
+      this.loading = true;
+      try {
+        const response = await getOutletRegion();
+        if (this.getUser.region) {
+          this.regionOptions = response.data.filter(
+            (region) => region === this.getUser.region
+          );
+        } else {
+          this.regionOptions = response.data;
+        }
+      } catch (error) {
+        console.error("Error fetching :", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    handleRegionChange(value) {
+      this.options.page = 1;
+      this.filter.region = value;
+
+      if (!value) {
+        this.filter.area = '';
+      }
+      this.fetchData();
+    },
+    handleAreaChange(value) {
+      this.options.page = 1;
+      this.filter.area = value;
+      this.fetchData();
+    },
     onPageChange(newPage) {
       this.page = newPage;
     },
@@ -236,6 +336,7 @@ export default {
           page: this.options.page,
           limit: this.options.itemsPerPage,
           searchTerm: this.search,
+          filter: this.filter,
         });
         this.tableData = response.data.data;
         this.totalItems = response.data.totalItems;
