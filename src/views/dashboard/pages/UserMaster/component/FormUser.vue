@@ -92,8 +92,8 @@
               <v-autocomplete
                 v-model="itemData.area"
                 :items="areaOptions"
-                item-text="name"
-                item-value="name"
+                item-text="area"
+                item-value="area"
                 label="Area"
                 clearable
                 multiple
@@ -207,9 +207,9 @@
 </template>
 
 <script>
-  import { getOutletArea, getOutletRegion } from '@/api/masterOutletService'
-  import { getAllList } from '@/api/masterRoleService'
-  import {mapGetters} from "vuex";
+import { getAllArea, getAllRegion} from '@/api/regionAreaService'
+import { getAllList } from '@/api/masterRoleService'
+import {mapGetters} from "vuex";
 
   export default {
     name: "FormUser",
@@ -308,14 +308,16 @@
       async fetchArea() {
         this.loading = true;
         try {
-          const response = await getOutletArea();
-          // Check if user area array is defined and not empty; if so, filter based on areas
+          const response = await getAllArea();
           if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
-            this.areaOptions = response.data.filter(
-              (area) => this.getUser.area.includes(area)
+            this.areaOptions = response.data.data.filter(
+              (area) => this.getUser.area.includes(area.area)
             );
           } else {
-            this.areaOptions = response.data;
+            this.areaOptions = response.data.data;
+          }
+          if (this.areaOptions.length === 1) {
+            this.itemData.area = [this.areaOptions[0]];
           }
         } catch (error) {
           console.error("Error fetching :", error);
@@ -326,13 +328,16 @@
       async fetchRegion() {
         this.loading = true;
         try {
-          const response = await getOutletRegion();
+          const response = await getAllRegion();
           if (this.getUser.region) {
-            this.regionOptions = response.data.filter(
-              (region) => region === this.getUser.region
+            this.regionOptions = response.data.data.filter(
+              (region) => region.name === this.getUser.region
             );
           } else {
-            this.regionOptions = response.data; // No filtering if region is undefined
+            this.regionOptions = response.data.data;
+          }
+          if (this.regionOptions.length === 1) {
+            this.itemData.region = this.regionOptions[0].name;
           }
         } catch (error) {
           console.error("Error fetching :", error);

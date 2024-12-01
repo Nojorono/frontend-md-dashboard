@@ -64,6 +64,7 @@
                   label="Region"
                   v-model="filter.region"
                   :items="regionOptions"
+                  :disabled="regionOptions.length <= 1"
                   clearable
                   @change="handleRegionChange"
                 >
@@ -262,6 +263,11 @@ export default {
           );
         } else {
           this.regionOptions = response.data;
+        }
+
+        if (this.regionOptions.length > 0) {
+          this.filter.region = this.regionOptions[0];
+          this.handleRegionChange(this.filter.region);
         }
       } catch (error) {
         console.error("Error fetching :", error);
