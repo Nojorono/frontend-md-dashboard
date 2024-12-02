@@ -619,7 +619,7 @@
             this.areaOptions = response.data;
           }
         } catch (error) {
-          console.error("Error fetching :", error);
+          Vue.prototype.$toast.error(`${error.data.message}`);
         } finally {
           this.loading = false;
         }
@@ -636,7 +636,7 @@
             this.regionOptions = response.data;
           }
         } catch (error) {
-          console.error("Error fetching :", error);
+          Vue.prototype.$toast.error(`${error.data.message}`);
         } finally {
           this.loading = false;
         }
@@ -685,7 +685,6 @@
           this.closeFormDialog();
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`);
-          console.error(error);
         } finally {
           await this.fetchData();
         }
@@ -753,7 +752,6 @@
           Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`);
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data?.message}`);
-          console.error(error);
         } finally {
           this.loading = false;
           this.closeConfirmDeleteDialog();

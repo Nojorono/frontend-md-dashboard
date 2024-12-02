@@ -60,7 +60,6 @@ export default {
     };
   },
   computed: {
-    // Access the loading state from Vuex
     loading() {
       return this.$store.getters.getLoading;
     },
@@ -78,12 +77,10 @@ export default {
     },
     async uploadFile() {
       if (this.file) {
-        // Show the loading spinner
         await this.$store.dispatch("showLoading");
-
         const fileData = {
           file: this.file,
-          fileType: this.fileType, // Pass file type flag
+          fileType: this.fileType,
         };
 
         try {
@@ -91,9 +88,8 @@ export default {
         } catch (error) {
           this.$toast.error("File upload failed!");
         } finally {
-          // Hide the loading spinner
           await this.$store.dispatch("hideLoading");
-          this.closeDialog(); // Close the dialog
+          this.closeDialog();
         }
       }
     },

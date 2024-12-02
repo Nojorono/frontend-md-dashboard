@@ -104,7 +104,7 @@
                   color="warning"
                   outlined
                   small
-                  @click="handleSchedule(item.id)"
+                  @click="handleDetail(item.id)"
                 >
                   <v-icon>mdi-calendar-arrow-right</v-icon>
                 </v-btn>
@@ -191,7 +191,7 @@
         tableData: [],
         totalItems: 0,
         totalPages: 0,
-        page: 1, // Current page number
+        page: 1,
         options: { page: 1, itemsPerPage: 10 },
         loading: false,
         selectedItem: null,
@@ -336,9 +336,9 @@
         this.selectedItem = data
         this.isConfirmDeleteDialogOpen = true
       },
-      async handleSchedule(id) {
+      async handleDetail(id) {
         await this.$router.push({
-          name: 'Call Plan Schedule',
+          name: 'Detail Activity',
           params: { id },
         });
       },

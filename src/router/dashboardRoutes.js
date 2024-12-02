@@ -90,6 +90,12 @@ export default [
         meta: requiresAuth,
       },
       {
+        name: 'Detail Activity',
+        path: '/activity/detail/:id',
+        component: () => import('@/views/dashboard/pages/Activity/components/DetailActivity.vue'),
+        meta: requiresAuth,
+      },
+      {
         name: 'Call Plan',
         path: '/call-plan',
         component: () => import('@/views/dashboard/pages/CallPlan/CallPlan.vue'),

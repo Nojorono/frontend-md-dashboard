@@ -302,24 +302,24 @@ export default {
       const activity = this.activities[activityIndex];
       if (activity.newComment.trim()) {
         activity.comments.push({
-          user: "User", // Replace with dynamic username
+          user: "User",
           text: activity.newComment,
         });
-        activity.newComment = ""; // Clear input
+        activity.newComment = "";
       }
     },
     toggleActivity(activityIndex) {
       const activity = this.activities[activityIndex];
-      activity.showAllComments = !activity.showAllComments; // Toggle the visibility
+      activity.showAllComments = !activity.showAllComments;
     },
     toggleComments(activityIndex) {
       const activity = this.activities[activityIndex];
-      activity.showAllComments = !activity.showAllComments; // Toggle the visibility
+      activity.showAllComments = !activity.showAllComments;
     },
     visibleComments(activity) {
       return activity.showAllComments
         ? activity.comments
-        : activity.comments.slice(0, 2); // Show first 2 comments only
+        : activity.comments.slice(0, 2);
     },
     formatDate(date) {
       return new Intl.DateTimeFormat("en-US", {
@@ -331,10 +331,8 @@ export default {
       this.loading = true;
       try {
         const response = await getOutletById(id);
-        console.log(response);
         this.data = response.data;
       } catch (error) {
-        console.error("Error fetching data:", error);
         Vue.prototype.$toast.error(error.response?.data?.message || "Failed to load data");
       } finally {
         this.loading = false;
@@ -344,8 +342,7 @@ export default {
       this.$router.back();
     },
     handleSwitchChange(data, isActive) {
-      console.log(data, isActive)
-      // Show SweetAlert confirmation before changing the switch state
+      console.log(data, isActive);
       this.$swal.fire({
         title: "Are you sure?",
         text: "This action cannot be undone.",
