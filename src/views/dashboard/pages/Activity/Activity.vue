@@ -18,6 +18,39 @@
             class="justify-space-between"
             style="align-items: baseline"
           >
+            <v-col
+              cols="4"
+              style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+            >
+              <v-autocomplete
+                item-text="name"
+                item-value="name"
+                label="Region"
+                :items="regionOptions"
+                clearable
+                return-object
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-content>Region not found</v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+              <v-autocomplete
+                item-text="name"
+                item-value="name"
+                label="Area"
+                :items="areaOptions"
+                clearable
+                return-object
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-content>Area not found</v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </v-col>
             <v-col cols="4">
               <v-text-field
                 v-model="search"
@@ -59,42 +92,39 @@
         <template v-slot:item="{ item, index }">
           <tr>
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+            <td>{{ item?.region }}</td>
+            <td>{{ item?.area }}</td>
             <td>{{ item?.brand }}</td>
+            <td>{{ item?.type_sio }}</td>
+            <td>{{ item?.status }}</td>
             <td>
-              <div>
-                <v-chip
-                  v-for="(sog, indexSog) in item?.sog"
-                  :key="indexSog"
-                  small
+              <div class="d-flex" style="align-items: center">
+                <v-btn
+                  class="mx-1"
+                  color="warning"
                   outlined
-                  class="ma-1"
+                  small
+                  @click="handleSchedule(item.id)"
                 >
-                  {{ sog }}
-                </v-chip>
+                  <v-icon>mdi-calendar-arrow-right</v-icon>
+                </v-btn>
+                <v-menu v-model="menu" offset-y>
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" color="warning" outlined small>
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item
+                      v-for="status in statusOptions"
+                      :key="status.value"
+                      @click="handleStatusUpdate(item, status.value)"
+                    >
+                      <v-list-item-title>{{ status.value }}: {{ status.text }}</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
               </div>
-            </td>
-            <td>{{ item?.sog.length }}</td>
-            <td
-              class="d-flex"
-              style="align-items: center"
-            >
-              <v-btn
-                class="mx-1"
-                outlined
-                small
-                @click="openHandleUpdate(item)"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn
-                class="mx-1"
-                color="error"
-                outlined
-                small
-                @click="openConfirmDeleteDialog(item)"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
             </td>
           </tr>
         </template>
@@ -113,6 +143,7 @@
         />
       </v-row>
     </v-card>
+
     <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
       :dialog="isConfirmDeleteDialogOpen"
@@ -120,10 +151,11 @@
       @close="closeConfirmDeleteDialog"
     />
     <!-- Create & Update Dialog -->
-    <form-brand
+    <form-call-plan
       :dialog="isFormRoleDialog"
       :is-edit="isEdit"
       :item="selectedItem"
+      :refresh="refreshDataTrigger"
       @close="closeFormDialog"
       @save="handleSave"
     />
@@ -131,159 +163,208 @@
 </template>
 
 <script>
-import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-import { createData, deleteData, getAll, updateData } from '@/api/brandService'
-import Vue from "vue";
-import {mapActions, mapGetters} from "vuex";
-import FormBrand from "@/views/dashboard/pages/Brand/components/FormBrand.vue";
+  import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
+  import { createData, deleteData, updateData, getAll } from '@/api/activityService'
+  import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
+  import Vue from "vue";
+  import { getOutletArea, getOutletRegion } from "@/api/masterOutletService";
+  import { mapGetters } from "vuex";
 
-export default {
-  name: "Activity",
-  components: {FormBrand, ConfirmDeleteDialog },
-  data() {
-    return {
-      snackbar: {
-        open : false,
-        type: 'info',
-        message: 'info',
+  export default {
+    name: 'Activity',
+    components: {
+      FormCallPlan,
+      ConfirmDeleteDialog,
+    },
+    data() {
+      return {
+        refreshDataTrigger : false,
+        tableHeaders: [
+          { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
+          { text: 'Region', value: 'region', sortable: false, class: 'text-left', width: '20%' },
+          { text: 'Area', value: 'area', sortable: false, class: 'text-left', width: '15%' },
+          { text: 'Brand', value: 'brand', sortable: false, class: 'text-left', width: '15%' },
+          { text: 'Type SIO', value: 'type_sio', sortable: false, class: 'text-left', width: '15%' },
+          { text: 'Status', value: 'status', sortable: false, class: 'text-left', width: '15%' },
+          { text: 'Actions', value: 'actions', sortable: false, class: 'text-center' },
+        ],
+        tableData: [],
+        totalItems: 0,
+        totalPages: 0,
+        page: 1, // Current page number
+        options: { page: 1, itemsPerPage: 10 },
+        loading: false,
+        selectedItem: null,
+        isFormRoleDialog: false,
+        isEdit: false,
+        isConfirmDeleteDialogOpen: false,
+        search: '',
+        regionOptions: [],
+        areaOptions: [],
+        statusOptions: [
+          { value: 0, text: 'Pending' },
+          { value: 1, text: 'In Progress' },
+          { value: 2, text: 'Completed' }
+        ],
+        status: '',
+        statusUpdate: '',
+        statusUpdateItem: null,
+        menu: false,
+      }
+    },
+    computed: {
+      ...mapGetters(['getUser']),
+    },
+    watch: {
+      page(value) {
+        this.options.page = value;
+        this.fetchData();
       },
-      tableHeaders: [
-        { text: "No", value: "no" },
-        { text: "Brand", value: "brand" },
-        { text: "SOG", value: "sog" },
-        { text: "Total SOG", value: "total" },
-        { text: "Action", value: "action" },
-      ],
-      tableData: [],
-      totalItems: 0,
-      totalPages: 0,
-      page: 1,
-      options: { page: 1, itemsPerPage: 10 },
-      loading: false,
-      selectedItem: null,
-      isFormRoleDialog: false,
-      isEdit: false,
-      isConfirmDeleteDialogOpen: false,
-      search: '',
-    };
-  },
-  computed: {
-    ...mapGetters(['getUser', 'getLoading']),
-  },
-  watch: {
-    page(value) {
-      this.options.page = value;
-      this.fetchData();
+      itemsPerPage(value) {
+        this.options.itemsPerPage = value;
+        this.fetchData();
+      },
     },
-    itemsPerPage(value) {
-      this.options.itemsPerPage = value;
-      this.fetchData();
+    mounted() {
+      this.fetchRegion();
+      this.fetchArea();
     },
-    getUser(newUser) {
-      this.checkUserMenuLoaded(newUser);
-    },
-    getLoading(state) {
-      this.loading =  state;
-    },
-  },
-  created() {
-    this.fetchData();
-  },
-  methods: {
-    ...mapActions(['showLoading', 'hideLoading']),
-    onPageChange(newPage) {
-      this.page = newPage;
-    },
-    handleSearch() {
-      this.options.page = 1;
-      this.fetchData();
-    },
-    openHandleAdd() {
-      this.isEdit = false
-      this.selectedItem = null
-      this.isFormRoleDialog = true
-    },
-    openHandleUpdate(item) {
-      console.log(item)
-      this.isEdit = true
-      this.selectedItem = {
-        id: item.id,
-        brand: item.brand,
-        sog: item.sog,
-      }
-      this.isFormRoleDialog = true
-    },
-    async handleSave(item) {
-      this.showLoading()
-      try {
-        if (this.isEdit) {
-          const { id, ...itemWithoutId } = item
-          const res  = await updateData(id, itemWithoutId)
-          if (res.statusCode === 200) {
-            Vue.prototype.$toast.success(`Update data Successfully!`)
-            this.closeFormDialog()
+    methods: {
+      onPageChange(newPage) {
+        this.page = newPage;
+      },
+      openHandleAdd() {
+        this.isEdit = false
+        this.selectedItem = null
+        this.isFormRoleDialog = true
+      },
+      openHandleUpdate(item) {
+        this.isEdit = true
+        this.selectedItem = item
+        this.isFormRoleDialog = true
+      },
+      async handleStatusUpdate(item, status) {
+        this.statusUpdateItem = item
+        this.statusUpdate = status
+      },
+      async handleSave(item) {
+        try {
+          if (this.isEdit) {
+            const { id, ...itemWithoutId } = item
+            const res  = await updateData(id, itemWithoutId)
+            if (res.statusCode === 200) {
+              Vue.prototype.$toast.success(`Update data Successfully!`)
+              this.closeFormDialog()
+            }
+          } else {
+            const res = await createData(item)
+            if (res.statusCode === 200) {
+              Vue.prototype.$toast.success(`Create data Successfully!`)
+              this.closeFormDialog()
+            }
           }
-        } else {
-          const res = await createData(item)
-          if (res.statusCode === 200) {
-            Vue.prototype.$toast.success(`Create data Successfully!`)
-            this.closeFormDialog()
-          }
+        } catch (error) {
+          Vue.prototype.$toast.error(`${error.data.message}`)
+          console.error(error)
+        } finally {
+          await this.fetchData()
         }
-      } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
-        console.error(error)
-      } finally {
-        this.hideLoading()
-        await this.fetchData()
-      }
-    },
-    closeFormDialog() {
-      this.isFormRoleDialog = false;
-    },
-    // Fetch all data and update tableData
-    async fetchData() {
-      this.loading = true;
-      try {
-        const response = await getAll({
-          page: this.options.page,
-          limit: this.options.itemsPerPage,
-          searchTerm: this.search,
+      },
+      closeFormDialog() {
+        this.isFormRoleDialog = false
+        this.isEdit = false
+      },
+      handleSearch() {
+        this.options.page = 1;
+        this.fetchData();
+      },
+      async fetchArea() {
+        this.loading = true;
+        try {
+          const response = await getOutletArea();
+          // Check if user area array is defined and not empty; if so, filter based on areas
+          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+            this.areaOptions = response.data.filter(
+              (area) => this.getUser.area.includes(area)
+            );
+          } else {
+            this.areaOptions = response.data;
+          }
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
+        }
+      },
+      async fetchRegion() {
+        this.loading = true;
+        try {
+          const response = await getOutletRegion();
+          if (this.getUser.region) {
+            this.regionOptions = response.data.filter(
+              (region) => region === this.getUser.region
+            );
+          } else {
+            this.regionOptions = response.data; // No filtering if region is undefined
+          }
+        } catch (error) {
+          console.error("Error fetching :", error);
+        } finally {
+          this.loading = false;
+        }
+      },
+      async fetchData() {
+        this.loading = true
+        try {
+          const response = await getAll({
+            page: this.options.page,
+            limit: this.options.itemsPerPage,
+            searchTerm: this.search,
+          });
+          this.tableData = response.data.result;
+          this.totalItems = response.data.totalRecords;
+          this.totalPages = response.data.totalPages;
+          this.options.page = response.data.currentPage;
+        } catch (error) {
+          Vue.prototype.$toast.error(`${error.data.message}`)
+          console.error(error)
+        } finally {
+          this.loading = false
+        }
+      },
+      openConfirmDeleteDialog(data) {
+        this.selectedItem = data
+        this.isConfirmDeleteDialogOpen = true
+      },
+      async handleSchedule(id) {
+        await this.$router.push({
+          name: 'Call Plan Schedule',
+          params: { id },
         });
-        this.tableData = response.data.data;
-        this.totalItems = response.data.totalItems;
-        this.totalPages = response.data.totalPages;
-        this.options.page = response.data.currentPage;
-        this.tableData = response.data.data;
-      } catch (error) {
-        console.error("Error fetching :", error);
-      } finally {
-        this.loading = false;
-      }
+      },
+      closeConfirmDeleteDialog() {
+        this.isConfirmDeleteDialogOpen = false
+      },
+      async handleDelete() {
+        this.loading = true
+        const data = this.selectedItem
+        try {
+          await deleteData(data.id)
+          Vue.prototype.$toast.success(`Deleted Area ${data.area} successfully!`)
+        } catch (error) {
+          Vue.prototype.$toast.error(`${error.data.message}`)
+          console.error(error)
+        } finally {
+          this.loading = false
+          this.closeConfirmDeleteDialog()
+          await this.fetchData()
+        }
+      },
+
     },
-    // DELETE
-    openConfirmDeleteDialog(item) {
-      this.selectedItem = item;
-      this.isConfirmDeleteDialogOpen = true;
-    },
-    closeConfirmDeleteDialog() {
-      this.isConfirmDeleteDialogOpen = false;
-    },
-    async handleDelete() {
-      this.loading = true
-      const data = this.selectedItem
-      try {
-        await deleteData(data.id)
-        Vue.prototype.$toast.success(`Deleted Code ${data.code_batch} successfully!`)
-      } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
-        console.error(error)
-      } finally {
-        this.loading = false
-        this.closeConfirmDeleteDialog()
-        await this.fetchData()
-      }
-    },
-  },
-};
+  }
 </script>
+
+<style scoped>
+/* Add any scoped styles here */
+</style>
