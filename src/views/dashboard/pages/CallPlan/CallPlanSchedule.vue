@@ -184,6 +184,7 @@ export default {
       id: this.$route.params.id,
       tableHeaders: [
         { text: 'No', value: 'No', sortable: false, class: 'text-left', width: '5%' },
+        { text: 'Type', value: 'type', sortable: false, class: 'text-left', width: '10%' },
         { text: 'User', value: 'email', sortable: false, class: 'text-left', width: '10%' },
         { text: 'Outlet', value: 'outlet_code', sortable: false, class: 'text-left', width: '20%' },
         { text: 'Code Call Plan', value: 'code_call_plan', sortable: false, class: 'text-left', width: '10%' },
