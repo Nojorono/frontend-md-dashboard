@@ -84,11 +84,13 @@
         <template v-slot:item="{ item, index }">
           <tr>
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+            <td>{{ item?.outlet_name }}</td>
             <td>{{ item?.region }}</td>
             <td>{{ item?.area }}</td>
             <td>{{ item?.brand }}</td>
             <td>{{ item?.type_sio }}</td>
             <td>{{ item?.status }}</td>
+            <td>{{ item?.created_at }}</td>
             <td>
               <div class="d-flex" style="align-items: center; gap: 5px;">
                 <v-btn
@@ -176,11 +178,13 @@
         refreshDataTrigger : false,
         tableHeaders: [
           { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
+          { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left', width: '20%' },
           { text: 'Region', value: 'region', sortable: false, class: 'text-left', width: '20%' },
           { text: 'Area', value: 'area', sortable: false, class: 'text-left', width: '15%' },
           { text: 'Brand', value: 'brand', sortable: false, class: 'text-left', width: '15%' },
           { text: 'Type SIO', value: 'type_sio', sortable: false, class: 'text-left', width: '15%' },
           { text: 'Status', value: 'status', sortable: false, class: 'text-left', width: '15%' },
+          { text: 'Created At', value: 'created_at', sortable: false, class: 'text-left', width: '15%' },
           { text: 'Actions', value: 'actions', sortable: false, class: 'text-center' },
         ],
         tableData: [],
