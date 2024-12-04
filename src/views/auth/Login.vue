@@ -133,7 +133,7 @@
               }, 2000);
             }
           } catch (error) {
-            console.log(error)
+            Vue.prototype.$toast.error(`${error.response.data.message}`)
           } finally {
             this.hideLoading();
           }

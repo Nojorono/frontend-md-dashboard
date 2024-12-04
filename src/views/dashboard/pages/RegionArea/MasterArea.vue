@@ -177,7 +177,6 @@ export default {
       try {
         if (this.isEdit) {
           const { id, ...itemWithoutId } = item
-          console.log(id)
           const res = await updateChildData(id, itemWithoutId)
           if (res.statusCode === 200){
             Vue.prototype.$toast.success(`Update data Successfully!`)

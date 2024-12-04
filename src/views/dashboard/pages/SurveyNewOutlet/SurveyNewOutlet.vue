@@ -274,7 +274,6 @@ export default {
       this.fetchData();
     },
     activeTab(newValue) {
-      console.log(newValue)
       this.fetchData();
     },
   },

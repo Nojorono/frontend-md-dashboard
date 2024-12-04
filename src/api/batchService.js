@@ -91,7 +91,6 @@ export const updateBatchTarget = async (id, data) => {
 
 // Function to delete
 export const deleteData = async (id) => {
-  console.log(id)
   try {
     const response = await axiosInstance.delete(`/batch/${id}`);
     return response.data;
@@ -101,7 +100,6 @@ export const deleteData = async (id) => {
 };
 
 export const deleteBatchTarget = async (id) => {
-  console.log(id)
   try {
     const response = await axiosInstance.delete(`/batch-target/${id}`);
     return response.data;

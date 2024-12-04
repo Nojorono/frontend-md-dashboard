@@ -98,9 +98,8 @@
             <td>{{ item?.type_sio }}</td>
             <td>{{ item?.status }}</td>
             <td>
-              <div class="d-flex" style="align-items: center">
+              <div class="d-flex" style="align-items: center; gap: 5px;">
                 <v-btn
-                  class="mx-1"
                   color="warning"
                   outlined
                   small
@@ -108,19 +107,23 @@
                 >
                   <v-icon>mdi-calendar-arrow-right</v-icon>
                 </v-btn>
-                <v-menu v-model="menu" offset-y>
-                  <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" color="warning" outlined small>
-                      <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-                  </template>
+
+                <v-btn
+                  :id="`menu-activator-status-${item.id}`"
+                  color="primary"
+                  outlined
+                  small
+                >
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+                <v-menu :activator="`#menu-activator-status-${item.id}`">
                   <v-list>
                     <v-list-item
-                      v-for="status in statusOptions"
-                      :key="status.value"
-                      @click="handleStatusUpdate(item, status.value)"
+                      v-for="(status, index) in statusOptions"
+                      :key="index"
+                      :value="status.value"  
                     >
-                      <v-list-item-title>{{ status.value }}: {{ status.text }}</v-list-item-title>
+                      <v-list-item-title>{{ status.text }}</v-list-item-title>
                     </v-list-item>
                   </v-list>
                 </v-menu>
@@ -360,7 +363,9 @@
           await this.fetchData()
         }
       },
-
+      updateStatus(item, status) {
+        item.status = status;
+      },
     },
   }
 </script>

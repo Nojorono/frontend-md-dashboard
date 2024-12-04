@@ -305,7 +305,6 @@
       },
       handleSwitchChange(data, isActive) {
         if(isActive){
-            console.log(data);
             this.$swal.fire({
                 title: "Are you sure?",
                 text: "This action cannot be undone.",

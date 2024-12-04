@@ -203,7 +203,7 @@
                 :items="outletOptions"
                 item-text="name"
                 item-value="id"
-                label="Outlet Ganti"
+                label="Outlet yang diganti"
                 clearable
               >
                 <template v-slot:no-data>
@@ -448,23 +448,6 @@ export default {
         console.error('Error deleting image from server:', error);
       }
     },
-    async fetchArea() {
-      this.loading = true;
-      try {
-        const response = await getAllArea();
-        if (this.getUser.area) {
-          this.areaOptions = response.data.data.filter(
-            (area) => this.getUser.area.includes(area.area)
-          );
-        } else {
-          this.areaOptions = response.data.data;
-        }
-      } catch (error) {
-        console.error("Error fetching :", error);
-      } finally {
-        this.loading = false;
-      }
-    },
     async fetchSio() {
       this.loading = true;
       try {
@@ -492,6 +475,23 @@ export default {
       try {
         const response = await getAllBrand();
         this.brandOptions = response.data.data;
+      } catch (error) {
+        console.error("Error fetching :", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchArea() {
+      this.loading = true;
+      try {
+        const response = await getAllArea();
+        if (this.getUser.area > 0) {
+          this.areaOptions = response.data.data.filter(
+            (area) => this.getUser.area.includes(area.area)
+          );
+        } else {
+          this.areaOptions = response.data.data;
+        }
       } catch (error) {
         console.error("Error fetching :", error);
       } finally {

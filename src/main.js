@@ -1,16 +1,3 @@
-// =========================================================
-// * Vuetify Material Dashboard - v2.1.0
-// =========================================================
-//
-// * Product Page: https://www.creative-tim.com/product/vuetify-material-dashboard
-// * Copyright 2019 Creative Tim (https://www.creative-tim.com)
-//
-// * Coded by Creative Tim
-//
-// =========================================================
-//
-// * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -29,6 +16,9 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import Toast from 'vue-toastification'
 import Swal from 'sweetalert2'
 import 'vue-toastification/dist/index.css'
+import io from 'socket.io-client';
+// import VueSocketIOExtended from 'vue-socket.io-extended';
+
 moment.locale('id')
 
 Vue.filter('formatDate', function(value, format = 'dddd, DD MMM YYYY') {
@@ -48,6 +38,44 @@ Vue.use(Toast, toastOptions)
 Vue.prototype.$swal = Swal;
 
 Vue.config.productionTip = false
+
+// Enhanced configuration for the Socket.IO client
+const socket = io('http://localhost:9001', {
+  auth: {
+    token: localStorage.getItem('token')
+  },
+  transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 2000,
+  reconnectionDelayMax: 5000,
+  timeout: 20000,
+  autoConnect: true,
+});
+
+socket.on('notification', (message) => {
+  console.log('Received notification:', message);
+  // You can also use this to display notifications in the UI
+  alert(`Notification: ${message.title} - ${message.body}`);
+});
+
+socket.on('connect', () => {
+  console.log('Connected to WebSocket server at http://localhost:9001');
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error);
+});
+
+socket.on('disconnect', (reason) => {
+  console.log('Disconnected:', reason);
+  if (reason === 'io server disconnect') {
+    socket.connect();
+  }
+});
+
+// Make socket instance available globally
+Vue.prototype.$socket = socket;
 
 new Vue({
   router,

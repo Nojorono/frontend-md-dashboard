@@ -49,7 +49,6 @@ export default {
     },
 
     addMarkersToMap(data) {
-      console.log(data)
       const dummyData = [
         {
           latitude: -6.1751,   // Jakarta, Indonesia

@@ -78,7 +78,6 @@ export default {
   watch: {
     isGroupActive(newVal) {
       if (newVal) {
-        console.log(newVal)
         this.item.expanded = true;
       }
     },

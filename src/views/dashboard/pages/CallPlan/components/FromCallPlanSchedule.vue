@@ -276,7 +276,6 @@ export default {
       return `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area}`;
     },
     onSurveyOutletChange(surveyOutlet) {
-      console.log(surveyOutlet)
       if (surveyOutlet) {
         this.itemData.survey_outlet_id = surveyOutlet;
       } else {

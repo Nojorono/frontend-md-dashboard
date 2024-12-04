@@ -204,7 +204,6 @@ export default {
       this.isFormRoleDialog = true
     },
     openHandleUpdate(item) {
-      console.log(item)
       this.isEdit = true
       this.selectedItem = {
         id: item.id,

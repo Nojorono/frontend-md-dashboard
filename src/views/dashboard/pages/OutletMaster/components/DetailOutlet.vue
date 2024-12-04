@@ -341,8 +341,7 @@ export default {
     handleBack(){
       this.$router.back();
     },
-    handleSwitchChange(data, isActive) {
-      console.log(data, isActive);
+    handleSwitchChange() {
       this.$swal.fire({
         title: "Are you sure?",
         text: "This action cannot be undone.",
