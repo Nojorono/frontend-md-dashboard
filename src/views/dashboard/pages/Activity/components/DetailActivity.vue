@@ -8,6 +8,7 @@
           <v-card
             class="pa-4"
             elevation="2"
+            style="padding: 20px; border-radius: 20px"
           >
             <v-btn
               small
@@ -139,60 +140,85 @@
                       </h3>
                     </v-card-title>
                     <v-divider></v-divider>
-                    <template>
-                        <v-col cols="8">
-                            <v-divider></v-divider>
-                            <v-card-title class="text-h5 font-weight-medium">
-                                Photo Outlet
-                            </v-card-title>
-                            <v-card-text>
-                                <v-carousel>
-                                <v-carousel-item
-                                    v-for="(photo, index) in data.photos"
-                                    :key="index"
-                                    :src="photo"
-                                    reverse-transition="fade-transition"
-                                    transition="fade-transition"
-                                >
-                                    <v-img :src="photo" width="100%" height="auto" />
-                                </v-carousel-item>
-                                </v-carousel>
-                            </v-card-text>
-                        </v-col>
-                    </template>
-                    <template>
-                        <v-col cols="8">
-                            <v-card-title class="d-flex justify-space-between">
-                                <h3 class="text-h4 font-weight-medium mb-3">
-                                    Activity
-                                </h3>
-                            </v-card-title>
-                            <div class="activities-container">
-                            <v-list dense>
-                                <v-list-item-group>
-                                <v-list-item
-                                    v-for="(activity, index) in activitySios"
-                                    :key="index"
-                                    class="activity-item"
-                                    @click="openImagePreview(activity)"
-                                >
-                                    <v-list-item-content>
-                                    <v-list-item-title class="font-weight-bold">
-                                        {{ activity.name }}
-                                    </v-list-item-title>
-                                    <v-list-item-subtitle>
-                                        <v-img
-                                        :src="activity.photo"
-                                        width="100"
-                                        />
-                                    </v-list-item-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                                </v-list-item-group>
-                            </v-list>
-                            </div>
-                        </v-col>
-                    </template>
+                    <v-row>
+                      <v-col cols="6">
+                        <v-card-title class="text-h5 font-weight-medium">
+                            Photo Outlet
+                        </v-card-title>
+                        <v-card-text>
+                            <v-carousel>
+                            <v-carousel-item
+                                v-for="(photo, index) in data.photos"
+                                :key="index"
+                                :src="photo"
+                                reverse-transition="fade-transition"
+                                transition="fade-transition"
+                            >
+                                <v-img :src="photo" width="100%" height="auto" />
+                            </v-carousel-item>
+                            </v-carousel>
+                        </v-card-text>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-card-title class="text-h5 font-weight-medium">
+                          Activity Sog
+                        </v-card-title>
+                        <v-card-text>
+                          <v-simple-table dense>
+                            <template v-slot:default>
+                              <thead>
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Description</th>
+                                  <th>Notes</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(sog, index) in activitySogs" :key="index">
+                                  <td>{{ sog.name }}</td>
+                                  <td>{{ sog.description }}</td>
+                                  <td>{{ sog.notes }}</td>
+                                </tr>
+                              </tbody>
+                            </template>
+                          </v-simple-table>
+                        </v-card-text>
+                      </v-col>
+                    </v-row>
+                    <v-divider></v-divider>
+                    <v-row>
+                    <v-col cols="12">
+                      <v-card-title class="d-flex justify-space-between">
+                          <h3 class="text-h4 font-weight-medium">
+                              Activity Sio
+                          </h3>
+                      </v-card-title>
+                      <div class="activities-container" style="padding: 20px">
+                      <v-list dense>
+                          <v-list-item-group>
+                          <v-list-item
+                              v-for="(activity, index) in activitySios"
+                              :key="index"
+                              class="activity-item"
+                              @click="openImagePreview(activity)"
+                          >
+                              <v-list-item-content>
+                              <v-list-item-title class="font-weight-bold">
+                                  {{ activity.name }}
+                              </v-list-item-title>
+                              <v-list-item-subtitle>
+                                  <v-img
+                                  :src="activity.photo"
+                                  width="100"
+                                  />
+                              </v-list-item-subtitle>
+                              </v-list-item-content>
+                          </v-list-item>
+                          </v-list-item-group>
+                      </v-list>
+                      </div>
+                    </v-col>
+                    </v-row>
                   </v-card>
                 </v-col>
               </v-row>

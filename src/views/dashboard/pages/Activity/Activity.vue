@@ -76,14 +76,6 @@
                 >
                   mdi-refresh
                 </v-icon>
-                <v-btn
-                  color="primary"
-                  style="margin: unset!important;"
-                  @click="openHandleAdd"
-                >
-                  <v-icon>mdi-plus-box-multiple</v-icon>
-                  <span class="mx-1">Add</span>
-                </v-btn>
               </div>
             </v-col>
           </v-row>

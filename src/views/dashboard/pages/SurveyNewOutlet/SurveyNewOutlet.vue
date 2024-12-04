@@ -274,7 +274,9 @@ export default {
       this.fetchData();
     },
     activeTab(newValue) {
-      this.fetchData();
+      if (newValue) {
+        this.fetchData();
+      }
     },
   },
   mounted () {
