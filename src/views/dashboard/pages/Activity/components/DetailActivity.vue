@@ -109,7 +109,7 @@
                       </v-col>
                       <v-col cols="12">
                         <!-- Comments Section -->
-                        <v-card class="comment-section">
+                        <v-card class="comment-section" ref="commentSection">
                           <v-card-text>
                             <v-list dense class="comment-list">
                               <template v-if="loadingComment">
@@ -127,17 +127,11 @@
                                       </v-avatar>
                                       <div class="comment-content">
                                         <div class="comment-text">
-                                          <span class="username">{{ comment.user_id }}</span>
+                                          <span class="username">{{ comment.user_email }}</span>
                                           <p class="message">{{ comment.content }}</p>
                                         </div>
                                         <div class="comment-actions">
                                           <span class="timestamp">{{ formatDate(comment.created_at) }}</span>
-                                          <!-- <v-btn text x-small class="like-btn" @click="toggleLike(comment)">
-                                            <v-icon small :color="comment.isLiked ? 'red' : ''">
-                                              {{ comment.isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}
-                                            </v-icon>
-                                            <span>{{ comment.likes || 0 }}</span>
-                                          </v-btn> -->
                                         </div>
                                       </div>
                                     </div>
@@ -410,6 +404,7 @@
         if (this.newComment.trim()) {
           this.loadingComment = true;
           const comment = {
+            user_id: this.currentUser.id,
             activity_id: parseInt(this.id),
             outlet_id: parseInt(this.data.outlet?.id),
             content: this.newComment,

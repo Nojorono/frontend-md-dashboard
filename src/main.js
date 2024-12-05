@@ -53,10 +53,9 @@ const socket = io('http://localhost:9001', {
   autoConnect: true,
 });
 
-socket.on('notification', (message) => {
-  console.log('Received notification:', message);
-  // You can also use this to display notifications in the UI
-  alert(`Notification: ${message.title} - ${message.body}`);
+socket.on('notification', (payload) => {
+  console.log('Received notification:', payload);
+  Vue.prototype.$toast.info(payload.message);
 });
 
 socket.on('connect', () => {
