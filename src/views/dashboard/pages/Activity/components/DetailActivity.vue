@@ -333,7 +333,7 @@
   
   <script>
   import { getById } from '@/api/activityService';
-  // import { createComment } from '@/api/commentService';
+  import { createComment, getByActivityId } from '@/api/commentService';
 
   import Vue from 'vue';
   
@@ -401,33 +401,44 @@
   
     mounted() {
       this.fetchData(this.id);
+      this.getComment();
     },
   
     methods: {
       // Comment Methods
       async postComment() {
         if (this.newComment.trim()) {
-          this.loadingComment = true; // Set loading to true
+          this.loadingComment = true;
           const comment = {
-            user_id: this.currentUser.id,
-            activity_id: this.id,
-            outlet_id: this.data.outlet?.id,
+            activity_id: parseInt(this.id),
+            outlet_id: parseInt(this.data.outlet?.id),
             content: this.newComment,
-            created_at: new Date(),
             is_liked: false,
           };
 
           try {
-            // const response = await createComment(comment);
-            // console.log(response);
-            this.comments.push(comment);
+            const response = await createComment(comment);
+            if(response.statusCode === 200) {
+              this.getComment();
+            }
             this.newComment = '';
           } catch (error) {
-            console.error("Error posting comment:", error);
-            // Optionally handle the error (e.g., show a toast notification)
+            Vue.prototype.$toast.error(error.response?.data?.message || "Failed to post comment");
           } finally {
-            this.loadingComment = false; // Set loading to false after the operation
+            this.loadingComment = false;
           }
+        }
+      },
+
+      async getComment() {
+        try {
+          this.loadingComment = true;
+          const getComment = await getByActivityId(parseInt(this.id));
+          this.comments = getComment.data;
+        } catch (error) {
+          Vue.prototype.$toast.error(error.response?.data?.message || "Failed to get comment");
+        } finally {
+          this.loadingComment = false;
         }
       },
 

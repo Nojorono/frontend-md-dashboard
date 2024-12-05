@@ -22,9 +22,9 @@ export const getAll = async (params) => {
 };
 
 // Function to get a single outlet by ID
-export const getById = async (id) => {
+export const getByActivityId = async (id) => {
   try {
-    const response = await axiosInstance.get(`/comment/${id}`);
+    const response = await axiosInstance.get(`/comment/activity/${id}`);
     return response.data;
   } catch (error) {
     throw error.response;
