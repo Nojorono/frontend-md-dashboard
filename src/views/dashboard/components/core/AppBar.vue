@@ -47,6 +47,9 @@
       offset-y
       origin="top right"
       transition="scale-transition"
+      :max-height="400"
+      absolute
+      style="max-width: 400px; z-index: 99999999999;"
     >
       <template v-slot:activator="{ attrs, on }">
         <v-btn
@@ -71,7 +74,6 @@
       <v-list
         :tile="false"
         nav
-        max-height="300"
         class="overflow-y-auto notification-list"
         style="max-width: 400px"
       >
