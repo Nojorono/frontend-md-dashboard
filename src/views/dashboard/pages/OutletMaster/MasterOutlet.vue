@@ -62,19 +62,18 @@
                       @click:append="handleSearch"
                     />
                   </v-col>
-                  <v-col>
-                    <div class="d-flex justify-end">
-                      <v-col
-                        cols="6"
-                        style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
-                      >
+                  <v-col cols="8">
+                      <div class="d-flex justify-end">
                         <v-autocomplete
-                          item-text="name"
-                          item-value="name"
-                          label="Region"
+                          v-model="selectedRegion"
                           :items="regionOptions"
+                          item-text="name"
+                          item-value="id"
+                          label="Region"
                           clearable
-                          return-object
+                          class="mx-2"
+                          :loading="loadingRegions"
+                          @change="onRegionChange"
                         >
                           <template v-slot:no-data>
                             <v-list-item>
@@ -82,23 +81,29 @@
                             </v-list-item>
                           </template>
                         </v-autocomplete>
+
                         <v-autocomplete
+                          v-model="selectedArea"
+                          :items="filteredAreaOptions"
                           item-text="name"
-                          item-value="name"
+                          item-value="id"
                           label="Area"
-                          :items="areaOptions"
                           clearable
-                          return-object
+                          class="mx-2"
+                          :loading="loadingAreas"
+                          :disabled="!selectedRegion"
+                          @change="onAreaChange"
                         >
                           <template v-slot:no-data>
                             <v-list-item>
-                              <v-list-item-content>Area not found</v-list-item-content>
+                              <v-list-item-content>
+                                {{ selectedRegion ? 'No areas found' : 'Please select a region first' }}
+                              </v-list-item-content>
                             </v-list-item>
                           </template>
                         </v-autocomplete>
-                      </v-col>
-                    </div>
-                  </v-col>
+                      </div>
+                    </v-col>
                 </v-row>
               </template>
               <template v-slot:item="{ item, index }">
@@ -787,5 +792,4 @@
 .small-table td {
   font-weight: normal;
 }
-</style>
-    
+</style>    

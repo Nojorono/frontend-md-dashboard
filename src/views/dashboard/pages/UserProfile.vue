@@ -9,13 +9,13 @@
         cols="12"
         md="8"
       >
-        <base-material-card>
+        <base-material-card class="elevation-10">
           <template v-slot:heading>
-            <div class="display-2 font-weight-light">
+            <div class="display-2 font-weight-light primary--text">
               Edit Profile
             </div>
-            <div class="subtitle-1 font-weight-light">
-              Complete your profile
+            <div class="subtitle-1 font-weight-light grey--text">
+              Complete your profile information
             </div>
           </template>
 
@@ -27,9 +27,12 @@
                   md="4"
                 >
                   <v-text-field
-                    label="Role (disabled)"
+                    label="Role"
                     :value="user.roles"
                     disabled
+                    outlined
+                    dense
+                    prepend-icon="mdi-shield-account"
                   />
                 </v-col>
 
@@ -39,8 +42,11 @@
                 >
                   <v-text-field
                     v-model="user.username"
-                    class="purple-input"
-                    label="User Name"
+                    label="Username"
+                    outlined
+                    dense
+                    prepend-icon="mdi-account"
+                    :rules="[v => !!v || 'Username is required']"
                   />
                 </v-col>
 
@@ -51,7 +57,10 @@
                   <v-text-field
                     v-model="user.email"
                     label="Email Address"
-                    class="purple-input"
+                    outlined
+                    dense
+                    prepend-icon="mdi-email"
+                    :rules="[v => !!v || 'Email is required', v => /.+@.+\..+/.test(v) || 'Email must be valid']"
                   />
                 </v-col>
 
@@ -62,26 +71,36 @@
                   <v-text-field
                     v-model="user.fullname"
                     label="Full Name"
-                    class="purple-input"
+                    outlined
+                    dense
+                    prepend-icon="mdi-account-card-details"
+                    :rules="[v => !!v || 'Full name is required']"
                   />
                 </v-col>
 
                 <v-col
                   cols="12"
-                  md="4"
+                  md="6"
                 >
                   <v-text-field
                     v-model="user.region"
                     label="Region"
-                    class="purple-input"
+                    outlined
+                    dense
+                    prepend-icon="mdi-map-marker"
                   />
                 </v-col>
 
                 <v-col cols="12">
                   <v-textarea
                     v-model="user.about"
-                    class="purple-input"
                     label="About Me"
+                    outlined
+                    auto-grow
+                    rows="3"
+                    prepend-icon="mdi-text"
+                    hint="Tell us about yourself"
+                    persistent-hint
                   />
                 </v-col>
 
@@ -90,10 +109,16 @@
                   class="text-right"
                 >
                   <v-btn
-                    color="success"
+                    color="primary"
                     class="mr-0"
                     @click="updateProfile"
+                    :loading="loading"
+                    rounded
+                    elevation="2"
                   >
+                    <v-icon left>
+                      mdi-content-save
+                    </v-icon>
                     Update Profile
                   </v-btn>
                 </v-col>
@@ -108,24 +133,28 @@
         md="4"
       >
         <base-material-card
-          class="v-card-profile"
+          class="v-card-profile elevation-10"
           avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
         >
           <v-card-text class="text-center">
-            <h6 class="display-1 mb-1 grey--text">
+            <h6 class="text-h5 mb-2 primary--text">
               User Details
             </h6>
-            <h4 class="display-2 font-weight-light mb-3 black--text">
-              {{ user.fullname }}
+            <h4 class="text-h4 font-weight-medium mb-3 black--text">
+              {{ user.fullname || 'Your Name' }}
             </h4>
-            <p class="font-weight-light grey--text">
-              {{ user.about || "Add a bio..." }}
+            <p class="body-1 grey--text text--darken-1">
+              {{ user.about || "Add a bio to tell people about yourself..." }}
             </p>
             <v-btn
-              color="success"
+              color="primary"
               rounded
-              class="mr-0"
+              class="px-5 mt-3"
+              elevation="2"
             >
+              <v-icon left>
+                mdi-account-plus
+              </v-icon>
               Follow
             </v-btn>
           </v-card-text>
@@ -139,6 +168,7 @@
 export default {
   data() {
     return {
+      loading: false,
       user: {
         roles: '',
         username: '',
@@ -156,17 +186,35 @@ export default {
     }
   },
   methods: {
-    updateProfile() {
-      // You can add logic here to save updates to the user's profile
-      localStorage.setItem('user', JSON.stringify(this.user));
-      alert("Profile updated successfully!");
+    async updateProfile() {
+      this.loading = true;
+      try {
+        // You can add logic here to save updates to the user's profile
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.$vuetify.snackbar = {
+          value: true,
+          color: 'success',
+          text: 'Profile updated successfully!'
+        };
+      } catch (error) {
+        this.$vuetify.snackbar = {
+          value: true,
+          color: 'error',
+          text: 'Failed to update profile'
+        };
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-.purple-input .v-input__control .v-input__slot {
-  background-color: #f3e5f5;
+.v-card-profile {
+  transition: all 0.3s ease;
+}
+.v-card-profile:hover {
+  transform: translateY(-5px);
 }
 </style>

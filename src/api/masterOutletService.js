@@ -93,6 +93,15 @@ export const updateOutlet = async (id, outletData) => {
   }
 };
 
+export const updateOutletStatus = async (id, outletData) => {
+  try {
+    const response = await axiosInstance.put(`/outlets/${id}/status`, outletData);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
 // Function to delete an outlet by ID
 export const deleteOutlet = async (id) => {
   try {

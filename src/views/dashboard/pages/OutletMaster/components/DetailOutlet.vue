@@ -223,7 +223,7 @@
 </template>
 
 <script>
-import { getOutletById } from '@/api/masterOutletService';
+import { getOutletById, updateOutletStatus } from '@/api/masterOutletService';
 import Vue from 'vue';
 
 export default {
@@ -343,6 +343,7 @@ export default {
     },
 
     async handleSwitchChange(data, isActive) {
+      console.log(data, isActive);
       this.switchLoading = true;
       try {
         await this.$swal.fire({
@@ -355,6 +356,7 @@ export default {
           reverseButtons: true
         }).then((result) => {
           if (result.isConfirmed) {
+             updateOutletStatus(data.id, { is_active: isActive ? 1 : 0 });
             this.$swal.fire({
               title: "Success!",
               text: `Outlet ${isActive ? 'activated' : 'deactivated'} successfully.`,

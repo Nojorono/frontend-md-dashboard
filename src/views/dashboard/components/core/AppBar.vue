@@ -134,7 +134,10 @@
     </v-menu>
     <template>
       <div class="text-center">
-        <v-menu offset-y>
+        <v-menu
+          offset-y
+          style="max-width: 400px; z-index: 99999999999;"
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               class="ml-2"
@@ -153,7 +156,7 @@
               </v-list-item-title>
             </v-list-item>
 
-            <v-list-item :to="{ path: '/logout' }">
+            <v-list-item @click="handleLogout">
               <v-list-item-title>
                 {{ 'Logout' }}
               </v-list-item-title>
@@ -268,6 +271,25 @@
         }
       },
 
+      handleLogout(){
+        this.$swal.fire({
+          title: 'Are you sure?',
+          text: "You will be logged out of the system",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#FF5733',
+          cancelButtonColor: '#6B7A8F',
+          confirmButtonText: 'Yes, logout',
+          cancelButtonText: 'Cancel',
+          confirmButtonTextColor: '#FFFFFF',
+          cancelButtonTextColor: '#000000',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$router.push('/logout');
+          }
+        });
+      },
+
       async markAsRead(id) {
         try {
           await updateData(id, { is_read: true });
@@ -296,3 +318,9 @@
     },
   }
 </script>
+
+<style scoped>
+  .notification-item {
+    cursor: pointer;
+  }
+</style>

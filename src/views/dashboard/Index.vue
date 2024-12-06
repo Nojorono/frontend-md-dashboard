@@ -42,6 +42,7 @@
 
 <script>
 import {mapActions, mapGetters} from "vuex";
+
   export default {
     name: 'DashboardIndex',
 
@@ -88,7 +89,20 @@ import {mapActions, mapGetters} from "vuex";
       },
       handleLogout(){
         this.showAlert = false;
-        this.$router.push('/logout');
+        this.$swal.fire({
+          title: 'Are you sure?',
+          text: "You will be logged out of the system",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, logout',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$router.push('/logout');
+          }
+        });
       }
     },
   }
