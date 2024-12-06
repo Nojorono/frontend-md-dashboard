@@ -60,11 +60,9 @@
             color="red"
             overlap
             bordered
+            :content="unreadCount"
+            :value="unreadCount > 0"
           >
-            <template v-slot:badge>
-              <span>5</span>
-            </template>
-
             <v-icon>mdi-bell</v-icon>
           </v-badge>
         </v-btn>
@@ -73,15 +71,63 @@
       <v-list
         :tile="false"
         nav
+        max-height="300"
+        class="overflow-y-auto notification-list"
+        style="max-width: 400px"
       >
-        <div>
-          <app-bar-item
-            v-for="(n, i) in notifications"
-            :key="`item-${i}`"
+        <div v-if="notifications.length > 0">
+          <v-list-item
+            v-for="notification in notifications"
+            :key="notification.id"
+            class="notification-item py-2"
+            :class="{ 'grey lighten-4': notification.is_read }"
+            @click="goToNotification(notification)"
+            style="cursor: pointer"
           >
-            <v-list-item-title v-text="n" />
-          </app-bar-item>
+            <v-list-item-avatar>
+              <v-icon :color="notification.is_read ? 'grey' : 'primary'">mdi-comment</v-icon>
+            </v-list-item-avatar>
+            
+            <v-list-item-content>
+              <v-list-item-title class="subtitle-1" :class="{ 'grey--text': notification.is_read }">
+                {{ notification.outlet.name }} - {{ notification.outlet.outlet_code }}
+              </v-list-item-title>
+              <v-list-item-subtitle class="caption">
+                {{ notification.user.email }} - {{ notification.message }}
+              </v-list-item-subtitle>
+              <v-list-item-subtitle class="caption">
+                {{ formatDate(notification.created_at) }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+
+            <v-list-item-action v-if="!notification.is_read">
+              <v-btn
+                icon
+                small
+                @click.stop="markAsRead(notification.id)"
+              >
+                <v-icon small>mdi-check</v-icon>
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+          <div class="text-center py-2" v-if="hasMoreNotifications">
+            <v-btn
+              text
+              small
+              color="primary"
+              @click="loadMoreNotifications"
+              :loading="loading"
+              :disabled="loading"
+            >
+              Load More
+            </v-btn>
+          </div>
         </div>
+        <v-list-item v-else>
+          <v-list-item-content class="text-center">
+            <v-list-item-title>No notifications</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-menu>
     <template>
@@ -118,40 +164,12 @@
 </template>
 
 <script>
-  // Components
-  import { VHover, VListItem } from 'vuetify/lib'
-
   // Utilities
-  import { mapState, mapMutations } from 'vuex'
+  import { mapState, mapMutations, mapGetters } from 'vuex'
+  import { getAll, updateData } from '@/api/notificationService'
 
   export default {
     name: 'DashboardCoreAppBar',
-
-    components: {
-      AppBarItem: {
-        render (h) {
-          return h(VHover, {
-            scopedSlots: {
-              default: ({ hover }) => {
-                return h(VListItem, {
-                  attrs: this.$attrs,
-                  class: {
-                    'black--text': !hover,
-                    'white--text secondary elevation-12': hover,
-                  },
-                  props: {
-                    activeClass: '',
-                    dark: hover,
-                    link: true,
-                    ...this.$attrs,
-                  },
-                }, this.$slots.default)
-              },
-            },
-          })
-        },
-      },
-    },
 
     props: {
       value: {
@@ -161,17 +179,33 @@
     },
 
     data: () => ({
-      notifications: [
-        'Mike John Responded to your email',
-        'You have 5 new tasks',
-        'You\'re now friends with Andrew',
-        'Another Notification',
-        'Another one',
-      ],
+      notifications: [],
+      notificationInterval: null,
+      limit: 10,
+      offset: 0,
+      hasMoreNotifications: false,
+      loading: false
     }),
 
     computed: {
       ...mapState(['drawer']),
+      ...mapGetters(['getUser']),
+      unreadCount() {
+        return this.notifications.filter(n => !n.is_read).length;
+      }
+    },
+
+    mounted() {
+      this.$socket.on('notification', this.fetchNotifications);
+      this.fetchNotifications();
+      // Poll for new notifications every minute
+      this.notificationInterval = setInterval(this.fetchNotifications, 60000);
+    },
+
+    beforeDestroy() {
+      if (this.notificationInterval) {
+        clearInterval(this.notificationInterval);
+      }
     },
 
     methods: {
@@ -179,6 +213,84 @@
         setDrawer: 'SET_DRAWER',
         logout: 'LOGOUT',
       }),
+
+      formatDate(date) {
+        const now = new Date();
+        const notifDate = new Date(date);
+        const diff = now - notifDate;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (minutes < 60) {
+          return `${minutes} minutes ago`;
+        } else if (hours < 24) {
+          return `${hours} hours ago`;
+        } else if (days < 7) {
+          return `${days} days ago`;
+        } else {
+          return notifDate.toLocaleDateString();
+        }
+      },
+
+      async fetchNotifications() {
+        try {
+          const user = this.getUser;
+          const response = await getAll({userId: user.id, limit: this.limit, offset: this.offset});
+          const newNotifications = response.data.data.sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+          );
+          
+          // Check if there are potentially more notifications
+          this.hasMoreNotifications = newNotifications.length >= this.limit;
+
+          if (this.offset === 0) {
+            this.notifications = newNotifications;
+          } else {
+            this.notifications = [...this.notifications, ...newNotifications];
+          }
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+        }
+      },
+
+      async loadMoreNotifications() {
+        try {
+          this.loading = true;
+          this.offset += this.limit;
+          await this.fetchNotifications();
+        } catch (error) {
+          console.error('Error loading more notifications:', error);
+        } finally {
+          this.loading = false;
+        }
+      },
+
+      async markAsRead(id) {
+        try {
+          await updateData(id, { is_read: true });
+          const notification = this.notifications.find(n => n.id === id);
+          if (notification) {
+            notification.is_read = true;
+          }
+        } catch (error) {
+          console.error('Error marking notification as read:', error);
+        }
+      },
+
+      goToNotification(notification) {
+        // Mark as read when clicking
+        if (!notification.is_read) {
+          this.markAsRead(notification.id);
+        }
+        
+        // Navigate based on notification type and identifier
+        if (notification.type === 1 && notification.comments) {
+          this.$router.push({
+            path: `/activity/detail/${notification.comments.activity_id}`
+          });
+        }
+      },
     },
   }
 </script>

@@ -17,7 +17,7 @@ import Toast from 'vue-toastification'
 import Swal from 'sweetalert2'
 import 'vue-toastification/dist/index.css'
 import io from 'socket.io-client';
-// import VueSocketIOExtended from 'vue-socket.io-extended';
+import VueSocketIOExtended from 'vue-socket.io-extended';
 
 moment.locale('id')
 
@@ -54,7 +54,6 @@ const socket = io('http://localhost:9001', {
 });
 
 socket.on('notification', (payload) => {
-  console.log('Received notification:', payload);
   Vue.prototype.$toast.info(payload.message);
 });
 
@@ -72,6 +71,8 @@ socket.on('disconnect', (reason) => {
     socket.connect();
   }
 });
+
+Vue.use(VueSocketIOExtended, socket);
 
 // Make socket instance available globally
 Vue.prototype.$socket = socket;
