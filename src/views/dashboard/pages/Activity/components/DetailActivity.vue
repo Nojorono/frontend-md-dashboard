@@ -10,9 +10,9 @@
 
             <!-- Header Section -->
             <v-card-title style="display: grid;" class="text-h3 font-weight-bold text-center mb-0">
-              {{ data.name || 'Activity Detail' }} {{ data.outlet?.name }}
+              {{ data.name || 'Activity Detail' }} {{ data.outlet?.name || data.surveyOutlet?.name }}
               <v-card-subtitle class="text-h5 grey--text text-center mb-4">
-                {{ data.outlet?.address_line }}, {{ data.outlet?.sub_district }} - {{ data.outlet?.region }}
+                {{ data.outlet?.address_line || data.surveyOutlet?.address_line }}, {{ data.outlet?.sub_district || data.surveyOutlet?.sub_district }} - {{ data.outlet?.region || data.surveyOutlet?.region }}
               </v-card-subtitle>
             </v-card-title>
   
@@ -91,7 +91,7 @@
                       <v-col cols="12">
                         <v-carousel hide-delimiters show-arrows-on-hover height="550">
                           <v-carousel-item
-                            v-for="(photo, index) in data.outlet?.photos"
+                            v-for="(photo, index) in data.outlet?.photos || data.surveyOutlet?.photos"
                             :key="index"
                             :src="decodeURIComponent(photo)"
                             reverse-transition="fade-transition"
@@ -357,14 +357,14 @@
         const { latitude, longitude } = this.data.outlet || {};
         return !!(latitude && longitude);
       },
-
+      
       outletDetailsLeft() {
         return {
-          "Outlet Code": this.data.outlet?.outlet_code,
-          "Brand": this.data.outlet?.brand,
-          "Type": this.data.type_sio,
-          "Region": this.data.region,
-          "Area": this.data.area,
+          "Outlet Code": this.data.outlet?.outlet_code || this.data.surveyOutlet?.outlet_code,
+          "Brand": this.data.outlet?.brand || this.data.surveyOutlet?.brand,
+          "Type": this.data.type_sio || this.data.surveyOutlet?.type_sio,
+          "Region": this.data.region || this.data.surveyOutlet?.region,
+          "Area": this.data.area || this.data.surveyOutlet?.area,
           "Start Time": this.formattedStartTime || 'N/A',
         };
       },

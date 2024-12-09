@@ -88,7 +88,17 @@
         <template v-slot:item="{ item, index }">
           <tr>
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
-            <td class="font-weight-medium">{{ item?.outlet_name }}</td>
+            <td>
+              <v-chip
+                :color="item?.outlet_name ? 'primary' : 'warning'"
+                small
+                label
+                text-color="white"
+              >
+                {{ item?.outlet_name ? 'Existing' : 'New' }}
+              </v-chip>
+            </td>
+            <td class="font-weight-medium">{{ item?.outlet_name || item?.survey_name }}</td>
             <td>{{ item?.region }}</td>
             <td>{{ item?.area }}</td>
             <td>{{ item?.brand }}</td>
@@ -205,6 +215,7 @@
         refreshDataTrigger : false,
         tableHeaders: [
           { text: 'No', value: 'number', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
+          { text: 'Type', value: 'type', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
           { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
           { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
           { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
