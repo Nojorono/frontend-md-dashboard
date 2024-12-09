@@ -1,8 +1,8 @@
 <template>
   <v-container fluid>
     <v-card
-      style="padding: 20px; border-radius: 20px"
-      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
+      class="v-card--material v-card v-sheet theme--light elevation-4"
+      style="padding: 24px; border-radius: 16px; background: linear-gradient(to right, #ffffff, #f8f9fa)"
     >
       <v-data-table
         :headers="tableHeaders"
@@ -11,136 +11,175 @@
         :loading="loading"
         :options.sync="options"
         hide-default-footer
+        class=""
+        style="border-radius: 8px"
         @update:options="fetchData"
       >
         <template v-slot:top>
           <v-row
-            class="justify-space-between"
-            style="align-items: baseline"
+            class="justify-space-between align-center px-4 py-3"
           >
             <v-col
               cols="4"
-              style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+              class="d-flex align-center"
             >
               <v-text-field
                 v-model="search"
                 label="Search"
-                class="mx-5"
+                dense
+                outlined
+                hide-details
                 clearable
                 append-icon="mdi-magnify"
+                class="mr-4"
                 @click:append="handleSearch"
+                @keyup.enter="handleSearch"
               />
             </v-col>
-            <v-col>
-              <div class="d-flex justify-space-between">
-                <v-icon
-                  style="
-                width: 40px; border-radius: 50%;"
-                  color="primary"
-                  size="2rem"
-                  :loading="loading"
-                  @click="fetchData"
-                >
-                  mdi-refresh
-                </v-icon>
-                <v-btn
-                  color="primary"
-                  style="margin: unset!important;"
-                  @click="openHandleAdd"
-                >
-                  <v-icon>mdi-plus-box-multiple</v-icon>
-                  <span class="mx-1">Add</span>
-                </v-btn>
-              </div>
+            <v-col cols="4" class="d-flex align-center">
+              <v-autocomplete
+                v-model="filter.region"
+                :items="getRegionOptions" 
+                item-text="name"
+                item-value="name"
+                label="Region"
+                :loading="regionLoading"
+                clearable
+                dense
+                outlined
+                hide-details
+                class="mr-4"
+                @change="handleRegionChange"
+                @click:clear="clearRegionFilter"
+
+              >
+              </v-autocomplete>
+              <v-autocomplete
+                v-model="filter.area"
+                :items="getAreaOptions"
+                item-text="name"
+                item-value="name"
+                label="Area"
+                :disabled="!filter.region"
+                :loading="areaLoading"
+                clearable
+                dense
+                outlined
+                hide-details
+                multiple
+                small-chips
+                deletable-chips
+                @change="handleAreaChange"
+                @click:clear="clearAreaFilter"
+              >
+              </v-autocomplete>
             </v-col>
-            <v-col
-              cols="6"
-              style="display: flex; justify-content: flex-end; align-items: center; padding-right: unset; padding-left: 10px"
-            >
-              <div class="d-flex justify-end">
-                <v-autocomplete
-                  item-text="name"
-                  item-value="name"
-                  label="Region"
-                  v-model="filter.region"
-                  :items="regionOptions"
-                  :disabled="regionOptions.length <= 1"
-                  clearable
-                  @change="handleRegionChange"
-                >
-                  <template v-slot:no-data>
-                    <v-list-item>
-                      <v-list-item-content>Region not found</v-list-item-content>
-                    </v-list-item>
-                  </template>
-                </v-autocomplete>
-                <v-autocomplete
-                  item-text="name"
-                  item-value="name"
-                  label="Area"
-                  v-model="filter.area"
-                  :items="areaOptions"
-                  clearable
-                  :disabled="!filter.region"
-                  @change="handleAreaChange"
-                >
-                  <template v-slot:no-data>
-                    <v-list-item>
-                      <v-list-item-content>Area not found</v-list-item-content>
-                    </v-list-item>
-                  </template>
-                </v-autocomplete>
-              </div>
+            <v-col cols="4" class="d-flex justify-end align-center">
+              <v-btn
+                icon
+                color="primary"
+                class="mr-2"
+                :loading="loading"
+                @click="fetchData"
+              >
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+              <v-btn
+                color="primary"
+                class="text-none"
+                @click="openHandleAdd"
+              >
+                <v-icon left>mdi-plus</v-icon>
+                Add User
+              </v-btn>
             </v-col>
           </v-row>
         </template>
+
         <template v-slot:item="{ item }">
           <tr>
             <td>{{ item?.roles }}</td>
-            <td>{{ item?.username }}</td>
+            <td class="font-weight-medium">{{ item?.username }}</td>
             <td>{{ item?.email }}</td>
             <td>{{ item?.phone }}</td>
             <td>{{ item?.fullname }}</td>
-            <td>{{ item?.region }}</td>
             <td>
-              <span
+              <v-chip
+                v-if="item?.region"
+                small
+                label
+                color="primary"
+                class="white--text"
+              >
+                {{ item?.region }}
+              </v-chip>
+            </td>
+            <td>
+              <v-chip
                 v-for="(area, index) in item?.area"
                 :key="index"
+                class="mr-1 mb-1"
+                small
+                label
+                color="secondary"
+                outlined
               >
-                {{ area }}<span v-if="index < item.area.length - 1">, </span>
-              </span>
+                {{ area }}
+              </v-chip>
             </td>
             <td>{{ item?.type_md }}</td>
-            <td>{{ item?.status }}</td>
-            <td>{{ item?.last_login }}</td>
             <td>
-              <v-btn
-                outlined
+              <v-chip
+                :color="item?.is_active ? 'success' : 'error'"
                 small
+                label
+                text-color="white"
+              >
+                {{ item?.is_active ? 'Active' : 'Inactive' }}
+              </v-chip>
+            </td>
+            <td>{{ formatDate(item?.last_login) }}</td>
+            <td class="text-center d-flex justify-center">
+              <v-btn
+                small
+                fab
+                color="primary"
+                class="mr-2"
                 @click="openHandleUpdate(item)"
               >
-                <v-icon>mdi-pencil</v-icon>
+                <v-icon small>mdi-pencil</v-icon>
               </v-btn>
               <v-btn
-                color="error"
-                outlined
                 small
+                fab
+                color="error"
                 @click="openConfirmDeleteDialog(item)"
               >
-                <v-icon>mdi-delete</v-icon>
+                <v-icon small>mdi-delete</v-icon>
               </v-btn>
             </td>
           </tr>
         </template>
+
+        <template v-slot:no-data>
+          <v-alert
+            type="info"
+            class="ma-2"
+          >
+            No data available
+          </v-alert>
+        </template>
       </v-data-table>
+
       <v-row
         justify="center"
-        class="py-5"
+        class="pt-4"
       >
         <v-pagination
           v-model="page"
           :length="totalPages"
           :total-visible="7"
+          color="primary"
           next-icon="mdi-menu-right"
           prev-icon="mdi-menu-left"
           @input="onPageChange"
@@ -148,13 +187,12 @@
       </v-row>
     </v-card>
 
-    <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
       :dialog="isConfirmDeleteDialogOpen"
       @confirm="handleDelete"
       @close="closeConfirmDeleteDialog"
     />
-    <!-- Create & Update Dialog -->
+
     <form-user
       :dialog="isFormRoleDialog"
       :is-edit="isEdit"
@@ -166,12 +204,11 @@
 </template>
 
 <script>
-  import { mapGetters } from "vuex";
-  import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue';
-  import { createData, deleteData, updateData, getAll } from '@/api/userService';
-  import FormUser from '@/views/dashboard/pages/UserMaster/component/FormUser.vue';
-  import { getOutletRegion, getOutletArea } from "@/api/masterOutletService";
-  import Vue from "vue";
+import { mapGetters } from "vuex";
+import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue';
+import { createData, deleteData, updateData, getAll } from '@/api/userService';
+import FormUser from '@/views/dashboard/pages/UserMaster/component/FormUser.vue';
+import Vue from "vue";
 
 export default {
   name: 'MasterUser',
@@ -182,34 +219,34 @@ export default {
   data() {
     return {
       tableHeaders: [
-        { text: 'Roles', value: 'roles', class: 'text-left', width: '5%' },
-        { text: 'Username', value: 'username', class: 'text-left', width: '5%' },
-        { text: 'Email', value: 'email', class: 'text-left', width: '10%' },
-        { text: 'Phone', value: 'phone', class: 'text-left', width: '5%' },
-        { text: 'Full Name', value: 'fullname', class: 'text-left', width: '10%' },
-        { text: 'Region', value: 'region', class: 'text-left', width: '5%' },
-        { text: 'Area', value: 'area', class: 'text-left', width: '5%' },
-        { text: 'Type MD', value: 'type_md', class: 'text-left', width: '10%' },
-        { text: 'Status', value: 'is_active', class: 'text-left', width: '10%' },
-        { text: 'Last Login', value: 'last_login', class: 'text-left', width: '5%' },
-        { text: 'Actions', value: 'actions', sortable: false, class: 'text-center', width: '15%' },
+        { text: 'Roles', value: 'roles', sortable: false, class: 'text-left font-weight-bold', width: '8%' },
+        { text: 'Username', value: 'username', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+        { text: 'Email', value: 'email', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+        { text: 'Phone', value: 'phone', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+        { text: 'Full Name', value: 'fullname', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+        { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '8%' },
+        { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+        { text: 'Type MD', value: 'type_md', sortable: false, class: 'text-left font-weight-bold', width: '8%' },
+        { text: 'Status', value: 'is_active', sortable: false, class: 'text-left font-weight-bold', width: '8%' },
+        { text: 'Last Login', value: 'last_login', sortable: false, class: 'text-left font-weight-bold', width: '12%' },
+        { text: 'Actions', value: 'actions', sortable: false, class: 'text-center font-weight-bold', width: '10%' },
       ],
       tableData: [],
       totalItems: 0,
       totalPages: 0,
-      page: 1, // Current page number
+      page: 1,
       options: { page: 1, itemsPerPage: 10 },
       loading: false,
+      regionLoading: false,
+      areaLoading: false,
       selectedItem: null,
       isFormRoleDialog: false,
       isEdit: false,
       isConfirmDeleteDialogOpen: false,
       search: '',
-      regionOptions: [],
-      areaOptions: [],
       filter: {
         region: '',
-        area: '',
+        area: [],
       },
     }
   },
@@ -226,76 +263,69 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['getUser']),
+    ...mapGetters(['getRegionOptions', 'getAreaOptions']),
   },
 
   mounted() {
-    this.fetchRegion();
-    this.fetchArea();
+    
   },
 
   methods: {
-    async fetchArea() {
-      this.loading = true;
-      try {
-        const response = await getOutletArea();
-        if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
-          this.areaOptions = response.data.filter(
-            (area) => this.getUser.area.includes(area)
-          );
-        } else {
-          this.areaOptions = response.data;
-        }
-      } catch (error) {
-        console.error("Error fetching :", error);
-      } finally {
-        this.loading = false;
-      }
+    formatDate(date) {
+      if (!date) return '-';
+      return new Date(date).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     },
-    async fetchRegion() {
-      this.loading = true;
-      try {
-        const response = await getOutletRegion();
-        if (this.getUser.region) {
-          this.regionOptions = response.data.filter(
-            (region) => region === this.getUser.region
-          );
-        } else {
-          this.regionOptions = response.data;
-        }
 
-        if (this.regionOptions.length > 0) {
-          this.filter.region = this.regionOptions[0];
-          this.handleRegionChange(this.filter.region);
-        }
-      } catch (error) {
-        console.error("Error fetching :", error);
-      } finally {
-        this.loading = false;
-      }
-    },
-    handleRegionChange(value) {
-      this.options.page = 1;
-      this.filter.region = value;
-
-      if (!value) {
-        this.filter.area = '';
-      }
+    clearRegionFilter() {
+      this.filter.region = '';
+      this.filter.area = [];
       this.fetchData();
     },
-    handleAreaChange(value) {
-      this.options.page = 1;
-      this.filter.area = value;
+
+    clearAreaFilter() {
+      this.filter.area = [];
       this.fetchData();
     },
+
+    async handleRegionChange(value) {
+      this.regionLoading = true;
+      try {
+        this.options.page = 1;
+        this.filter.region = value;
+        this.filter.area = [];
+        await this.fetchData();
+      } finally {
+        this.regionLoading = false;
+      }
+    },
+
+    async handleAreaChange(value) {
+      this.areaLoading = true;
+      try {
+        this.options.page = 1;
+        this.filter.area = value;
+        await this.fetchData();
+      } finally {
+        this.areaLoading = false;
+      }
+    },
+
     onPageChange(newPage) {
       this.page = newPage;
     },
+
     openHandleAdd() {
       this.isEdit = false;
       this.selectedItem = null;
       this.isFormRoleDialog = true;
     },
+
     openHandleUpdate(item) {
       this.isEdit = true;
       this.selectedItem = {
@@ -310,74 +340,94 @@ export default {
         region: item.region,
         valid_from: item.valid_from,
         valid_to: item.valid_to,
-      }
+      };
       this.isFormRoleDialog = true;
     },
+
     async handleSave(item) {
       try {
         if (this.isEdit) {
           const { id, ...itemWithoutId } = item;
           await updateData(id, itemWithoutId);
-          Vue.prototype.$toast.success(`Update data Successfully!`);
+          Vue.prototype.$toast.success("User updated successfully");
         } else {
           await createData(item);
-          Vue.prototype.$toast.success(`Create data Successfully!`);
+          Vue.prototype.$toast.success("User created successfully");
         }
         this.closeFormDialog();
-      } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`);
-        console.error(error);
-      } finally {
         await this.fetchData();
+      } catch (error) {
+        Vue.prototype.$toast.error(error.data?.message || "An error occurred");
+        console.error(error);
       }
     },
+
     closeFormDialog() {
       this.isFormRoleDialog = false;
+      this.isEdit = false;
+      this.selectedItem = null;
     },
+
     async fetchData() {
       this.loading = true;
       try {
+        if (this.getRegionOptions.length === 1) {
+          this.filter.region = this.getRegionOptions[0];
+        }
+        if (this.getAreaOptions.length === 1) {
+          this.filter.area = this.getAreaOptions[0];
+        }
         const response = await getAll({
           page: this.options.page,
           limit: this.options.itemsPerPage,
           searchTerm: this.search,
-          filter: this.filter,
+          filter: {
+            region: this.filter.region,
+            area: this.filter.area,
+          },
         });
+        
         this.tableData = response.data.data;
         this.totalItems = response.data.totalItems;
         this.totalPages = response.data.totalPages;
         this.options.page = response.data.currentPage;
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data?.message}`);
+        Vue.prototype.$toast.error(error.data?.message || "Failed to fetch data");
         console.error(error);
       } finally {
         this.loading = false;
       }
     },
+
     handleSearch() {
       this.options.page = 1;
       this.fetchData();
     },
+
     openConfirmDeleteDialog(item) {
       this.selectedItem = item;
       this.isConfirmDeleteDialogOpen = true;
     },
+
     closeConfirmDeleteDialog() {
       this.isConfirmDeleteDialogOpen = false;
+      this.selectedItem = null;
     },
+
     async handleDelete() {
+      if (!this.selectedItem) return;
+      
       this.loading = true;
-      const data = this.selectedItem;
       try {
-        await deleteData(data.id);
-        Vue.prototype.$toast.success(`Deleted ${data.email} successfully!`);
+        await deleteData(this.selectedItem.id);
+        Vue.prototype.$toast.success(`User ${this.selectedItem.email} deleted successfully`);
+        await this.fetchData();
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data?.message}`);
+        Vue.prototype.$toast.error(error.data?.message || "Failed to delete user");
         console.error(error);
       } finally {
         this.loading = false;
         this.closeConfirmDeleteDialog();
-        await this.fetchData();
       }
     },
   },
@@ -385,5 +435,24 @@ export default {
 </script>
 
 <style scoped>
-/* Add any scoped styles here */
+.v-data-table ::v-deep tbody tr:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.v-data-table ::v-deep .v-data-table__wrapper {
+  border-radius: 8px;
+}
+
+.v-btn {
+  text-transform: none;
+}
+
+.v-chip {
+  font-weight: 500;
+}
+
+.v-autocomplete ::v-deep .v-select__selections {
+  max-height: 48px;
+  overflow-y: auto;
+}
 </style>

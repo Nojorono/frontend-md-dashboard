@@ -1,37 +1,78 @@
 <template>
-  <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading">
-    <v-container fluid>
-      <v-row style="height: 70px">
+  <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading elevation-2">
+    <v-container fluid class="pa-4">
+      <v-row class="mb-4" align="center">
         <v-col cols="4">
           <v-tabs
             v-model="activeTab"
             dark
             grow
-            class="rounded"
+            class="rounded-lg elevation-1"
+            background-color="primary lighten-1"
           >
             <v-tab
               v-for="tab in tabs"
               :key="tab.name"
               active-class="active-tab"
+              class="text-subtitle-1 font-weight-medium"
             >
               {{ tab.label }}
             </v-tab>
           </v-tabs>
         </v-col>
-        <v-icon
+        
+        <v-btn
+          icon
           color="primary"
-          size="2rem"
+          class="mx-2"
           :loading="loading"
           @click="fetchData"
         >
-          mdi-refresh
-        </v-icon>
+          <v-icon size="24">mdi-refresh</v-icon>
+        </v-btn>
+
+        <v-col cols="6">
+          <div class="d-flex justify-end align-center">
+            <v-autocomplete
+                v-model="filter.region"
+                :items="getRegionOptions" 
+                item-text="name"
+                item-value="name"
+                label="Region"
+                clearable
+                dense
+                outlined
+                hide-details
+                class="mr-4"
+                @change="handleRegionChange"
+                @click:clear="clearRegionFilter"
+              >
+              </v-autocomplete>
+              <v-autocomplete
+                v-model="filter.area"
+                :items="getAreaOptions"
+                item-text="name"
+                item-value="name"
+                label="Area"
+                :disabled="!filter.region"
+                clearable
+                dense
+                outlined
+                hide-details
+                small-chips
+                deletable-chips
+                @change="handleAreaChange"
+                @click:clear="clearAreaFilter"
+              >
+              </v-autocomplete>
+          </div>
+        </v-col>
       </v-row>
 
       <!-- Tab Content -->
       <v-tabs-items v-model="activeTab">
         <v-tab-item>
-          <v-card style="box-shadow: unset;">
+          <div class="rounded-lg">
             <v-data-table
               :headers="tableHeaders"
               :items="tableData"
@@ -41,71 +82,26 @@
               :search="search"
               hide-default-footer
               class="small-table"
-              style="padding: 6px; border-radius: 20px"
               @update:options="fetchData"
             >
               <template v-slot:top>
-                <v-row
-                  class="justify-space-between"
-                  style="align-items: baseline"
-                >
-                  <v-col
-                    cols="4"
-                    style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
-                  >
+                <v-row class="px-4 py-2" align="center">
+                  <v-col cols="4">
                     <v-text-field
                       v-model="search"
                       label="Search"
-                      class="mx-5"
+                      dense
+                      outlined
+                      hide-details
                       clearable
-                      append-icon="mdi-magnify"
-                      @click:append="handleSearch"
+                      prepend-inner-icon="mdi-magnify"
+                      @keyup.enter="handleSearch"
+                      @click:clear="handleClearSearch"
                     />
                   </v-col>
-                  <v-col cols="8">
-                      <div class="d-flex justify-end">
-                        <v-autocomplete
-                          v-model="selectedRegion"
-                          :items="regionOptions"
-                          item-text="name"
-                          item-value="id"
-                          label="Region"
-                          clearable
-                          class="mx-2"
-                          :loading="loadingRegions"
-                          @change="onRegionChange"
-                        >
-                          <template v-slot:no-data>
-                            <v-list-item>
-                              <v-list-item-content>Region not found</v-list-item-content>
-                            </v-list-item>
-                          </template>
-                        </v-autocomplete>
-
-                        <v-autocomplete
-                          v-model="selectedArea"
-                          :items="filteredAreaOptions"
-                          item-text="name"
-                          item-value="id"
-                          label="Area"
-                          clearable
-                          class="mx-2"
-                          :loading="loadingAreas"
-                          :disabled="!selectedRegion"
-                          @change="onAreaChange"
-                        >
-                          <template v-slot:no-data>
-                            <v-list-item>
-                              <v-list-item-content>
-                                {{ selectedRegion ? 'No areas found' : 'Please select a region first' }}
-                              </v-list-item-content>
-                            </v-list-item>
-                          </template>
-                        </v-autocomplete>
-                      </div>
-                    </v-col>
                 </v-row>
               </template>
+
               <template v-slot:item="{ item, index }">
                 <tr>
                   <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
@@ -231,18 +227,19 @@
                   </td>
                   <td>
                     <v-btn
-                      outlined
                       small
                       color="warning"
+                      class="text-none px-2"
                       @click="handleDetail(item.id)"
                     >
-                      <v-icon>mdi-details</v-icon>
-                      detail
+                      <v-icon small left>mdi-details</v-icon>
+                      Detail
                     </v-btn>
                   </td>
                 </tr>
               </template>
             </v-data-table>
+
             <v-row
               justify="center"
               class="py-3"
@@ -256,12 +253,12 @@
                 @input="onPageChange"
               />
             </v-row>
-          </v-card>
+          </div>
         </v-tab-item>
 
         <!-- Tab 2: Settings -->
         <v-tab-item>
-          <v-card style="box-shadow: unset;">
+          <div class="rounded-lg">
             <v-data-table
               :headers="tableHeaders"
               :items="tableData"
@@ -271,74 +268,35 @@
               :search="search"
               hide-default-footer
               class="small-table"
-              style="padding: 6px; border-radius: 20px"
               @update:options="fetchData"
             >
               <template v-slot:top>
-                <v-row
-                  class="justify-space-between"
-                  style="align-items: baseline"
-                >
-                  <v-col
-                    cols="4"
-                    style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
-                  >
+                <v-row class="px-4 py-2" align="center">
+                  <v-col cols="4">
                     <v-text-field
                       v-model="search"
                       label="Search"
-                      class="mx-5"
+                      dense
+                      outlined
+                      hide-details
                       clearable
-                      append-icon="mdi-magnify"
-                      @click:append="handleSearch"
+                      prepend-inner-icon="mdi-magnify"
+                      @keyup.enter="handleSearch"
+                      @click:clear="handleClearSearch"
                     />
                   </v-col>
-                  <v-col
-                        cols="6"
-                        style="display: flex; justify-content: flex-end; align-items: center; padding-right: unset; padding-left: 10px"
-                      >
-                    <div class="d-flex justify-end">
-                        <v-autocomplete
-                          item-text="name"
-                          item-value="name"
-                          label="Region"
-                          :items="regionOptions"
-                          clearable
-                          @change="handleRegionChange"
-                        >
-                          <template v-slot:no-data>
-                            <v-list-item>
-                              <v-list-item-content>Region not found</v-list-item-content>
-                            </v-list-item>
-                          </template>
-                        </v-autocomplete>
-                        <v-autocomplete
-                          item-text="name"
-                          item-value="name"
-                          label="Area"
-                          :items="areaOptions"
-                          clearable
-                          @change="handleAreaChange"
-                        >
-                          <template v-slot:no-data>
-                            <v-list-item>
-                              <v-list-item-content>Area not found</v-list-item-content>
-                            </v-list-item>
-                          </template>
-                        </v-autocomplete>
-                    
-                    </div>
-                  </v-col>
-                  <v-col cols="2" class="d-flex justify-end">
+                  <v-spacer></v-spacer>
                   <v-btn
-                        color="primary"
-                        @click="openImportDialog()"
-                      >
-                        <v-icon>mdi-plus-box-multiple</v-icon>
-                        <span class="mx-1">Import</span>
-                      </v-btn>
-                  </v-col>
+                    color="primary"
+                    class="text-none"
+                    @click="openImportDialog()"
+                  >
+                    <v-icon left>mdi-plus-box-multiple</v-icon>
+                    Import
+                  </v-btn>
                 </v-row>
               </template>
+
               <template v-slot:item="{ item, index }">
                 <tr>
                   <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
@@ -464,18 +422,19 @@
                   </td>
                   <td>
                     <v-btn
-                      outlined
                       small
                       color="warning"
+                      class="text-none px-2"
                       @click="handleDetail(item.id)"
                     >
-                      <v-icon>mdi-details</v-icon>
-                      detail
+                      <v-icon small left>mdi-details</v-icon>
+                      Detail
                     </v-btn>
                   </td>
                 </tr>
               </template>
             </v-data-table>
+
             <v-row
               justify="center"
               class="py-3"
@@ -489,16 +448,18 @@
                 @input="onPageChange"
               />
             </v-row>
-          </v-card>
+          </div>
         </v-tab-item>
       </v-tabs-items>
+
       <!-- Confirm Delete Dialog -->
       <confirm-delete-dialog
         :dialog="isConfirmDeleteDialogOpen"
         @confirm="handleDelete"
         @close="closeConfirmDeleteDialog"
       />
-      <!-- Import Delete Dialog -->
+
+      <!-- Import Dialog -->
       <import-outlet
         :dialog="isImportDialogOpen"
         @close="closeImportDialog"
@@ -515,7 +476,6 @@
   import Vue from "vue";
   import {createData, updateData} from "@/api/userService";
   import ImportOutlet from "@/views/dashboard/pages/OutletMaster/components/ImportOutlet.vue";
-  import { getOutletRegion, getOutletArea } from "@/api/masterOutletService";
 
   export default {
     name: 'MasterOutlet',
@@ -529,7 +489,6 @@
         tabs: [
           { name: 'Non Active', label: 'Non Active', value: 0 },
           { name: 'Active', label: 'Active', value: 1 },
-          // Add more tabs here
         ],
         tableHeaders: [
           { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
@@ -573,7 +532,7 @@
         tableData: [],
         totalItems: 0,
         totalPages: 0,
-        page: 1, // Current page number
+        page: 1,
         options: { page: 1, itemsPerPage: 10 },
         loading: false,
         selectedItem: null,
@@ -591,7 +550,7 @@
       }
     },
     computed: {
-      ...mapGetters(['getUser']),
+      ...mapGetters(['getUser','getAreaOptions', 'getRegionOptions']),
     },
     watch: {
       page(value) {
@@ -603,59 +562,39 @@
         this.fetchData();
       },
       activeTab() {
+        this.options.page = 1;
+        this.page = 1;
         this.fetchData();
       },
     },
     mounted () {
       this.fetchData()
-      this.fetchRegion()
-      this.fetchArea()
     },
     methods: {
-      async fetchArea() {
-        this.loading = true;
-        try {
-          const response = await getOutletArea();
-          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
-            this.areaOptions = response.data.filter(
-              (area) => this.getUser.area.includes(area)
-            );
-          } else {
-            this.areaOptions = response.data;
-          }
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`);
-        } finally {
-          this.loading = false;
-        }
-      },
-      async fetchRegion() {
-        this.loading = true;
-        try {
-          const response = await getOutletRegion();
-          if (this.getUser.region) {
-            this.regionOptions = response.data.filter(
-              (region) => region === this.getUser.region
-            );
-          } else {
-            this.regionOptions = response.data;
-          }
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`);
-        } finally {
-          this.loading = false;
-        }
-      },
-      handleRegionChange(value) {
-        this.filter.region = value;
-        this.options.page = 1;
-        this.fetchData();
-      },
-      handleAreaChange(value) {
-        this.filter.area = value;
-        this.options.page = 1;
-        this.fetchData();
-      },
+
+    clearRegionFilter() {
+      this.filter.region = '';
+      this.filter.area = '';
+      this.fetchData();
+    },
+
+    clearAreaFilter() {
+      this.filter.area = '';
+      this.fetchData();
+    },
+
+    async handleRegionChange(value) {
+      this.options.page = 1;
+      this.filter.region = value;
+      this.filter.area = '';
+      await this.fetchData();
+    },
+
+    async handleAreaChange(value) {
+      this.options.page = 1;
+      this.filter.area = value;
+      await this.fetchData();
+    },
       async handleDetail(id) {
         await this.$router.push({
           name: 'Outlet Detail',
@@ -697,10 +636,15 @@
       closeFormDialog() {
         this.isFormRoleDialog = false;
       },
-      // Fetch all outlets and update tableData
       async fetchData () {
         this.loading = true
         try {
+          if (this.getRegionOptions.length === 1) {
+          this.filter.region = this.getRegionOptions[0];
+        }
+        if (this.getAreaOptions.length === 1) {
+          this.filter.area = this.getAreaOptions[0];
+        }
           const response = await getAllOutlets({
             page: this.options.page,
             limit: this.options.itemsPerPage,
@@ -718,7 +662,6 @@
           this.loading = false
         }
       },
-      // IMPORT
       openImportDialog () {
         this.isImportDialogOpen = true
       },
@@ -739,6 +682,11 @@
         }
       },
       handleSearch() {
+        this.options.page = 1;
+        this.fetchData();
+      },
+      handleClearSearch() {
+        this.search = '';
         this.options.page = 1;
         this.fetchData();
       },
@@ -768,28 +716,38 @@
 </script>
 
 <style scoped>
-/* Customize the active tab style */
 .active-tab {
-  background-color: #4caf50 !important; /* Green background for active tab */
-  color: #fff !important; /* White text for active tab */
-  font-weight: bold; /* Bold text for active tab */
+  background-color: #1976d2 !important;
+  color: white !important;
+  font-weight: 500 !important;
 }
 
 .small-table {
-  font-size: 12px;
+  font-size: 13px;
+  border-radius: 8px;
 }
 
 .small-table th,
 .small-table td {
-  padding: 4px 8px;
-  height: 30px;
+  padding: 8px 16px;
+  height: 40px;
 }
 
 .small-table th {
-  font-weight: bold;
+  font-weight: 500;
+  background-color: #f5f5f5;
 }
 
 .small-table td {
   font-weight: normal;
 }
-</style>    
+
+.v-data-table ::v-deep .v-data-table__wrapper {
+  border-radius: 8px;
+}
+
+.v-btn {
+  text-transform: none !important;
+  letter-spacing: 0.5px;
+}
+</style>

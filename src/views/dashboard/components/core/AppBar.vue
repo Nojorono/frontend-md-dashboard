@@ -271,23 +271,21 @@
         }
       },
 
-      handleLogout(){
+      handleLogout() {
         this.$swal.fire({
-          title: 'Are you sure?',
-          text: "You will be logged out of the system",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#FF5733',
-          cancelButtonColor: '#6B7A8F',
-          confirmButtonText: 'Yes, logout',
-          cancelButtonText: 'Cancel',
-          confirmButtonTextColor: '#FFFFFF',
-          cancelButtonTextColor: '#000000',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.$router.push('/logout');
-          }
-        });
+        title: 'Are you sure?',
+        text: "You will be logged out of the system",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#FF5733',
+        cancelButtonColor: '#6B7A8F',
+        confirmButtonText: 'Yes, logout',
+        cancelButtonText: 'Cancel',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$router.push('/logout');
+        }
+      });
       },
 
       async markAsRead(id) {

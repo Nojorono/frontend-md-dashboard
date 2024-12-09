@@ -27,6 +27,8 @@
                 :rules="usernameRules"
                 label="Username"
                 required
+                outlined
+                dense
               />
               <!-- Fullname Input -->
               <v-text-field
@@ -34,6 +36,8 @@
                 :rules="fullnameRules"
                 label="Full Name"
                 required
+                outlined
+                dense
               />
 
               <!-- Email Input -->
@@ -42,6 +46,8 @@
                 :rules="emailRules"
                 label="Email"
                 required
+                outlined
+                dense
               />
 
               <!-- Phone Input -->
@@ -53,6 +59,8 @@
                 maxlength="20"
                 @keypress="isNumber"
                 required
+                outlined
+                dense
               />
 
               <!-- Type MD Input -->
@@ -61,6 +69,8 @@
                 :items="typeMD"
                 clearable
                 label="Type MD"
+                outlined
+                dense
               />
             </v-col>
             <v-col
@@ -77,9 +87,10 @@
                 item-value="name"
                 label="Region"
                 clearable
-                return-object
                 :rules="regionRules"
-                @change="onRegionChange"
+                @update:search-input="onRegionChange"
+                outlined
+                dense
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -90,17 +101,18 @@
 
               <!-- Area Input -->
               <v-autocomplete
-                v-model="itemData.area"
+                v-model="selectedAreas"
                 :items="areaOptions"
                 item-text="area"
                 item-value="area"
                 label="Area"
-                clearable
-                return-object
+                multiple
                 chips
-                required
-                @change="onAreaChange"
+                deletable-chips
                 :rules="areaRules"
+                required
+                outlined
+                dense
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -108,7 +120,8 @@
                   </v-list-item>
                 </template>
               </v-autocomplete>
-              <!-- Area Input -->
+
+              <!-- Role Input -->
               <v-autocomplete
                 v-model="itemData.user_role_id"
                 :items="rolesOptions"
@@ -116,23 +129,27 @@
                 item-value="id"
                 label="Role"
                 clearable
-                return-object
                 :rules="roleRules"
                 required
                 @change="onRoleChange"
+                outlined
+                dense
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content>Area not found</v-list-item-content>
+                    <v-list-item-content>Role not found</v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
+
+              <!-- Valid From Date -->
               <v-menu
                 ref="validStartMenu"
                 v-model="validStartMenu"
                 :close-on-content-click="false"
                 transition="scale-transition"
                 min-width="290px"
+                offset-y
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
@@ -143,23 +160,25 @@
                     v-bind="attrs"
                     :rules="dateRules"
                     v-on="on"
+                    outlined
+                    dense
                   />
                 </template>
                 <v-date-picker
                   v-model="itemData.valid_from"
-                  style="margin: 0;"
-                  required
                   @input="validStartMenu = false"
+                  :min="new Date().toISOString().substr(0, 10)"
                 />
               </v-menu>
 
-              <!-- End Plan -->
+              <!-- Valid To Date -->
               <v-menu
                 ref="validEndMenu"
                 v-model="validEndMenu"
                 :close-on-content-click="false"
                 transition="scale-transition"
                 min-width="290px"
+                offset-y
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
@@ -168,15 +187,16 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
-                    :rules="dateRules"
+                    :rules="[...dateRules, validEndDateRule]"
                     v-on="on"
+                    outlined
+                    dense
                   />
                 </template>
                 <v-date-picker
                   v-model="itemData.valid_to"
-                  style="margin: 0;"
-                  required
                   @input="validEndMenu = false"
+                  :min="itemData.valid_from || new Date().toISOString().substr(0, 10)"
                 />
               </v-menu>
             </v-col>
@@ -187,19 +207,19 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          color="blue darken-1"
+          color="grey darken-1"
           text
           @click="closeDialog"
         >
           Cancel
         </v-btn>
         <v-btn
-          color="green darken-1"
-          text
+          color="primary"
+          :loading="loading"
           :disabled="!formValid"
           @click="saveItem"
         >
-          {{ isEdit ? "Save" : "Add" }}
+          {{ isEdit ? "Save Changes" : "Add User" }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -211,204 +231,203 @@ import { getAllArea, getAllRegion} from '@/api/regionAreaService'
 import { getAllList } from '@/api/masterRoleService'
 import {mapGetters} from "vuex";
 
-  export default {
-    name: "FormUser",
-    props: {
-      dialog: Boolean,
-      isEdit: Boolean,
-      item: Object,
-    },
-    data() {
-      return {
-        itemData: {
-          username: '',
-          user_role_id: '',
-          fullname: '',
-          email: '',
-          phone: '',
-          type_md: '',
-          area: '',
-          region: '',
-          valid_from: '',
-          valid_to: '',
-        },
-        regionOptions: [],
-        areaOptions: [],
-        rolesOptions: [],
-        typeMD : [
-          'MOTOR', 'MOBIL'
-        ],
-        formValid: false,
-        validStartMenu: false,
-        validEndMenu: false,
-        usernameRules: [
-          (v) => !!v || "Username is required",
-          (v) => v.length >= 2 || "Username must be at least 2 characters",
-          (v) => v.length <= 50 || "Username must be less than 50 characters",
-        ],
-        fullnameRules: [
-          (v) => !!v || "FullName is required",
-          (v) => v.length >= 2 || "Username must be at least 2 characters",
-          (v) => v.length <= 50 || "Full Name must be less than 50 characters",
-        ],
-        emailRules: [
-          (v) => !!v || "Email is required",
-          (v) => /.+@.+\..+/.test(v) || "Email must be valid",
-          (v) => v.length <= 60 || "Email must be less than 60 characters",
-        ],
-        phoneRules: [
-          (v) => !!v || "Phone number is required",
-          (v) => /^[0-9]*$/.test(v) || "Phone number must contain only numbers",
-          (v) => v.length <= 20 || "Phone number must be less than 20 characters",
-        ],
-
-        regionRules: [
-          (v) => !!v || "Region is required",
-        ],
-        areaRules: [
-          (v) => !!v || "Area is required",
-        ],
-        roleRules: [
-          (v) => !!v || "Role is required",
-        ],
-        dateRules: [
-          (v) => !!v || "Valid is required",
-        ],
-      };
-    },
-    computed: {
-      ...mapGetters(['getUser']),
-    },
-    watch: {
-      item: {
-        immediate: true,
-        handler(newItem) {
-          if (newItem) {
-            this.itemData = {
-              ...newItem
-            };
-          } else {
-            this.resetForm();
+export default {
+  name: "FormUser",
+  props: {
+    dialog: Boolean,
+    isEdit: Boolean,
+    item: Object,
+  },
+  data() {
+    return {
+      loading: false,
+      itemData: {
+        username: '',
+        user_role_id: '',
+        fullname: '',
+        email: '',
+        phone: '',
+        type_md: '',
+        area: [],
+        region: '',
+        valid_from: '',
+        valid_to: '',
+      },
+      selectedAreas: [],
+      regionOptions: [],
+      areaOptions: [],
+      rolesOptions: [],
+      typeMD : [
+        'MOTOR', 'MOBIL'
+      ],
+      formValid: false,
+      validStartMenu: false,
+      validEndMenu: false,
+      usernameRules: [
+        (v) => !!v || "Username is required",
+        (v) => v.length >= 2 || "Username must be at least 2 characters",
+        (v) => v.length <= 50 || "Username must be less than 50 characters",
+      ],
+      fullnameRules: [
+        (v) => !!v || "FullName is required", 
+        (v) => v.length >= 2 || "Username must be at least 2 characters",
+        (v) => v.length <= 50 || "Full Name must be less than 50 characters",
+      ],
+      emailRules: [
+        (v) => !!v || "Email is required",
+        (v) => /.+@.+\..+/.test(v) || "Email must be valid",
+        (v) => v.length <= 60 || "Email must be less than 60 characters",
+      ],
+      phoneRules: [
+        (v) => !!v || "Phone number is required",
+        (v) => /^[0-9]*$/.test(v) || "Phone number must contain only numbers",
+        (v) => v.length <= 20 || "Phone number must be less than 20 characters",
+      ],
+      regionRules: [
+        (v) => !!v || "Region is required",
+      ],
+      areaRules: [
+        (v) => !!v || "Area is required",
+      ],
+      roleRules: [
+        (v) => !!v || "Role is required",
+      ],
+      dateRules: [
+        (v) => !!v || "Date is required",
+      ],
+    };
+  },
+  computed: {
+    ...mapGetters(['getUser']),
+    validEndDateRule() {
+      return (v) => !this.itemData.valid_from || !v || v >= this.itemData.valid_from || 'Valid To date must be after Valid From date'
+    }
+  },
+  watch: {
+    item: {
+      immediate: true,
+      handler(newItem) {
+        if (newItem) {
+          this.itemData = { ...newItem };
+          // Handle area data for edit mode
+          if (Array.isArray(newItem.area)) {
+            this.selectedAreas = newItem.area.map(a => typeof a === 'string' ? a : a.area);
+          } else if (newItem.area) {
+            this.selectedAreas = [newItem.area];
           }
-        },
+        } else {
+          this.resetForm();
+        }
       },
     },
-    mounted () {
-      this.fetchRegion()
-      this.fetchArea()
+    selectedAreas: {
+      handler(newVal) {
+        this.itemData.area = newVal;
+      }
+    }
+  },
+  async mounted() {
+    await Promise.all([
+      this.fetchRegion(),
+      this.fetchArea(),
       this.fetchRoles()
+    ]);
+  },
+  methods: {
+    isNumber(event) {
+      const charCode = event.which ? event.which : event.keyCode;
+      if (charCode < 48 || charCode > 57) {
+        event.preventDefault();
+      }
     },
-    methods: {
-      isNumber(event) {
-        const charCode = event.which ? event.which : event.keyCode;
-        if (charCode < 48 || charCode > 57) {
-          event.preventDefault();
-        }
-      },
-      async fetchArea() {
-        this.loading = true;
-        try {
-          const response = await getAllArea();
-          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
-            this.areaOptions = response.data.data.filter(
-              (area) => this.getUser.area.includes(area.area)
-            );
-          } else {
-            this.areaOptions = response.data.data;
-          }
-          if (this.areaOptions.length === 1) {
-            this.itemData.area = [this.areaOptions[0]];
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      async fetchRegion() {
-        this.loading = true;
-        try {
-          const response = await getAllRegion();
-          if (this.getUser.region) {
-            this.regionOptions = response.data.data.filter(
-              (region) => region.name === this.getUser.region
-            );
-          } else {
-            this.regionOptions = response.data.data;
-          }
-          if (this.regionOptions.length === 1) {
-            this.itemData.region = this.regionOptions[0].name;
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      async fetchRoles() {
-        this.loading = true;
-        try {
-          const response = await getAllList();
-          this.rolesOptions = response.data;
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      resetForm() {
-        this.itemData = {
-          username: '',
-          user_role_id: '',
-          fullname: '',
-          email: '',
-          phone: '',
-          type_md: '',
-          area: '',
-          region: '',
-          valid_from: '',
-          valid_to: '',
+    async fetchArea() {
+      this.loading = true;
+      try {
+        const response = await getAllArea();
+        this.areaOptions = response.data.data;
+      } catch (error) {
+        console.error("Error fetching areas:", error);
+        this.$toast.error("Failed to fetch areas");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchRegion() {
+      this.loading = true;
+      try {
+        const response = await getAllRegion();
+        this.regionOptions = response.data.data;
+      } catch (error) {
+        console.error("Error fetching regions:", error);
+        this.$toast.error("Failed to fetch regions");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchRoles() {
+      this.loading = true;
+      try {
+        const response = await getAllList();
+        this.rolesOptions = response.data;
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+        this.$toast.error("Failed to fetch roles");
+      } finally {
+        this.loading = false;
+      }
+    },
+    resetForm() {
+      this.itemData = {
+        username: '',
+        user_role_id: '',
+        fullname: '',
+        email: '',
+        phone: '',
+        type_md: '',
+        area: [],
+        region: '',
+        valid_from: '',
+        valid_to: '',
+      };
+      this.selectedAreas = [];
+      this.formValid = false;
+      if (this.$refs.form) {
+        this.$refs.form.resetValidation();
+      }
+    },
+    closeDialog() {
+      this.resetForm();
+      this.$emit("close");
+    },
+    saveItem() {
+      if (this.$refs.form.validate()) {
+        const formattedData = {
+          ...this.itemData,
+          area: this.selectedAreas
         };
-        this.formValid = false;
-        // Check if the form reference exists before calling resetValidation
-        if (this.$refs.form) {
-          this.$refs.form.resetValidation();
-        }
-      },
-      closeDialog() {
-        this.resetForm();
-        this.$emit("close");
-      },
-      saveItem() {
-        if (this.$refs.form.validate()) {
-          const formattedData = {
-            ...this.itemData,
-            area: [this.itemData.area],
-          };
-          this.$emit("save", formattedData);
-        }
-      },
-      onRegionChange(item) {
-        if (item) {
-          this.itemData.region = item.name;
-        } else {
-          this.itemData.region = null;
-        }
-      },
-      onAreaChange(item) {
-        if (item) {
-          this.itemData.area = item.area;
-        } else {
-          this.itemData.area = [];
-        }
-      },
-      onRoleChange(item) {
-        if (item) {
-          this.itemData.user_role_id = item.id;
-        } else {
-          this.itemData.user_role_id = null;
-        }
-      },
+        this.$emit("save", formattedData);
+      }
     },
-  };
+    onRegionChange(item) {
+      if (!item) {
+        this.itemData.region = '';
+        return;
+      }
+      const selectedRegion = this.regionOptions.find(region => region.name === item);
+      if (selectedRegion) {
+        this.itemData.region = selectedRegion.name;
+      }
+    },
+    onAreaChange(item) {
+      if (item) {
+        this.itemData.area = item.area;
+      } else {
+        this.itemData.area = null;
+      }
+    },
+    onRoleChange(item) {
+      this.itemData.user_role_id = item ? item.id : null;
+    },
+  },
+};
 </script>

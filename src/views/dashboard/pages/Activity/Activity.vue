@@ -1,8 +1,8 @@
 <template>
   <v-container fluid>
     <v-card
-      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
-      style="padding: 20px; border-radius: 20px"
+      class="v-card--material v-card v-sheet theme--light elevation-4"
+      style="padding: 24px; border-radius: 16px; background: linear-gradient(to right, #ffffff, #f8f9fa)"
     >
       <v-data-table
         :headers="tableHeaders"
@@ -11,23 +11,28 @@
         :loading="loading"
         :options.sync="options"
         hide-default-footer
+        class=""
+        style="border-radius: 8px"
         @update:options="fetchData"
       >
         <template v-slot:top>
           <v-row
-            class="justify-space-between"
-            style="align-items: baseline"
+            class="justify-space-between align-center px-4 py-3"
           >
             <v-col
               cols="4"
-              style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+              class="d-flex align-center"
             >
               <v-autocomplete
                 item-text="name"
                 item-value="name"
                 label="Region"
-                :items="regionOptions"
+                :items="getRegionOptions"
                 clearable
+                dense
+                outlined
+                class="mr-4"
+                hide-details
                 return-object
               >
                 <template v-slot:no-data>
@@ -40,8 +45,11 @@
                 item-text="name"
                 item-value="name"
                 label="Area"
-                :items="areaOptions"
+                :items="getAreaOptions"
                 clearable
+                dense
+                outlined
+                hide-details
                 return-object
               >
                 <template v-slot:no-data>
@@ -55,68 +63,86 @@
               <v-text-field
                 v-model="search"
                 label="Search"
-                class="mx-5"
+                dense
+                outlined
+                hide-details
                 clearable
                 append-icon="mdi-magnify"
                 @click:append="handleSearch"
               />
             </v-col>
-            <v-col cols="4">
-              <div
-                class="d-flex justify-space-between"
-                style="align-self: center;"
+            <v-col cols="4" class="d-flex justify-end">
+              <v-btn
+                icon
+                color="primary"
+                class="mr-2"
+                :loading="loading"
+                @click="fetchData"
               >
-                <v-icon
-                  style="
-                width: 40px; border-radius: 50%;"
-                  color="primary"
-                  size="2rem"
-                  :loading="loading"
-                  @click="fetchData"
-                >
-                  mdi-refresh
-                </v-icon>
-              </div>
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
             </v-col>
           </v-row>
         </template>
-        <!-- Mapping Item Properties -->
+
         <template v-slot:item="{ item, index }">
           <tr>
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
-            <td>{{ item?.outlet_name }}</td>
+            <td class="font-weight-medium">{{ item?.outlet_name }}</td>
             <td>{{ item?.region }}</td>
             <td>{{ item?.area }}</td>
             <td>{{ item?.brand }}</td>
             <td>{{ item?.type_sio }}</td>
-            <td>{{ item?.status }}</td>
-            <td>{{ item?.created_at }}</td>
             <td>
-              <div class="d-flex" style="align-items: center; gap: 5px;">
+              <v-chip
+                :color="getStatusColor(item?.status)"
+                small
+                label
+                text-color="white"
+              >
+              {{ getStatusLabel(item?.status) }}
+            </v-chip>
+            </td>
+            <td>{{ formatDate(item?.created_at) }}</td>
+            <td>
+              <div class="d-flex align-center">
                 <v-btn
                   color="warning"
                   outlined
                   small
+                  class="mr-2"
                   @click="handleDetail(item.id)"
                 >
-                  <v-icon>mdi-calendar-arrow-right</v-icon>
+                  <v-icon small class="mr-1">mdi-calendar-arrow-right</v-icon>
+                  Detail
                 </v-btn>
 
-                <v-btn
-                  :id="`menu-activator-status-${item.id}`"
-                  color="primary"
-                  outlined
-                  small
+                <v-menu
+                  offset-y
+                  :close-on-content-click="false"
                 >
-                  <v-icon>mdi-dots-vertical</v-icon>
-                </v-btn>
-                <v-menu :activator="`#menu-activator-status-${item.id}`">
-                  <v-list>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      color="primary"
+                      outlined
+                      small
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon small>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list dense>
                     <v-list-item
                       v-for="(status, index) in statusOptions"
                       :key="index"
-                      :value="status.value"  
+                      @click="updateStatus(item, status.value)"
                     >
+                      <v-list-item-icon class="mr-2">
+                        <v-icon small :color="getStatusColor(status.value)">
+                          mdi-circle-small
+                        </v-icon>
+                      </v-list-item-icon>
                       <v-list-item-title>{{ status.text }}</v-list-item-title>
                     </v-list-item>
                   </v-list>
@@ -126,14 +152,16 @@
           </tr>
         </template>
       </v-data-table>
+
       <v-row
         justify="center"
-        class="py-3"
+        class="pt-4"
       >
         <v-pagination
           v-model="page"
           :length="totalPages"
           :total-visible="7"
+          color="primary"
           next-icon="mdi-menu-right"
           prev-icon="mdi-menu-left"
           @input="onPageChange"
@@ -141,13 +169,12 @@
       </v-row>
     </v-card>
 
-    <!-- Confirm Delete Dialog -->
     <confirm-delete-dialog
       :dialog="isConfirmDeleteDialogOpen"
       @confirm="handleDelete"
       @close="closeConfirmDeleteDialog"
     />
-    <!-- Create & Update Dialog -->
+
     <form-call-plan
       :dialog="isFormRoleDialog"
       :is-edit="isEdit"
@@ -164,8 +191,8 @@
   import { createData, deleteData, updateData, getAll } from '@/api/activityService'
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
   import Vue from "vue";
-  import { getOutletArea, getOutletRegion } from "@/api/masterOutletService";
   import { mapGetters } from "vuex";
+  import { STATUS_LABELS, STATUS_COLORS } from '@/constants/status';
 
   export default {
     name: 'Activity',
@@ -177,15 +204,15 @@
       return {
         refreshDataTrigger : false,
         tableHeaders: [
-          { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
-          { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left', width: '20%' },
-          { text: 'Region', value: 'region', sortable: false, class: 'text-left', width: '20%' },
-          { text: 'Area', value: 'area', sortable: false, class: 'text-left', width: '15%' },
-          { text: 'Brand', value: 'brand', sortable: false, class: 'text-left', width: '15%' },
-          { text: 'Type SIO', value: 'type_sio', sortable: false, class: 'text-left', width: '15%' },
-          { text: 'Status', value: 'status', sortable: false, class: 'text-left', width: '15%' },
-          { text: 'Created At', value: 'created_at', sortable: false, class: 'text-left', width: '15%' },
-          { text: 'Actions', value: 'actions', sortable: false, class: 'text-center' },
+          { text: 'No', value: 'number', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
+          { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
+          { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
+          { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Brand', value: 'brand', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Type SIO', value: 'type_sio', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Status', value: 'status', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Created At', value: 'created_at', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Actions', value: 'actions', sortable: false, class: 'text-center font-weight-bold' },
         ],
         tableData: [],
         totalItems: 0,
@@ -212,7 +239,7 @@
       }
     },
     computed: {
-      ...mapGetters(['getUser']),
+      ...mapGetters(['getUser', 'getRegionOptions', 'getAreaOptions']),
     },
     watch: {
       page(value) {
@@ -224,11 +251,22 @@
         this.fetchData();
       },
     },
-    mounted() {
-      this.fetchRegion();
-      this.fetchArea();
-    },
+  
     methods: {
+      getStatusLabel(status) {
+        return STATUS_LABELS[status];
+      },
+      getStatusColor(status) {
+        return STATUS_COLORS[status];
+      },
+      formatDate(date) {
+        if (!date) return '';
+        return new Date(date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+      },
       onPageChange(newPage) {
         this.page = newPage;
       },
@@ -276,41 +314,6 @@
       handleSearch() {
         this.options.page = 1;
         this.fetchData();
-      },
-      async fetchArea() {
-        this.loading = true;
-        try {
-          const response = await getOutletArea();
-          // Check if user area array is defined and not empty; if so, filter based on areas
-          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
-            this.areaOptions = response.data.filter(
-              (area) => this.getUser.area.includes(area)
-            );
-          } else {
-            this.areaOptions = response.data;
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      async fetchRegion() {
-        this.loading = true;
-        try {
-          const response = await getOutletRegion();
-          if (this.getUser.region) {
-            this.regionOptions = response.data.filter(
-              (region) => region === this.getUser.region
-            );
-          } else {
-            this.regionOptions = response.data; // No filtering if region is undefined
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
       },
       async fetchData() {
         this.loading = true
@@ -367,5 +370,19 @@
 </script>
 
 <style scoped>
-/* Add any scoped styles here */
+.v-data-table ::v-deep tbody tr:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.v-data-table ::v-deep .v-data-table__wrapper {
+  border-radius: 8px;
+}
+
+.v-btn {
+  text-transform: none;
+}
+
+.v-chip {
+  font-weight: 500;
+}
 </style>

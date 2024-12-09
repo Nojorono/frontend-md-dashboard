@@ -14,10 +14,8 @@ export const getAll = async (params) => {
   }
 };
 
-// Function to get all pagination
 // Function to get roles with optional region and area filtering
-export const getAllRole = async (region, area) => {
-  // Construct params object based on the presence of region and area
+export const getAllMdRole = async (region, area) => {
   const params = {};
   params.region = region
   params.area = area

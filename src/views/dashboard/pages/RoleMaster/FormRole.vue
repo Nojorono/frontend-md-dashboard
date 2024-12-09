@@ -26,15 +26,31 @@
 
             <v-autocomplete
               v-model="itemData.menus"
-              :items="menusOptions"
-              item-text="name"
-              item-value="value"
+              :items="mappedMenuOptions"
+              item-text="title"
+              item-value="path"
               label="Menus"
               clearable
               small-chips
-              return-object
               multiple
+              return-object
             >
+              <template v-slot:selection="{ item }">
+                <v-chip small>
+                  {{ item.title }}
+                </v-chip>
+              </template>
+              
+              <template v-slot:item="{ item }">
+                <v-list-item-icon v-if="item.icon">
+                  <v-icon>{{ item.icon }}</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ item.path }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </template>
+
               <template v-slot:no-data>
                 <v-list-item>
                   <v-list-item-content>Menus not found</v-list-item-content>
@@ -132,6 +148,34 @@ export default {
       ],
     };
   },
+  computed: {
+    mappedMenuOptions() {
+      const flattenMenus = (routes, parentPath = '') => {
+        return routes.reduce((acc, route) => {
+          if (route.meta?.hideInMenu) return acc;
+          
+          const currentPath = parentPath ? `${parentPath}${route.path}` : route.path;
+          
+          // Only add menu item if path doesn't already exist
+          if (!acc.some(item => item.path === currentPath)) {
+            acc.push({
+              title: route.name || route.meta?.title || route.path,
+              path: currentPath,
+              icon: route.meta?.icon
+            });
+          }
+          
+          if (route.children) {
+            acc.push(...flattenMenus(route.children, currentPath));
+          }
+          
+          return acc;
+        }, []);
+      };
+
+      return flattenMenus(this.menusOptions);
+    }
+  },
   watch: {
     item: {
       immediate: true,
@@ -157,14 +201,14 @@ export default {
       if (this.selectAll) {
         this.itemData.menus = [];
       } else {
-        this.itemData.menus = [...this.menusOptions];
+        this.itemData.menus = [...this.mappedMenuOptions];
       }
       this.selectAll = !this.selectAll;
     },
     loadMenuOptions() {
       const rootRoute = this.$router.options.routes.find(route => route.path === '/');
       if (rootRoute && rootRoute.children) {
-        this.menusOptions = rootRoute.children;
+        this.menusOptions = rootRoute.children.filter(route => !route.meta?.hideInMenu);
       }
     },
     resetForm() {
@@ -174,10 +218,10 @@ export default {
         is_active: true,
         is_mobile: false,
         is_web: false,
+        menus: []
       };
       this.formValid = false;
       this.selectAll = false;
-      // Check if the form reference exists before calling resetValidation
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }

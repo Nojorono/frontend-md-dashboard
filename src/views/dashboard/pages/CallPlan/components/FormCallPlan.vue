@@ -1,87 +1,178 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="600"
+    max-width="800"
+    persistent
     @click:outside="closeDialog"
   >
-    <v-card>
-      <v-card-title>
+    <v-card class="rounded-lg">
+      <v-card-title class="primary white--text py-4">
+        <v-icon left color="white">{{ isEdit ? 'mdi-pencil' : 'mdi-plus' }}</v-icon>
         <span class="headline">{{ isEdit ? "Edit Call Plan" : "Add New Call Plan" }}</span>
       </v-card-title>
 
-      <v-card-text>
+      <v-card-text class="pt-6">
         <v-form
           ref="form"
           v-model="formValid"
+          lazy-validation
         >
           <v-row>
-            <v-col>
-              <!-- Name Input -->
+            <v-col cols="12">
               <v-text-field
                 v-model="itemData.code_batch"
                 label="Code Batch"
+                outlined
+                dense
                 required
                 readonly
+                prepend-inner-icon="mdi-barcode"
+                :disabled="loading"
+                class="mb-2"
               />
-              <!-- Region Input -->
+
               <v-autocomplete
                 v-model="itemData.region"
                 :items="regionOptions"
                 item-text="name"
                 item-value="name"
                 label="Region"
+                outlined
+                dense
                 clearable
                 return-object
                 :rules="regionRules"
+                :loading="loading"
+                :disabled="loading"
+                prepend-inner-icon="mdi-map-marker"
                 @change="onRegionChange"
+                class="mb-2"
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content>Region not found</v-list-item-content>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        <v-icon left>mdi-alert</v-icon>
+                        Region not found
+                      </v-list-item-title>
+                    </v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
 
-              <!-- Area Input -->
               <v-autocomplete
                 v-model="itemData.area"
                 :items="areaOptions"
-                item-text="name"
-                item-value="name"
+                item-text="area"
+                item-value="area"
                 label="Area"
+                outlined
+                dense
                 clearable
                 return-object
                 :rules="areaRules"
+                :loading="loading"
+                :disabled="loading || !itemData.region"
+                prepend-inner-icon="mdi-map"
                 @change="onAreaChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content>Area not found</v-list-item-content>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        <v-icon left>mdi-alert</v-icon>
+                        Area not found
+                      </v-list-item-title>
+                    </v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
-              <!-- Area Input -->
+
+              <v-row>
+                <v-col cols="6">
+                  <v-menu
+                    v-model="startDateMenu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        v-model="itemData.start_plan"
+                        label="Start Date"
+                        outlined
+                        dense
+                        readonly
+                        v-on="on"
+                        :rules="dateRules"
+                        prepend-inner-icon="mdi-calendar"
+                      />
+                    </template>
+                    <v-date-picker
+                      v-model="itemData.start_plan"
+                      no-title
+                      @input="startDateMenu = false"
+                    />
+                  </v-menu>
+                </v-col>
+                <v-col cols="6">
+                  <v-menu
+                    v-model="endDateMenu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        v-model="itemData.end_plan"
+                        label="End Date"
+                        outlined
+                        dense
+                        readonly
+                        v-on="on"
+                        :rules="dateRules"
+                        prepend-inner-icon="mdi-calendar"
+                      />
+                    </template>
+                    <v-date-picker
+                      v-model="itemData.end_plan"
+                      no-title
+                      :min="itemData.start_plan"
+                      @input="endDateMenu = false"
+                    />
+                  </v-menu>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
         </v-form>
       </v-card-text>
 
-      <v-card-actions>
+      <v-divider></v-divider>
+
+      <v-card-actions class="pa-4">
         <v-spacer />
         <v-btn
-          color="blue darken-1"
+          color="grey darken-1"
           text
+          :disabled="loading"
           @click="closeDialog"
         >
+          <v-icon left>mdi-close</v-icon>
           Cancel
         </v-btn>
         <v-btn
-          color="green darken-1"
-          text
-          :disabled="!formValid"
+          color="success"
+          :loading="loading"
+          :disabled="!formValid || loading"
           @click="saveItem"
         >
-          {{ isEdit ? "Save" : "Add" }}
+          <v-icon left>{{ isEdit ? 'mdi-content-save' : 'mdi-plus' }}</v-icon>
+          {{ isEdit ? "Save Changes" : "Create Call Plan" }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -89,136 +180,162 @@
 </template>
 
 <script>
-  import { getOutletArea, getOutletRegion } from '@/api/masterOutletService'
-  import {findLast} from "@/api/batchService";
-  import {mapGetters} from "vuex";
-  export default {
-    name: "FormCallPlan",
-    props: {
-      dialog: Boolean,
-      isEdit: Boolean,
-      item: Object,
+import { getAllArea, getAllRegion} from '@/api/regionAreaService'
+import {findLast} from "@/api/batchService";
+import {mapGetters} from "vuex";
+
+export default {
+  name: "FormCallPlan",
+  props: {
+    dialog: Boolean,
+    isEdit: Boolean,
+    item: Object,
+  },
+  data() {
+    return {
+      itemData: {
+        code_batch: '',
+        area: '',
+        region: '',
+        start_plan: '',
+        end_plan: '',
+      },
+      formValid: false,
+      loading: false,
+      startDateMenu: false,
+      endDateMenu: false,
+      userOptions: [],
+      regionOptions: [],
+      areaOptions: [],
+      regionRules: [
+        v => !!v || "Region is required",
+      ],
+      areaRules: [
+        v => !!v || "Area is required",
+      ],
+      dateRules: [
+        v => !!v || "Date is required",
+      ],
+    };
+  },
+  computed: {
+    ...mapGetters(['getUser']),
+  },
+  watch: {
+    isEdit(newValue){
+      if (newValue) {
+        this.itemData = { ...this.item };
+      }
     },
-    data() {
-      return {
-        itemData: {
-          code_batch: '',
-          area: '',
-          region: '',
-        },
-        formValid: false,
-        userOptions: [],
-        regionOptions: [],
-        areaOptions: [],
-        regionRules: [
-          (v) => !!v || "Region is required",
-        ],
-        areaRules: [
-          (v) => !!v || "Area is required",
-        ],
+    dialog(newValue) {
+      if (newValue) {
+        this.$refs.form?.resetValidation();
+        this.fetchRegion();
+        this.fetchArea();
+        this.fetchBatch();
+      }
+    },
+  },
+  methods: {
+    resetForm() {
+      this.itemData = {
+        code_batch: '',
+        area: '',
+        region: '',
+        start_plan: '',
+        end_plan: '',
       };
+      this.formValid = false;
+      this.$refs.form?.resetValidation();
     },
-    computed: {
-      ...mapGetters(['getUser']), // Map loading state getter
+    closeDialog() {
+      if (this.loading) return;
+      this.$emit("close");
+      this.resetForm();
     },
-    watch: {
-      isEdit(newValue){
-        if (newValue) {
-          this.itemData = { ...this.item }; // Populate form with item data when editing
-        }
-      },
-      dialog(newValue) {
-        if (newValue) {
-          this.fetchRegion();
-          this.fetchArea();
-          this.fetchBatch();
-        }
-      },
+    async saveItem() {
+      if (!this.$refs.form.validate()) return;
+      
+      try {
+        this.loading = true;
+        await this.$emit("save", { ...this.itemData });
+        this.$toast.success(`Call Plan successfully ${this.isEdit ? 'updated' : 'created'}`);
+        this.closeDialog();
+      } catch (error) {
+        this.$toast.error(`Failed to ${this.isEdit ? 'update' : 'create'} Call Plan`);
+      } finally {
+        this.loading = false;
+      }
     },
-    methods: {
-      resetForm() {
-        this.itemData = {
-          code_batch: '',
-          area: '',
-          region: '',
-          start_plan: '',
-          end_plan: '',
-        };
-        this.formValid = false;
-      },
-      closeDialog() {
-        this.$emit("close");
-        this.resetForm();
-      },
-      saveItem() {
-        if (this.$refs.form.validate()) {
-          this.$emit("save", { ...this.itemData });
-        }
-      },
-      async fetchArea() {
-        this.loading = true;
-        try {
-          const response = await getOutletArea();
-          // Check if user area array is defined and not empty; if so, filter based on areas
-          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
-            this.areaOptions = response.data.filter(
-              (area) => this.getUser.area.includes(area)
-            );
-          } else {
-            this.areaOptions = response.data;
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      async fetchRegion() {
-        this.loading = true;
-        try {
-          const response = await getOutletRegion();
-          if (this.getUser.region) {
-            this.regionOptions = response.data.filter(
-              (region) => region === this.getUser.region
-            );
-          } else {
-            this.regionOptions = response.data; // No filtering if region is undefined
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      async fetchBatch() {
-        this.loading = true;
-        try {
-          const response = await findLast();
-          this.itemData.code_batch = response.data.code_batch;
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
-      },
-      onRegionChange(item) {
-        if (item) {
-          this.itemData.region = item;
+    async fetchArea() {
+      this.loading = true;
+      try {
+        const response = await getAllArea();
+        if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
+          this.areaOptions = response.data.data.filter(
+            (area) => this.getUser.area.includes(area.area)
+          );
         } else {
-          this.itemData.region = null;
+          this.areaOptions = response.data.data;
         }
-      },
-      onAreaChange(item) {
-        if (item) {
-          this.itemData.area = item;
-        } else {
-          this.itemData.area = null;
-        }
-      },
+      } catch (error) {
+        this.$toast.error("Failed to fetch areas");
+      } finally {
+        this.loading = false;
+      }
     },
-  };
+    async fetchRegion() {
+      this.loading = true;
+      try {
+        const response = await getAllRegion();
+        if (this.getUser.region) {
+          this.regionOptions = response.data.data.filter(
+            (region) => region.name === this.getUser.region
+          );
+        } else {
+          this.regionOptions = response.data.data;
+        }
+      } catch (error) {
+        this.$toast.error("Failed to fetch regions" + error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchBatch() {
+      this.loading = true;
+      try {
+        const response = await findLast();
+        this.itemData.code_batch = response.data.code_batch;
+      } catch (error) {
+        this.$toast.error("Failed to fetch batch code");
+      } finally {
+        this.loading = false;
+      }
+    },
+    onRegionChange(item) {
+      if (item) {
+        this.itemData.region = item.name;
+        this.itemData.area = null;
+      } else {
+        this.itemData.region = null;
+      }
+    },
+    onAreaChange(item) {
+      if (item) {
+        this.itemData.area = item.area;
+      } else {
+        this.itemData.area = null;
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
-/* Additional styles if necessary */
+.v-dialog {
+  border-radius: 8px;
+}
+.v-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 </style>

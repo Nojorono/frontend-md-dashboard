@@ -1,35 +1,82 @@
 <template>
-  <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading">
-    <v-container fluid>
-      <v-col cols="4">
-        <v-tabs
-          v-model="activeTab"
-          dark
-          grow
-          class="rounded"
-        >
-          <v-tab
-            v-for="tab in tabs"
-            :key="tab.name"
-            active-class="primary"
+  <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading elevation-2">
+    <v-container fluid class="pa-4">
+      <v-row class="mb-4" align="center">
+        <v-col cols="4">
+          <v-tabs
+            v-model="activeTab"
+            dark
+            grow
+            class="rounded-lg elevation-1"
+            background-color="primary lighten-1"
           >
-            {{ tab.label }}
-          </v-tab>
-        </v-tabs>
-      </v-col>
+            <v-tab
+              v-for="tab in tabs"
+              :key="tab.name"
+              active-class="active-tab"
+              class="text-subtitle-1 font-weight-medium"
+            >
+              {{ tab.label }}
+            </v-tab>
+          </v-tabs>
+        </v-col>
 
-<!--      <v-icon-->
-<!--        color="primary"-->
-<!--        size="2rem"-->
-<!--        :loading="loading"-->
-<!--        @click="fetchData"-->
-<!--      >-->
-<!--        mdi-refresh-->
-<!--      </v-icon>-->
+        <v-btn
+          icon
+          color="primary"
+          class="mx-2"
+          :loading="loading"
+          @click="fetchData"
+        >
+          <v-icon size="24">mdi-refresh</v-icon>
+        </v-btn>
+
+        <v-col
+          cols="4"
+          class="d-flex gap-4"
+        >
+          <v-autocomplete
+            item-text="name"
+            item-value="name"
+            label="Region"
+            :items="regionOptions"
+            clearable
+            return-object
+            dense
+            outlined
+            hide-details
+            class="mr-3"
+          >
+            <template v-slot:no-data>
+              <v-list-item>
+                <v-list-item-content>Region not found</v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+          <v-autocomplete
+            item-text="name"
+            item-value="name"
+            label="Area"
+            :items="areaOptions"
+            clearable
+            return-object
+            dense
+            outlined
+            hide-details
+          >
+            <template v-slot:no-data>
+              <v-list-item>
+                <v-list-item-content>Area not found</v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+        </v-col>
+      </v-row>
+
       <!-- Tab Content -->
       <v-tabs-items v-model="activeTab">
         <v-tab-item>
-          <v-card style="box-shadow: unset;">
+          <div class="rounded-lg">
             <v-data-table
               :headers="tableHeaders"
               :items="tableData"
@@ -38,48 +85,66 @@
               :options.sync="options"
               hide-default-footer
               class="small-table"
-              style="padding: 6px; border-radius: 20px"
               @update:options="fetchData"
             >
               <template v-slot:top>
-                <v-row
-                  class="justify-space-between"
-                  style="align-items: baseline"
-                >
-                  <v-col
-                    cols="4"
-                    style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
-                  >
+                <v-row class="px-4 py-2" align="center">
+                  <v-col cols="4">
                     <v-text-field
                       v-model="search"
                       label="Search"
-                      class="mx-5"
+                      dense
+                      outlined
+                      hide-details
                       clearable
-                      append-icon="mdi-magnify"
+                      prepend-inner-icon="mdi-magnify"
                       @click:append="handleSearch"
                     />
                   </v-col>
-                  <v-col>
-                    <div class="d-flex justify-end">
-                      <v-btn
-                        color="primary"
-                        @click="openHandleAdd"
-                      >
-                        <v-icon>mdi-plus-box-multiple</v-icon>
-                        <span class="mx-1">Add</span>
-                      </v-btn>
-                    </div>
-                  </v-col>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="primary"
+                    class="text-none"
+                    @click="openHandleAdd"
+                  >
+                    <v-icon left>mdi-plus</v-icon>
+                    Add New
+                  </v-btn>
                 </v-row>
               </template>
+
               <template v-slot:item="{ item, index }">
                 <tr>
                   <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
                   <td>
-                    <span>{{ item?.region }}</span>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.region }}
+                        </span>
+                      </template>
+                      <span>{{ item?.region }}</span>
+                    </v-tooltip>
                   </td>
                   <td>
-                    <span>{{ item?.area }}</span>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.area }}
+                        </span>
+                      </template>
+                      <span>{{ item?.area }}</span>
+                    </v-tooltip>
                   </td>
                   <td>
                     <v-tooltip bottom>
@@ -97,13 +162,49 @@
                     </v-tooltip>
                   </td>
                   <td>
-                    <span>{{ item?.outlet_code }}</span>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.outlet_code }}
+                        </span>
+                      </template>
+                      <span>{{ item?.outlet_code }}</span>
+                    </v-tooltip>
                   </td>
                   <td>
-                    <span>{{ item?.brand }}</span>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.brand }}
+                        </span>
+                      </template>
+                      <span>{{ item?.brand }}</span>
+                    </v-tooltip>
                   </td>
                   <td>
-                    <span>{{ item?.sio_type }}</span>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.sio_type }}
+                        </span>
+                      </template>
+                      <span>{{ item?.sio_type }}</span>
+                    </v-tooltip>
                   </td>
                   <td>
                     <v-tooltip bottom>
@@ -121,29 +222,51 @@
                     </v-tooltip>
                   </td>
                   <td>
-                    <span>{{ item?.cycle }}</span>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block;"
+                          v-on="on"
+                        >
+                          {{ item?.cycle }}
+                        </span>
+                      </template>
+                      <span>{{ item?.cycle }}</span>
+                    </v-tooltip>
                   </td>
                   <td>
                     <v-btn
-                      outlined
                       small
+                      color="primary"
+                      class="mr-2"
+                      fab
                       @click="openHandleUpdate(item)"
                     >
-                      <v-icon>mdi-pencil</v-icon>
+                      <v-icon small>mdi-pencil</v-icon>
                     </v-btn>
                     <v-btn
-                      outlined
                       small
                       color="warning"
+                      fab
                       @click="handleDetail(item.id)"
                     >
-                      <v-icon>mdi-details</v-icon>
-                      detail
+                      <v-icon small>mdi-eye</v-icon>
+                    </v-btn>
+                    <v-btn
+                      small
+                      color="error"
+                      fab
+                      @click="openConfirmDeleteDialog(item)"
+                    >
+                      <v-icon small>mdi-delete</v-icon>
                     </v-btn>
                   </td>
                 </tr>
               </template>
             </v-data-table>
+
             <v-row
               justify="center"
               class="py-3"
@@ -154,28 +277,33 @@
                 :total-visible="7"
                 next-icon="mdi-menu-right"
                 prev-icon="mdi-menu-left"
+                color="primary"
                 @input="onPageChange"
               />
             </v-row>
-          </v-card>
+          </div>
         </v-tab-item>
 
-        <!-- Tab 2: Settings -->
         <v-tab-item>
-          tab 1
+          <div class="pa-4 text-center">
+            <h3 class="text-h6 grey--text">Approved Items</h3>
+          </div>
         </v-tab-item>
 
-        <!-- Tab 2: Settings -->
         <v-tab-item>
-          tab 2
+          <div class="pa-4 text-center">
+            <h3 class="text-h6 grey--text">Rejected Items</h3>
+          </div>
         </v-tab-item>
       </v-tabs-items>
-      <!-- Confirm Delete Dialog -->
+
+      <!-- Dialogs -->
       <confirm-delete-dialog
         :dialog="isConfirmDeleteDialogOpen"
         @confirm="handleDelete"
         @close="closeConfirmDeleteDialog"
       />
+
       <form-survey-new-outlet
         :dialog="isFormRoleDialog"
         :is-edit="isEdit"
@@ -188,10 +316,9 @@
 </template>
 
 <script>
-import { deleteOutlet } from '@/api/masterOutletService'
 import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
 import Vue from "vue";
-import {createData, updateData, getAll} from "@/api/surveyService";
+import {createData, updateData, getAll, deleteData} from "@/api/surveyService";
 import FormSurveyNewOutlet from "@/views/dashboard/pages/SurveyNewOutlet/components/FormSurveyNewOutlet.vue";
 
 export default {
@@ -207,48 +334,22 @@ export default {
         { name: 'On Progress', label: 'On Progress', value: 0 },
         { name: 'Approved', label: 'Approved', value: 1 },
         { name: 'Rejected', label: 'Rejected', value: 2 },
-        // Add more tabs here
       ],
       tableHeaders: [
         { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
-        {
-          text: 'Region',
-          value: 'region',
-        },
-        {
-          text: 'Area',
-          value: 'area',
-        },
-        {
-          text: 'Address',
-          value: 'address_line',
-        },
-        {
-          text: 'Outlet Code',
-          value: 'outlet_code',
-        },
-        {
-          text: 'Brand',
-          value: 'brand',
-        },
-        {
-          text: 'Sio Type',
-          value: 'sio_type',
-        },
-        {
-          text: 'Name',
-          value: 'name',
-        },
-        {
-          text: 'Cycle',
-          value: 'cycle',
-        },
-        {
-          text: 'Action',
-          value: 'Action',
-        },
+        { text: 'Region', value: 'region', sortable: true },
+        { text: 'Area', value: 'area', sortable: true },
+        { text: 'Address', value: 'address_line', sortable: true },
+        { text: 'Outlet Code', value: 'outlet_code', sortable: true },
+        { text: 'Brand', value: 'brand', sortable: true },
+        { text: 'Sio Type', value: 'sio_type', sortable: true },
+        { text: 'Name', value: 'name', sortable: true },
+        { text: 'Cycle', value: 'cycle', sortable: true },
+        { text: 'Actions', value: 'actions', sortable: false, align: 'center' },
       ],
       tableData: [],
+      regionOptions: [],
+      areaOptions: [],
       totalItems: 0,
       totalPages: 0,
       page: 1,
@@ -260,9 +361,11 @@ export default {
       isEdit: false,
       isConfirmDeleteDialogOpen: false,
       search: '',
+      filter: {
+        region: '',
+        area: '',
+      },
     }
-  },
-  computed: {
   },
   watch: {
     page(value) {
@@ -274,7 +377,7 @@ export default {
       this.fetchData();
     },
     activeTab(newValue) {
-      if (newValue) {
+      if (newValue !== undefined) {
         this.fetchData();
       }
     },
@@ -285,7 +388,7 @@ export default {
   methods: {
     async handleDetail(id) {
       await this.$router.push({
-        name: 'Outlet Detail',
+        name: 'Detail Survey Outlet',
         params: { id },
       });
     },
@@ -346,7 +449,6 @@ export default {
     closeFormDialog() {
       this.isFormRoleDialog = false;
     },
-    // Fetch all outlets and update tableData
     async fetchData () {
       this.loading = true
       try {
@@ -355,6 +457,7 @@ export default {
           limit: this.options.itemsPerPage,
           searchTerm: this.search,
           isActive: this.activeTab,
+          ...this.filter,
         });
         this.tableData = response.data.data;
         this.totalItems = response.data.totalItems;
@@ -381,7 +484,7 @@ export default {
       this.loading = true;
       const data = this.selectedItem;
       try {
-        await deleteOutlet(data.id);
+        await deleteData(data.id);
         Vue.prototype.$toast.success(`Deleted ${data.name} successfully!`);
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data?.message}`);
@@ -398,20 +501,31 @@ export default {
 
 <style scoped>
 .small-table {
-  font-size: 12px;
-}
-
-.small-table th,
-.small-table td {
-  padding: 4px 8px;
-  height: 30px;
+  font-size: 14px;
+  border-radius: 8px;
 }
 
 .small-table th {
-  font-weight: bold;
+  font-weight: 600 !important;
+  background-color: #f5f5f5 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .small-table td {
-  font-weight: normal;
+  padding: 12px !important;
+}
+
+.active-tab {
+  font-weight: 600;
+}
+
+.v-data-table ::v-deep .v-data-table__wrapper {
+  border-radius: 8px;
+}
+
+.v-btn.v-btn--fab.v-size--small {
+  width: 32px;
+  height: 32px;
 }
 </style>

@@ -3,9 +3,9 @@
 import axiosInstance from '@/api/index';
 
 // Function to get all active outlets
-export const getAllSurveyOutlet = async () => {
+export const getAllSurveyOutlet = async (callPlanId) => {
   try {
-    const response = await axiosInstance.get('/survey/schedule');
+    const response = await axiosInstance.get(`/survey/schedule/${callPlanId}`);
     return response.data;
   } catch (error) {
     throw error.response;

@@ -84,6 +84,12 @@ export default [
         meta: requiresAuth,
       },
       {
+        name: 'Detail Survey Outlet',
+        path: '/survey/detail/:id',
+        component: () => import('@/views/dashboard/pages/SurveyNewOutlet/components/DetailSurveyNewOutlet.vue'),
+        meta: requiresAuth,
+      },
+      {
         name: 'Activity',
         path: '/activity',
         component: () => import('@/views/dashboard/pages/Activity/Activity.vue'),

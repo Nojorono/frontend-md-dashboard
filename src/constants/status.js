@@ -39,6 +39,22 @@ export const STATUS_LABELS = {
   [STATUS_ACTIVITY_SURVEY_32]: 'Ditolak HO',
 };
 
-export const getStatusLabel = (statusNumber) => {
-  return STATUS_LABELS[statusNumber] || 'Unknown Status';
+// Define the STATUS_COLORS object
+export const STATUS_COLORS = {
+  [STATUS_INACTIVE]: 'grey',
+  [STATUS_ACTIVITY_MD_1]: 'info',
+  [STATUS_ACTIVITY_MD_2]: 'success',
+  [STATUS_ACTIVITY_MD_21]: 'warning',
+  [STATUS_ACTIVITY_MD_22]: 'error',
+  [STATUS_ACTIVITY_MD_23]: 'error',
+  [STATUS_ACTIVITY_MD_3]: 'success',
+  [STATUS_ACTIVITY_SURVEY_11]: 'success',
+  [STATUS_ACTIVITY_SURVEY_12]: 'info',
+  [STATUS_ACTIVITY_SURVEY_21]: 'warning',
+  [STATUS_ACTIVITY_SURVEY_22]: 'warning',
+  [STATUS_ACTIVITY_SURVEY_23]: 'error',
+  [STATUS_ACTIVITY_SURVEY_24]: 'error',
+  [STATUS_ACTIVITY_SURVEY_31]: 'error',
+  [STATUS_ACTIVITY_SURVEY_41]: 'info',
+  [STATUS_ACTIVITY_SURVEY_32]: 'error',
 };

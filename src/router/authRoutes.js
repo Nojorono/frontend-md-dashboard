@@ -1,5 +1,5 @@
 import store from "@/store";
-import {toastSuccess} from "@/utils/toast";
+import { toastSuccess, toastError } from "@/utils/toast";
 
 export default [
   {
@@ -11,9 +11,16 @@ export default [
     path: '/logout',
     name: 'Logout',
     beforeEnter: (to, from, next) => {
-      store.dispatch('logout');
-      toastSuccess('Logout successfully');
-      next('/login');
+      store.dispatch('logout')
+        .then(() => {
+          toastSuccess('Logout successfully');
+            next('/login'); // Redirect to login after successful logout
+        })
+        .catch((error) => {
+          console.error('Logout error:', error);
+          toastError('Logout failed. Please try again.');
+          next('/login'); // Redirect to login even if logout fails
+        });
     },
   },
   {

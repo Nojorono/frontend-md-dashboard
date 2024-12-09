@@ -37,55 +37,12 @@
     </v-list>
 
     <v-divider class="mb-2" />
-
-    <!-- Dynamic Menu Items -->
-<!--    <v-list-->
-<!--      dense-->
-<!--      nav-->
-<!--    >-->
-<!--      <template v-for="(item, index) in menuItems">-->
-<!--        &lt;!&ndash; Check if the item has children &ndash;&gt;-->
-<!--        <v-list-group-->
-<!--          v-if="item.children"-->
-<!--          :key="`group-${index}`"-->
-<!--          :prepend-icon="item.icon"-->
-<!--          :value="item.expanded"-->
-<!--        >-->
-<!--          <template #activator>-->
-<!--            <v-list-item-title>{{ item.title }}</v-list-item-title>-->
-<!--          </template>-->
-
-<!--          <v-list-item-->
-<!--            v-for="(child, childIndex) in item.children"-->
-<!--            :key="`child-${index}-${childIndex}`"-->
-<!--            :to="child.to"-->
-<!--          >-->
-<!--            <v-list-item-icon>-->
-<!--              <v-icon>{{ child.icon }}</v-icon>-->
-<!--            </v-list-item-icon>-->
-<!--            <v-list-item-title>{{ child.title }}</v-list-item-title>-->
-<!--          </v-list-item>-->
-<!--        </v-list-group>-->
-
-<!--        <v-list-item-->
-<!--          v-if="!item.children"-->
-<!--          :key="`item-${index}`"-->
-<!--          :to="item.to"-->
-<!--          :class="{ 'v-list-item&#45;&#45;active': $route.path === child.to }"-->
-<!--        >-->
-<!--          <v-list-item-icon>-->
-<!--            <v-icon>{{ item.icon }}</v-icon>-->
-<!--          </v-list-item-icon>-->
-<!--          <v-list-item-title>{{ item.title }}</v-list-item-title>-->
-<!--        </v-list-item>-->
-<!--      </template>-->
-<!--    </v-list>-->
     <v-list
       dense
       nav
     >
       <div />
-      <template v-for="(item, i) in menuItems">
+      <template v-for="(item, i) in computedMenuItems">
         <base-item-group
           v-if="item.children"
           :key="`child-${i}`"
@@ -124,7 +81,7 @@ export default {
         icon: 'mdi-folder-multiple',
         expanded: null,
         children: [
-          { title: 'Outlet', icon: 'mdi-account', to: '/master/outlet' },
+          { title: 'Outlet', icon: 'mdi-store', to: '/master/outlet' },
           { title: 'Users', icon: 'mdi-account', to: '/master/users' },
           { title: 'Roles', icon: 'mdi-key', to: '/master/roles' },
           { title: 'Brands', icon: 'mdi-cube', to: '/master/brand' },
@@ -133,19 +90,19 @@ export default {
           { title: 'Region & Area', icon: 'mdi-cube', to: '/master/region' },
         ],
       },
-      { title: 'Survey New Outlet', icon: 'mdi-calendar', to: '/survey' },
       { title: 'Call Plan', icon: 'mdi-calendar', to: '/call-plan' },
       { title: 'Activity MD', icon: 'mdi-calendar', to: '/activity' },
+      { title: 'Survey New Outlet', icon: 'mdi-calendar', to: '/survey' },
       {
         title: 'Settings',
         icon: 'mdi-cog',
         expanded: null,
         children: [
-          { title: 'Profile', icon: 'mdi-account-circle', to: '/settings/profile' },
-          { title: 'Notifications', icon: 'mdi-bell', to: '/settings/notifications' },
+          { title: 'Profile', icon: 'mdi-account-circle', to: '/pages/user' },
+          { title: 'Notifications', icon: 'mdi-bell', to: '/components/notifications' },
         ],
       },
-    ],
+    ]
   }),
   computed: {
     ...mapState(['barColor', 'barImage', 'user']),
@@ -157,6 +114,29 @@ export default {
         this.$store.commit('SET_DRAWER', val)
       },
     },
+    computedMenuItems() {
+      const userMenus = this.user?.menus || [];
+      
+      return this.menuItems.reduce((acc, item) => {
+        if (item.children) {
+          const filteredChildren = item.children.filter(child => 
+            userMenus.some(userMenu => userMenu.path === child.to)
+          );
+          
+          if (filteredChildren.length > 0) {
+            acc.push({
+              ...item,
+              children: filteredChildren
+            });
+          }
+        } else {
+          if (userMenus.some(userMenu => userMenu.path === item.to)) {
+            acc.push(item);
+          }
+        }
+        return acc;
+      }, []);
+    }
   },
 }
 </script>

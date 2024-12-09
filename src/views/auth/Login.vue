@@ -128,6 +128,8 @@
             if (response.statusCode === 200){
               Vue.prototype.$toast.success('Login Successfully!')
               await this.login({ token : response.data.accessToken, user: response.data.user });
+              await this.$store.dispatch('fetchRegionOptions');
+              await this.$store.dispatch('fetchAreaOptions');
               setTimeout(async () => {
                 await this.$router.push('/');
               }, 2000);

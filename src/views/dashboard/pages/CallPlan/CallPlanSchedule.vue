@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-card
       class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
-      style="padding: 20px; border-radius: 20px"
+      style="padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
     >
       <v-data-table
         :headers="tableHeaders"
@@ -15,38 +15,40 @@
       >
         <template v-slot:top>
           <v-row
-            class="justify-space-between"
-            style="align-items: baseline"
+            class="justify-space-between align-center px-4 py-2"
           >
             <v-col
               cols="1"
-              style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+              class="d-flex justify-center align-center pr-0 pl-2"
             >
-              <div class="mr-3">
-                <v-btn
-                  small
-                  fab
-                  outlined
-                  color="primary"
-                  @click="handleBack"
-                >
-                  <v-icon>mdi-backburger</v-icon>
-                </v-btn>
-              </div>
+              <v-btn
+                small
+                fab
+                outlined
+                color="primary"
+                class="elevation-1"
+                @click="handleBack"
+              >
+                <v-icon>mdi-backburger</v-icon>
+              </v-btn>
             </v-col>
             <v-col>
               <v-autocomplete
                 item-text="email"
                 item-value="id"
-                label="User"
+                label="Select User"
                 :items="userOptions"
                 clearable
                 return-object
+                outlined
+                dense
+                hide-details
+                class="custom-select"
                 @change="onUserChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content>User not found</v-list-item-content>
+                    <v-list-item-content class="text-center">User not found</v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
@@ -57,81 +59,137 @@
                 label="Search"
                 class="mx-5"
                 clearable
+                outlined
+                dense
+                hide-details
                 append-icon="mdi-magnify"
                 @click:append="handleSearch"
                 @click:clear="handleClear"
               />
             </v-col>
             <v-col cols="2">
-              <div
-                class="d-flex justify-space-between"
-                style="align-self: center;"
-              >
-                <v-icon
-                  style="
-                width: 40px; border-radius: 50%;"
+              <div class="d-flex justify-space-between align-center">
+                <v-btn
+                  icon
                   color="primary"
-                  size="2rem"
+                  class="mr-4 elevation-1"
                   :loading="loading"
                   @click="fetchData(id)"
                 >
-                  mdi-refresh
-                </v-icon>
+                  <v-icon>mdi-refresh</v-icon>
+                </v-btn>
                 <v-btn
                   color="primary"
-                  style="margin: unset!important;"
+                  class="text-none px-4"
+                  elevation="1"
                   @click="openHandleAdd"
                 >
-                  <v-icon>mdi-plus-box-multiple</v-icon>
-                  <span class="mx-1">Add</span>
+                  <v-icon left>mdi-plus</v-icon>
+                  Add New
                 </v-btn>
               </div>
             </v-col>
           </v-row>
         </template>
-        <!-- Mapping Item Properties -->
+
         <template v-slot:item="{ item, index }">
           <tr>
-            <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
-            <td>{{ item.type === 0 ? 'Visit Outlet' : 'Survey Outlet' }}</td>
-            <td>{{ item.email }}</td>
+            <td class="text-center">{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
             <td>
-              <span>
-                {{ item.outlet_code ? item.outlet_code : item.survey_outlet_code }}
-              </span>
-              <span>
-                {{ item.outlet_name ? item.outlet_name : item.survey_outlet_name }}
-              </span>
+              <v-chip
+                small
+                :color="item.type === 0 ? 'primary' : 'warning'"
+                text-color="white"
+              >
+                {{ item.type === 0 ? 'Visit Outlet' : 'Survey Outlet' }}
+              </v-chip>
             </td>
-            <td>{{ item.code_call_plan }}</td>
-            <td>{{ item.day_plan | formatDate }}</td>
+            <td>
+              <span class="font-weight-medium">{{ item.email }}</span>
+            </td>
+            <td>
+              <div class="d-flex flex-column">
+                <span class="font-weight-medium">
+                  {{ item.outlet_code ? item.outlet_code : item.survey_outlet_code }}
+                </span>
+                <span class="caption grey--text">
+                  {{ item.outlet_name ? item.outlet_name : item.survey_outlet_name }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="font-weight-medium">{{ item.code_call_plan }}</span>
+            </td>
+            <td>
+              <v-chip
+                small
+                outlined
+                color="primary"
+              >
+                {{ item.day_plan | formatDate }}
+              </v-chip>
+            </td>
             <td>{{ item.notes }}</td>
-            <td>{{ item.status }}</td>
-            <td class="d-flex">
-              <v-btn
-                class="mx-1"
-                outlined
+            <td>
+              <v-chip
                 small
-                @click="openHandleUpdate(item)"
+                :color="item.status === 'Active' ? 'success' : 'grey'"
+                text-color="white"
               >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn
-                class="mx-1"
-                color="error"
-                outlined
-                small
-                @click="openConfirmDeleteDialog(item)"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
+                {{ item.status }}
+              </v-chip>
+            </td>
+            <td>
+              <div class="d-flex justify-center">
+                <v-btn
+                  small
+                  color="primary"
+                  class="mr-2"
+                  fab
+                  elevation="1"
+                  @click="openHandleUpdate(item)"
+                >
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn
+                  small
+                  color="error"
+                  fab
+                  elevation="1"
+                  @click="openConfirmDeleteDialog(item)"
+                >
+                  <v-icon small>mdi-delete</v-icon>
+                </v-btn>
+              </div>
             </td>
           </tr>
         </template>
+
+        <template v-slot:loading>
+          <v-skeleton-loader
+            type="table-row"
+            class="my-2"
+          />
+        </template>
+
+        <template v-slot:no-data>
+          <div class="text-center py-6">
+            <v-icon
+              size="64"
+              color="grey lighten-1"
+            >
+              mdi-database-off
+            </v-icon>
+            <div class="text-subtitle-1 grey--text mt-2">
+              No data available
+            </div>
+          </div>
+        </template>
       </v-data-table>
+
       <v-row
         justify="center"
-        class="py-3"
+        class="pt-4"
       >
         <v-pagination
           v-model="page"
@@ -139,6 +197,7 @@
           :total-visible="7"
           next-icon="mdi-menu-right"
           prev-icon="mdi-menu-left"
+          color="primary"
           @input="onPageChange"
         />
       </v-row>
@@ -150,6 +209,7 @@
       @confirm="handleDelete"
       @close="closeConfirmDeleteDialog"
     />
+
     <!-- Create & Update Dialog -->
     <form-call-plan-schedule
       :dialog="isFormRoleDialog"
@@ -171,7 +231,7 @@ import {
   updateScheduleData,
   deleteScheduleData
 } from '@/api/callPlanService'
-import {getAllRole} from "@/api/userService";
+import { getAllMdRole } from "@/api/userService";
 
 export default {
   name: 'CallPlanSchedule',
@@ -182,22 +242,24 @@ export default {
   data() {
     return {
       id: this.$route.params.id,
+      region: this.$route.params.region,
+      area: this.$route.params.area,
       tableHeaders: [
-        { text: 'No', value: 'No', sortable: false, class: 'text-left', width: '5%' },
-        { text: 'Type', value: 'type', sortable: false, class: 'text-left', width: '10%' },
-        { text: 'User', value: 'email', sortable: false, class: 'text-left', width: '10%' },
-        { text: 'Outlet', value: 'outlet_code', sortable: false, class: 'text-left', width: '20%' },
-        { text: 'Code Call Plan', value: 'code_call_plan', sortable: false, class: 'text-left', width: '10%' },
-        { text: 'Day Plan', value: 'day_plan', sortable: false, class: 'text-left', width: '15%' },
-        { text: 'Notes', value: 'notes', sortable: false, class: 'text-left', width: '10%' },
-        { text: 'Status', value: 'notes', class: 'text-left', width: '5%' },
-        { text: 'Actions', value: 'actions', sortable: false, class: 'text-center', width: '10%' },
+        { text: 'No', value: 'No', sortable: false, align: 'center', width: '5%' },
+        { text: 'Type', value: 'type', sortable: false, align: 'left', width: '10%' },
+        { text: 'User', value: 'email', sortable: false, align: 'left', width: '10%' },
+        { text: 'Outlet', value: 'outlet_code', sortable: false, align: 'left', width: '20%' },
+        { text: 'Code Call Plan', value: 'code_call_plan', sortable: false, align: 'left', width: '10%' },
+        { text: 'Day Plan', value: 'day_plan', sortable: false, align: 'left', width: '15%' },
+        { text: 'Notes', value: 'notes', sortable: false, align: 'left', width: '10%' },
+        { text: 'Status', value: 'status', align: 'left', width: '5%' },
+        { text: 'Actions', value: 'actions', sortable: false, align: 'center', width: '10%' },
       ],
       tableData: [],
       userOptions: [],
       totalItems: 0,
       totalPages: 0,
-      page: 1, // Current page number
+      page: 1,
       options: { page: 1, itemsPerPage: 10 },
       loading: false,
       selectedItem: null,
@@ -288,7 +350,7 @@ export default {
       this.fetchData(this.id);
     },
     async fetchUsers () {
-      const response = await getAllRole(this.userLogin.region , this.userLogin.area)
+      const response = await getAllMdRole(this.region , this.area)
       this.userOptions = response.data
     },
     async fetchData(id) {
@@ -347,5 +409,31 @@ export default {
 </script>
 
 <style scoped>
-/* Add any scoped styles here */
+.v-data-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.v-data-table >>> thead th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.v-data-table >>> tbody td {
+  font-size: 0.875rem;
+}
+
+.v-btn {
+  text-transform: none;
+}
+
+.v-btn.v-btn--fab.v-size--small {
+  width: 32px;
+  height: 32px;
+}
+
+.custom-select >>> .v-input__slot {
+  min-height: 40px !important;
+}
 </style>

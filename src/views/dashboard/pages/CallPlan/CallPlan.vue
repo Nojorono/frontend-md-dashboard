@@ -1,8 +1,8 @@
 <template>
   <v-container fluid>
     <v-card
-      class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
-      style="padding: 20px; border-radius: 20px"
+      class="v-card--material v-card v-sheet theme--light elevation-2"
+      style="padding: 24px; border-radius: 16px; background: #FFFFFF;"
     >
       <v-data-table
         :headers="tableHeaders"
@@ -11,24 +11,31 @@
         :loading="loading"
         :options.sync="options"
         hide-default-footer
+        class="rounded-lg"
         @update:options="fetchData"
       >
         <template v-slot:top>
           <v-row
-            class="justify-space-between"
-            style="align-items: baseline"
+            class="px-4 py-3"
+            align="center"
           >
             <v-col
               cols="4"
-              style="display: flex; justify-content: center; align-items: center; padding-right: unset; padding-left: 10px"
+              class="d-flex gap-4"
             >
               <v-autocomplete
+                v-model="selectedRegion"
                 item-text="name"
                 item-value="name"
                 label="Region"
-                :items="regionOptions"
+                :items="getRegionOptions"
                 clearable
                 return-object
+                dense
+                outlined
+                hide-details
+                class="mr-3"
+                @change="handleRegionChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -37,12 +44,17 @@
                 </template>
               </v-autocomplete>
               <v-autocomplete
+                v-model="selectedArea"
                 item-text="name"
                 item-value="name"
                 label="Area"
-                :items="areaOptions"
+                :items="getAreaOptions"
                 clearable
                 return-object
+                dense
+                outlined
+                hide-details
+                @change="handleAreaChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -55,83 +67,106 @@
               <v-text-field
                 v-model="search"
                 label="Search"
-                class="mx-5"
+                dense
+                outlined
+                hide-details
                 clearable
-                append-icon="mdi-magnify"
-                @click:append="handleSearch"
+                prepend-inner-icon="mdi-magnify"
+                @keyup.enter="handleSearch"
+                @click:clear="search = ''"
               />
             </v-col>
             <v-col cols="4">
-              <div
-                class="d-flex justify-space-between"
-                style="align-self: center;"
-              >
-                <v-icon
-                  style="
-                width: 40px; border-radius: 50%;"
+              <div class="d-flex justify-end align-center">
+                <v-btn
+                  icon
                   color="primary"
-                  size="2rem"
+                  class="mr-4"
                   :loading="loading"
                   @click="fetchData"
                 >
-                  mdi-refresh
-                </v-icon>
+                  <v-icon>mdi-refresh</v-icon>
+                </v-btn>
                 <v-btn
                   color="primary"
-                  style="margin: unset!important;"
+                  class="text-none px-6"
+                  elevation="1"
                   @click="openHandleAdd"
                 >
-                  <v-icon>mdi-plus-box-multiple</v-icon>
-                  <span class="mx-1">Add</span>
+                  <v-icon left>mdi-plus</v-icon>
+                  Add New
                 </v-btn>
               </div>
             </v-col>
           </v-row>
         </template>
-        <!-- Mapping Item Properties -->
+
         <template v-slot:item="{ item, index }">
           <tr>
-            <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
-            <td>{{ item?.code_batch }}</td>
+            <td class="text-center">{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+            <td>
+              <span class="font-weight-medium">{{ item?.code_batch }}</span>
+            </td>
             <td>{{ item?.region }}</td>
             <td>{{ item?.area }}</td>
-            <td
-              class="d-flex"
-              style="align-items: center"
-            >
-              <v-btn
-                class="mx-1"
-                color="warning"
-                outlined
-                small
-                @click="handleSchedule(item.id)"
-              >
-                <v-icon>mdi-calendar-arrow-right</v-icon>
-              </v-btn>
-              <v-btn
-                class="mx-1"
-                outlined
-                small
-                @click="openHandleUpdate(item)"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn
-                class="mx-1"
-                color="error"
-                outlined
-                small
-                @click="openConfirmDeleteDialog(item)"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
+            <td>
+              <div class="d-flex justify-center">
+                <v-btn
+                  small
+                  color="warning"
+                  class="mr-2"
+                  fab
+                  @click="handleSchedule(item)"
+                >
+                  <v-icon small>mdi-calendar-arrow-right</v-icon>
+                </v-btn>
+                <v-btn
+                  small
+                  color="primary"
+                  class="mr-2"
+                  fab
+                  @click="openHandleUpdate(item)"
+                >
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn
+                  small
+                  color="error"
+                  fab
+                  @click="openConfirmDeleteDialog(item)"
+                >
+                  <v-icon small>mdi-delete</v-icon>
+                </v-btn>
+              </div>
             </td>
           </tr>
         </template>
+
+        <template v-slot:loading>
+          <v-skeleton-loader
+            type="table-row"
+            class="my-2"
+          />
+        </template>
+
+        <template v-slot:no-data>
+          <div class="text-center py-6">
+            <v-icon
+              size="64"
+              color="grey lighten-1"
+            >
+              mdi-database-off
+            </v-icon>
+            <div class="text-subtitle-1 grey--text mt-2">
+              No data available
+            </div>
+          </div>
+        </template>
       </v-data-table>
+
       <v-row
         justify="center"
-        class="py-3"
+        class="pt-4"
       >
         <v-pagination
           v-model="page"
@@ -139,6 +174,7 @@
           :total-visible="7"
           next-icon="mdi-menu-right"
           prev-icon="mdi-menu-left"
+          color="primary"
           @input="onPageChange"
         />
       </v-row>
@@ -150,6 +186,7 @@
       @confirm="handleDelete"
       @close="closeConfirmDeleteDialog"
     />
+
     <!-- Create & Update Dialog -->
     <form-call-plan
       :dialog="isFormRoleDialog"
@@ -167,7 +204,6 @@
   import { createData, deleteData, updateData, getAll } from '@/api/callPlanService'
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
   import Vue from "vue";
-  import { getOutletArea, getOutletRegion } from "@/api/masterOutletService";
   import { mapGetters } from "vuex";
 
   export default {
@@ -180,16 +216,16 @@
       return {
         refreshDataTrigger : false,
         tableHeaders: [
-          { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
-          { text: 'Code Batch', value: 'code_batch', sortable: false, class: 'text-left', width: '15%' },
-          { text: 'Region', value: 'region', sortable: false, class: 'text-left', width: '20%' },
-          { text: 'Area', value: 'area', sortable: false, class: 'text-left', width: '15%' },
-          { text: 'Actions', value: 'actions', sortable: false, class: 'text-center' },
+          { text: 'No', value: 'number', align: 'center', sortable: false, width: '5%' },
+          { text: 'Code Batch', value: 'code_batch', sortable: false, width: '15%' },
+          { text: 'Region', value: 'region', sortable: false, width: '20%' },
+          { text: 'Area', value: 'area', sortable: false, width: '15%' },
+          { text: 'Actions', value: 'actions', align: 'center', sortable: false },
         ],
         tableData: [],
         totalItems: 0,
         totalPages: 0,
-        page: 1, // Current page number
+        page: 1,
         options: { page: 1, itemsPerPage: 10 },
         loading: false,
         selectedItem: null,
@@ -197,12 +233,12 @@
         isEdit: false,
         isConfirmDeleteDialogOpen: false,
         search: '',
-        regionOptions: [],
-        areaOptions: [],
+        selectedRegion: null,
+        selectedArea: null,
       }
     },
     computed: {
-      ...mapGetters(['getUser']),
+      ...mapGetters(['getUser', 'getRegionOptions', 'getAreaOptions']),
     },
     watch: {
       page(value) {
@@ -213,10 +249,6 @@
         this.options.itemsPerPage = value;
         this.fetchData();
       },
-    },
-    mounted() {
-      this.fetchRegion();
-      this.fetchArea();
     },
     methods: {
       onPageChange(newPage) {
@@ -263,40 +295,13 @@
         this.options.page = 1;
         this.fetchData();
       },
-      async fetchArea() {
-        this.loading = true;
-        try {
-          const response = await getOutletArea();
-          // Check if user area array is defined and not empty; if so, filter based on areas
-          if (Array.isArray(this.getUser.area) && this.getUser.area.length > 0) {
-            this.areaOptions = response.data.filter(
-              (area) => this.getUser.area.includes(area)
-            );
-          } else {
-            this.areaOptions = response.data;
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
+      handleRegionChange() {
+        this.options.page = 1;
+        this.fetchData();
       },
-      async fetchRegion() {
-        this.loading = true;
-        try {
-          const response = await getOutletRegion();
-          if (this.getUser.region) {
-            this.regionOptions = response.data.filter(
-              (region) => region === this.getUser.region
-            );
-          } else {
-            this.regionOptions = response.data; // No filtering if region is undefined
-          }
-        } catch (error) {
-          console.error("Error fetching :", error);
-        } finally {
-          this.loading = false;
-        }
+      handleAreaChange() {
+        this.options.page = 1;
+        this.fetchData();
       },
       async fetchData() {
         this.loading = true
@@ -305,6 +310,10 @@
             page: this.options.page,
             limit: this.options.itemsPerPage,
             searchTerm: this.search,
+            filter: {
+              region: this.selectedRegion?.name || '',
+              area: this.selectedArea?.name || '',
+            },
           });
           this.tableData = response.data.data;
           this.totalItems = response.data.totalItems;
@@ -321,10 +330,10 @@
         this.selectedItem = data
         this.isConfirmDeleteDialogOpen = true
       },
-      async handleSchedule(id) {
+      async handleSchedule(item) {
         await this.$router.push({
           name: 'Call Plan Schedule',
-          params: { id },
+          params: { id: item.id, region: item.region, area: item.area },
         });
       },
       closeConfirmDeleteDialog() {
@@ -350,5 +359,27 @@
 </script>
 
 <style scoped>
-/* Add any scoped styles here */
+.v-data-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.v-data-table >>> thead th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.v-data-table >>> tbody td {
+  font-size: 0.875rem;
+}
+
+.v-btn {
+  text-transform: none;
+}
+
+.v-btn.v-btn--fab.v-size--small {
+  width: 32px;
+  height: 32px;
+}
 </style>

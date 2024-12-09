@@ -64,9 +64,11 @@ export const getOutletSio = async () => {
 };
 
 // Function to get a area
-export const getOutletByType = async () => {
+export const getOutletByType = async (query) => {
   try {
-    const response = await axiosInstance.get(`/outlets/list-by`);
+    const response = await axiosInstance.get(`/outlets/list-by`, {
+      params: query,
+    });
     return response.data;
   } catch (error) {
     throw error.response;
