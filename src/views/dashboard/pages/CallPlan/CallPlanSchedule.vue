@@ -29,7 +29,9 @@
                 class="elevation-1"
                 @click="handleBack"
               >
-                <v-icon>mdi-backburger</v-icon>
+                <v-icon>
+                  mdi-backburger
+                </v-icon>
               </v-btn>
             </v-col>
             <v-col>
@@ -48,7 +50,9 @@
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content class="text-center">User not found</v-list-item-content>
+                    <v-list-item-content class="text-center">
+                      User not found
+                    </v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
@@ -76,7 +80,9 @@
                   :loading="loading"
                   @click="fetchData(id)"
                 >
-                  <v-icon>mdi-refresh</v-icon>
+                  <v-icon>
+                    mdi-refresh
+                  </v-icon>
                 </v-btn>
                 <v-btn
                   color="primary"
@@ -84,7 +90,9 @@
                   elevation="1"
                   @click="openHandleAdd"
                 >
-                  <v-icon left>mdi-plus</v-icon>
+                  <v-icon left>
+                    mdi-plus
+                  </v-icon>
                   Add New
                 </v-btn>
               </div>
@@ -94,7 +102,9 @@
 
         <template v-slot:item="{ item, index }">
           <tr>
-            <td class="text-center">{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+            <td>
+              {{ (options.page - 1) * options.itemsPerPage + index + 1 }}
+            </td>
             <td>
               <v-chip
                 small
@@ -149,7 +159,9 @@
                   elevation="1"
                   @click="openHandleUpdate(item)"
                 >
-                  <v-icon small>mdi-pencil</v-icon>
+                  <v-icon small>
+                    mdi-pencil
+                  </v-icon>
                 </v-btn>
                 <v-btn
                   small
@@ -158,7 +170,9 @@
                   elevation="1"
                   @click="openConfirmDeleteDialog(item)"
                 >
-                  <v-icon small>mdi-delete</v-icon>
+                  <v-icon small>
+                    mdi-delete
+                  </v-icon>
                 </v-btn>
               </div>
             </td>

@@ -195,6 +195,7 @@
       },
       filterFlag: {
         type: String,
+        default: '',
       },
       filters: {
         type: Array,
@@ -285,7 +286,7 @@
   /* Flexbox to manage text alignment */
   display: flex;
   align-items: center;
-  justify-content: start; /* Center align if needed */
+  justify-content: flex-start; /* Center align if needed */
   white-space: nowrap; /* Prevent wrapping */
   overflow: hidden; /* Hide overflow */
   text-overflow: ellipsis; /* Show ellipsis for overflow */
