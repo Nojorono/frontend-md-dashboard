@@ -40,7 +40,7 @@ Vue.prototype.$swal = Swal;
 Vue.config.productionTip = false
 
 // Enhanced configuration for the Socket.IO client
-const socket = io('http://localhost:9001', {
+const socket = io(process.env.VUE_APP_SOCKET_URL, {
   auth: {
     token: localStorage.getItem('token')
   },
@@ -58,7 +58,7 @@ socket.on('notification', (payload) => {
 });
 
 socket.on('connect', () => {
-  console.log('Connected to WebSocket server at http://localhost:9001');
+  console.log('Connected to WebSocket server at ' + process.env.VUE_APP_SOCKET_URL);
 });
 
 socket.on('connect_error', (error) => {
