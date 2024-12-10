@@ -110,7 +110,7 @@
                 label
                 text-color="white"
               >
-              {{ getStatusLabel(item?.status) }}
+              {{ getStatusLabel(item) }}
             </v-chip>
             </td>
             <td>{{ formatDate(item?.created_at) }}</td>
@@ -143,18 +143,46 @@
                     </v-btn>
                   </template>
                   <v-list dense>
-                    <v-list-item
-                      v-for="(status, index) in statusOptions"
-                      :key="index"
-                      @click="updateStatus(item, status.value)"
-                    >
-                      <v-list-item-icon class="mr-2">
-                        <v-icon small :color="getStatusColor(status.value)">
-                          mdi-circle-small
-                        </v-icon>
-                      </v-list-item-icon>
-                      <v-list-item-title>{{ status.text }}</v-list-item-title>
-                    </v-list-item>
+                    <template v-if="getUser?.roles === 'ADMIN' || getUser?.roles === 'NASIONAL'">
+                      <v-list-item
+                        v-for="(status, index) in statusLevel2Options"
+                        :key="index"
+                        @click="updateStatus(item, status.value)"
+                      >
+                        <v-list-item-icon class="mr-2">
+                          <v-icon small :color="getStatusColor(status.value)">
+                            mdi-circle-small
+                          </v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>{{ getStatusLabelOption(status.value) }}</v-list-item-title>
+                      </v-list-item>
+                    </template>
+                    <template v-else-if="getUser?.roles === 'AMO' || getUser?.roles === 'REGIONAL' || getUser?.roles === 'TL'">
+                      <v-list-item
+                        v-for="(status, index) in statusLevel1Options"
+                        :key="index"
+                        @click="updateStatus(item, status.value)"
+                        class="cursor-pointer"
+                      >
+                        <v-list-item-icon class="mr-2">
+                          <v-icon small :color="getStatusColor(status.value)">
+                            mdi-circle-small
+                          </v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>{{ getStatusLabelOption(status.value) }}</v-list-item-title>
+                      </v-list-item>
+                    </template>
+                    <template v-else>
+                      <v-list-item
+                      >
+                        <v-list-item-icon class="mr-2">
+                            <v-icon small>mdi-circle-small</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>
+                            {{ getStatusLabel(item) }}
+                        </v-list-item-title>
+                      </v-list-item>
+                    </template>
                   </v-list>
                 </v-menu>
               </div>
@@ -202,7 +230,7 @@
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
   import Vue from "vue";
   import { mapGetters } from "vuex";
-  import { STATUS_LABELS, STATUS_COLORS } from '@/constants/status';
+  import { EXISTING_SURVEY_STATUS, NEW_SURVEY_STATUS, STATUS_COLORS } from '@/constants/status';
 
   export default {
     name: 'Activity',
@@ -216,13 +244,13 @@
         tableHeaders: [
           { text: 'No', value: 'number', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
           { text: 'Type', value: 'type', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
-          { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
-          { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
-          { text: 'Brand', value: 'brand', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+          { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+          { text: 'Brand', value: 'brand', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
           { text: 'Type SIO', value: 'type_sio', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
-          { text: 'Status', value: 'status', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
-          { text: 'Created At', value: 'created_at', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Status', value: 'status', sortable: false, class: 'text-left font-weight-bold', width: '11%' },
+          { text: 'Created At', value: 'created_at', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
           { text: 'Actions', value: 'actions', sortable: false, class: 'text-center font-weight-bold' },
         ],
         tableData: [],
@@ -238,10 +266,13 @@
         search: '',
         regionOptions: [],
         areaOptions: [],
-        statusOptions: [
-          { value: 0, text: 'Pending' },
-          { value: 1, text: 'In Progress' },
-          { value: 2, text: 'Completed' }
+        statusLevel1Options: [
+          { value: 101 },
+          { value: 406 },
+        ],
+        statusLevel2Options: [
+          { value: 203 },
+          { value: 407 },
         ],
         status: '',
         statusUpdate: '',
@@ -264,8 +295,11 @@
     },
   
     methods: {
-      getStatusLabel(status) {
-        return STATUS_LABELS[status];
+      getStatusLabel(item) {
+        return item?.outlet_name ? EXISTING_SURVEY_STATUS[item?.status] : NEW_SURVEY_STATUS[item?.status];
+      },
+      getStatusLabelOption(value) {
+        return EXISTING_SURVEY_STATUS[value] ? EXISTING_SURVEY_STATUS[value] : NEW_SURVEY_STATUS[value];
       },
       getStatusColor(status) {
         return STATUS_COLORS[status];

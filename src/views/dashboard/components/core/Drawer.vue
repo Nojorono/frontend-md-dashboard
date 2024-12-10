@@ -141,59 +141,77 @@ export default {
 }
 </script>
 
-<style lang="sass">
-@import '~vuetify/src/styles/tools/_rtl.sass'
+<style lang="scss">
+#core-navigation-drawer {
+  .v-list-group__header.v-list-item--active:before {
+    opacity: 0.12;
+  }
 
-#core-navigation-drawer
-  .v-list-group__header.v-list-item--active:before
-    opacity: .12
-
-  .v-list-item
+  .v-list-item {
     &__icon--text,
-    &__icon:first-child
-      justify-content: center
-      text-align: center
-      width: 20px
+    &__icon:first-child {
+      justify-content: center;
+      text-align: center;
+      width: 20px;
 
-      +ltr()
-        margin-right: 24px
-        margin-left: 12px !important
+      :deep([dir="ltr"]) & {
+        margin-right: 24px;
+        margin-left: 12px !important;
+      }
 
-      +rtl()
-        margin-left: 24px
-        margin-right: 12px !important
+      :deep([dir="rtl"]) & {
+        margin-left: 24px;
+        margin-right: 12px !important;
+      }
+    }
+  }
 
-  .v-list--dense
-    .v-list-item
+  .v-list--dense {
+    .v-list-item {
       &__icon--text,
-      &__icon:first-child
-        margin-top: 10px
+      &__icon:first-child {
+        margin-top: 10px;
+      }
+    }
+  }
 
-  .v-list-group--sub-group
-    .v-list-item
-      +ltr()
-        padding-left: 8px
+  .v-list-group--sub-group {
+    .v-list-item {
+      :deep([dir="ltr"]) & {
+        padding-left: 8px;
+      }
 
-      +rtl()
-        padding-right: 8px
+      :deep([dir="rtl"]) & {
+        padding-right: 8px;
+      }
+    }
 
-    .v-list-group__header
-      +ltr()
-        padding-right: 0
+    .v-list-group__header {
+      :deep([dir="ltr"]) & {
+        padding-right: 0;
+      }
 
-      +rtl()
-        padding-right: 0
+      :deep([dir="rtl"]) & {
+        padding-right: 0;
+      }
 
-      .v-list-item__icon--text
-        margin-top: 19px
-        order: 0
+      .v-list-item__icon--text {
+        margin-top: 19px;
+        order: 0;
+      }
 
-      .v-list-group__header__prepend-icon
-        order: 2
+      .v-list-group__header__prepend-icon {
+        order: 2;
 
-        +ltr()
-          margin-right: 8px
+        :deep([dir="ltr"]) & {
+          margin-right: 8px;
+        }
 
-        +rtl()
-          margin-left: 8px
+        :deep([dir="rtl"]) & {
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+}
 </style>

@@ -133,10 +133,10 @@
             <td>
               <v-chip
                 small
-                :color="item.status === 'Active' ? 'success' : 'grey'"
+                :color="getStatusColor(item.status)"
                 text-color="white"
               >
-                {{ item.status }}
+                {{ getStatusLabel(item) }}
               </v-chip>
             </td>
             <td>
@@ -232,6 +232,8 @@ import {
   deleteScheduleData
 } from '@/api/callPlanService'
 import { getAllMdRole } from "@/api/userService";
+import { EXISTING_SURVEY_STATUS, NEW_SURVEY_STATUS, STATUS_COLORS } from '@/constants/status';
+
 
 export default {
   name: 'CallPlanSchedule',
@@ -248,9 +250,9 @@ export default {
         { text: 'No', value: 'No', sortable: false, align: 'center', width: '5%' },
         { text: 'Type', value: 'type', sortable: false, align: 'left', width: '10%' },
         { text: 'User', value: 'email', sortable: false, align: 'left', width: '10%' },
-        { text: 'Outlet', value: 'outlet_code', sortable: false, align: 'left', width: '20%' },
+        { text: 'Outlet', value: 'outlet_code', sortable: false, align: 'left', width: '10%' },
         { text: 'Code Call Plan', value: 'code_call_plan', sortable: false, align: 'left', width: '10%' },
-        { text: 'Day Plan', value: 'day_plan', sortable: false, align: 'left', width: '15%' },
+        { text: 'Day Plan', value: 'day_plan', sortable: false, align: 'left', width: '10%' },
         { text: 'Notes', value: 'notes', sortable: false, align: 'left', width: '10%' },
         { text: 'Status', value: 'status', align: 'left', width: '5%' },
         { text: 'Actions', value: 'actions', sortable: false, align: 'center', width: '10%' },
@@ -289,6 +291,12 @@ export default {
     this.fetchUsers()
   },
   methods: {
+    getStatusColor(status) {
+      return STATUS_COLORS[status];
+    },
+    getStatusLabel(item) {
+      return item?.type === 0 ? EXISTING_SURVEY_STATUS[item?.status] : NEW_SURVEY_STATUS[item?.status];
+    },
     onPageChange(newPage) {
       this.page = newPage;
     },

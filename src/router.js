@@ -16,6 +16,6 @@ const router = new Router({
 });
 
 // Add a global navigation guard
-router.beforeEach((to, from, next) => checkAuthGuard(to, next));
+router.beforeEach((to, from, next) => checkAuthGuard(to, from, next));
 
 export default router;

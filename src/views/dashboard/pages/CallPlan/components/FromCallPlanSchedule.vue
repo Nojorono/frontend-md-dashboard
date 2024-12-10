@@ -283,7 +283,6 @@ export default {
       if (newValue) {
         this.call_plan_id = this.$route.params.id
         this.fetchOutlets()
-        console.log(this.call_plan_id)
         this.fetchSurveyOutlet()
       }
     },
