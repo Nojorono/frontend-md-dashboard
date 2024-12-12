@@ -229,6 +229,7 @@ export default {
           }
         }
       } catch (error) {
+        console.log(error)
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)
       } finally {

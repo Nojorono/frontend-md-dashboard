@@ -1,11 +1,11 @@
 // src/services/MasterRoleService.js
 
-import axiosInstance from '@/api/index';
+import axiosInstance from "@/api/index";
 
 // Function to get all active outlets
 export const getAll = async (params) => {
   try {
-    const response = await axiosInstance.get('/batch', {
+    const response = await axiosInstance.get("/batch", {
       params: params,
     });
     return response.data;
@@ -25,7 +25,7 @@ export const getAllTarget = async (batchId) => {
 
 export const getAllList = async () => {
   try {
-    const response = await axiosInstance.get('/batch');
+    const response = await axiosInstance.get("/batch");
     return response.data;
   } catch (error) {
     throw error.response;
@@ -34,7 +34,7 @@ export const getAllList = async () => {
 
 export const findLast = async () => {
   try {
-    const response = await axiosInstance.get('/batch/find-last');
+    const response = await axiosInstance.get("/batch/find-last");
     return response.data;
   } catch (error) {
     throw error.response;
@@ -54,7 +54,7 @@ export const getById = async (id) => {
 // Function to create
 export const createData = async (data) => {
   try {
-    const response = await axiosInstance.post('/batch', data);
+    const response = await axiosInstance.post("/batch", data);
     return response.data;
   } catch (error) {
     throw error.response;
@@ -63,7 +63,7 @@ export const createData = async (data) => {
 
 export const createBatchTarget = async (data) => {
   try {
-    const response = await axiosInstance.post('/batch-target', data);
+    const response = await axiosInstance.post("/batch-target", data);
     return response.data;
   } catch (error) {
     throw error.response;

@@ -3,27 +3,22 @@
     v-model="dialog"
     max-width="1000px"
     @click:outside="closeDialog"
+    @keydown.esc="closeDialog"
   >
     <v-card class="form-card">
       <v-card-title class="primary white--text py-4 rounded-t">
-        <span class="headline">{{ isEdit ? "Edit Survey" : "Add New Survey" }}</span>
+        <span class="headline">{{
+          isEdit ? "Edit Survey" : "Add New Survey"
+        }}</span>
       </v-card-title>
 
       <v-card-text class="pa-6">
-        <v-form
-          ref="form"
-          v-model="formValid"
-        >
+        <v-form ref="form" v-model="formValid">
           <v-row>
-            <v-col
-              sm="6"
-              md="6"
-              lg="6"
-              xl="6"
-            >
+            <v-col sm="6" md="6" lg="6" xl="6">
               <v-card flat class="pa-4 rounded-lg">
                 <v-card-title class="px-0 pb-4">Store Information</v-card-title>
-                
+
                 <v-autocomplete
                   v-model="itemData.outlet_id"
                   :items="outletOptions"
@@ -34,7 +29,9 @@
                 >
                   <template #no-data>
                     <v-list-item>
-                      <v-list-item-content>Outlet not found</v-list-item-content>
+                      <v-list-item-content
+                        >Outlet not found</v-list-item-content
+                      >
                     </v-list-item>
                   </template>
                 </v-autocomplete>
@@ -59,7 +56,7 @@
 
                 <v-autocomplete
                   v-model="itemData.sio_type"
-                  :items="sioTypeOptions"
+                  :items="getSioTypeOptions"
                   item-text="name"
                   item-value="name"
                   label="Sio Type"
@@ -74,7 +71,7 @@
 
                 <v-autocomplete
                   v-model="itemData.region"
-                  :items="regionOptions"
+                  :items="getRegionOptions"
                   item-text="name"
                   item-value="name"
                   label="Region"
@@ -83,14 +80,16 @@
                 >
                   <template #no-data>
                     <v-list-item>
-                      <v-list-item-content>Region not found</v-list-item-content>
+                      <v-list-item-content
+                        >Region not found</v-list-item-content
+                      >
                     </v-list-item>
                   </template>
                 </v-autocomplete>
 
                 <v-autocomplete
                   v-model="itemData.area"
-                  :items="areaOptions"
+                  :items="getAreaOptions"
                   item-text="area"
                   item-value="area"
                   label="Area"
@@ -106,7 +105,7 @@
 
                 <v-autocomplete
                   v-model="itemData.brand"
-                  :items="brandOptions"
+                  :items="getBrandOptions"
                   item-text="brand"
                   item-value="brand"
                   label="Brand"
@@ -114,7 +113,9 @@
                 >
                   <template #no-data>
                     <v-list-item>
-                      <v-list-item-content>Brands not found</v-list-item-content>
+                      <v-list-item-content
+                        >Brands not found</v-list-item-content
+                      >
                     </v-list-item>
                   </template>
                 </v-autocomplete>
@@ -139,33 +140,20 @@
                   label="Kode Pos"
                   type="number"
                 />
-
               </v-card>
             </v-col>
 
-            <v-col
-              sm="6"
-              md="6"
-              lg="6"
-              xl="6"
-            >
+            <v-col sm="6" md="6" lg="6" xl="6">
               <v-card flat class="pa-4 rounded-lg">
-                <v-card-title class="px-0 pb-4">Location & Schedule</v-card-title>
+                <v-card-title class="px-0 pb-4"
+                  >Location & Schedule</v-card-title
+                >
 
-                <v-text-field
-                  v-model="itemData.latitude"
-                  label="Latitude"
-                />
+                <v-text-field v-model="itemData.latitude" label="Latitude" />
 
-                <v-text-field
-                  v-model="itemData.longitude"
-                  label="Longitude"
-                />
+                <v-text-field v-model="itemData.longitude" label="Longitude" />
 
-                <v-text-field
-                  v-model="itemData.cycle"
-                  label="Cycle"
-                />
+                <v-text-field v-model="itemData.cycle" label="Cycle" />
 
                 <v-select
                   v-model="itemData.visit_day"
@@ -181,10 +169,7 @@
                   clearable
                 />
 
-                <v-text-field
-                  v-model="itemData.remarks"
-                  label="Remarks"
-                />
+                <v-text-field v-model="itemData.remarks" label="Remarks" />
 
                 <div v-if="isEdit">
                   <div class="image-gallery">
@@ -197,11 +182,8 @@
                         :src="`${decodeURIComponent(photo.url)}`"
                         class="image-preview"
                         alt="Store Photo"
-                      >
-                      <button
-                        class="delete-button"
-                        @click="deleteImage(index)"
-                      >
+                      />
+                      <button class="delete-button" @click="deleteImage(index)">
                         <v-icon>mdi-delete</v-icon>
                       </button>
                     </div>
@@ -215,13 +197,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          color="blue darken-1"
-          text
-          @click="closeDialog"
-        >
-          Cancel
-        </v-btn>
+        <v-btn color="blue darken-1" text @click="closeDialog"> Cancel </v-btn>
         <v-btn
           color="green darken-1"
           text
@@ -236,54 +212,58 @@
 </template>
 
 <script>
-import { getAllArea, getAllRegion } from '@/api/regionAreaService'
-import { mapGetters } from 'vuex'
-import { findLast } from '@/api/batchService'
-import { deleteImageS3 } from '@/api/S3Service'
-import { getAllSio } from '@/api/sioService'
-import { getAllBrand } from '@/api/brandService'
-import { getAllOutletSurvey } from '@/api/masterOutletService'
+import { mapGetters } from "vuex";
+import { deleteImageS3 } from "@/api/S3Service";
+import { getAllOutletSurvey } from "@/api/masterOutletService";
 
 export default {
-  name: 'FormSurveyNewOutlet',
+  name: "FormSurveyNewOutlet",
 
   props: {
     dialog: Boolean,
     isEdit: Boolean,
     item: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
 
   data() {
     return {
       apiUrl: process.env.VUE_APP_API_URL,
       itemData: {
-        name: '',
-        batch_code: '',
-        brand: '',
-        address_line: '',
-        sub_district: '',
-        district: '',
-        city_or_regency: '',
+        name: "",
+        batch_code: "",
+        brand: "",
+        address_line: "",
+        sub_district: "",
+        district: "",
+        city_or_regency: "",
         postal_code: null,
-        latitude: '',
-        longitude: '',
-        outlet_code: '',
-        sio_type: '',
-        region: '',
-        area: '',
-        cycle: '',
-        visit_day: '',
-        odd_even: '',
-        remarks: '',
+        latitude: "",
+        longitude: "",
+        outlet_code: "",
+        sio_type: "",
+        region: "",
+        area: "",
+        cycle: "",
+        visit_day: "",
+        odd_even: "",
+        remarks: "",
         photos: [],
         outlet_id: null,
-        is_approved: 0
+        is_approved: 0,
       },
-      visitOptions: ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'],
-      oddEvenOptions: ['GANJIL', 'GENAP'],
+      visitOptions: [
+        "SENIN",
+        "SELASA",
+        "RABU",
+        "KAMIS",
+        "JUMAT",
+        "SABTU",
+        "MINGGU",
+      ],
+      oddEvenOptions: ["GANJIL", "GENAP"],
       outletOptions: [],
       brandOptions: [],
       sioTypeOptions: [],
@@ -291,13 +271,20 @@ export default {
       areaOptions: [],
       formValid: false,
       rules: {
-        nameRules: [(v) => !!v || 'Name is required']
-      }
-    }
+        nameRules: [(v) => !!v || "Name is required"],
+      },
+    };
   },
 
   computed: {
-    ...mapGetters(['getUser'])
+    ...mapGetters([
+      "getUser",
+      "getRegionOptions",
+      "getAreaOptions",
+      "getBrandOptions",
+      "getSioTypeOptions",
+      "getCodeBatch",
+    ]),
   },
 
   watch: {
@@ -305,145 +292,97 @@ export default {
       immediate: true,
       handler(newItem) {
         if (newItem) {
-          this.itemData = { ...newItem }
+          this.itemData = { ...newItem };
         } else {
-          this.resetForm()
+          this.resetForm();
         }
-      }
-    }
+      },
+    },
   },
 
   mounted() {
-    this.fetchRegion()
-    this.fetchArea()
-    this.fetchBatch()
-    this.fetchSio()
-    this.fetchBrand()
-    this.fetchOutletSurvey()
+    this.fetchOutletSurvey();
+    this.batchCode();
   },
 
   methods: {
+
+    async batchCode() {
+      this.itemData.batch_code = this.getCodeBatch.code_batch;
+    },
+
     async deleteImage(index) {
-      const photo = this.itemData.photos[index]
-      this.itemData.photos.splice(index, 1)
-      await this.removeImageFromServer(photo.url)
+      const photo = this.itemData.photos[index];
+      this.itemData.photos.splice(index, 1);
+      await this.removeImageFromServer(photo.url);
     },
 
     async removeImageFromServer(key) {
       try {
-        await deleteImageS3(key)
+        await deleteImageS3(key);
       } catch (error) {
-        console.error('Error deleting image:', error)
-      }
-    },
-
-    async fetchSio() {
-      try {
-        const { data } = await getAllSio()
-        this.sioTypeOptions = data.data
-      } catch (error) {
-        console.error('Error fetching SIO:', error)
+        console.error("Error deleting image:", error);
       }
     },
 
     async fetchOutletSurvey() {
       try {
-        const { data } = await getAllOutletSurvey()
-        this.outletOptions = data.data
+        const { data } = await getAllOutletSurvey();
+        this.outletOptions = data.data;
       } catch (error) {
-        console.error('Error fetching outlets:', error)
-      }
-    },
-
-    async fetchBrand() {
-      try {
-        const { data } = await getAllBrand()
-        this.brandOptions = data.data
-      } catch (error) {
-        console.error('Error fetching brands:', error)
-      }
-    },
-
-    async fetchArea() {
-      try {
-        const { data } = await getAllArea()
-        this.areaOptions = this.getUser.area > 0
-          ? data.data.filter(area => this.getUser.area.includes(area.area))
-          : data.data
-      } catch (error) {
-        console.error('Error fetching areas:', error)
-      }
-    },
-
-    async fetchRegion() {
-      try {
-        const { data } = await getAllRegion()
-        this.regionOptions = this.getUser.region
-          ? data.data.filter(region => region.name === this.getUser.region)
-          : data.data
-      } catch (error) {
-        console.error('Error fetching regions:', error)
-      }
-    },
-
-    async fetchBatch() {
-      try {
-        const { data } = await findLast()
-        this.itemData.batch_code = data.code_batch
-      } catch (error) {
-        console.error('Error fetching batch:', error)
+        console.error("Error fetching outlets:", error);
       }
     },
 
     resetForm() {
       this.itemData = {
-        name: '',
-        batch_code: '',
-        brand: '',
-        address_line: '',
-        sub_district: '',
-        district: '',
-        city_or_regency: '',
+        name: "",
+        batch_code: "",
+        brand: "",
+        address_line: "",
+        sub_district: "",
+        district: "",
+        city_or_regency: "",
         postal_code: null,
-        latitude: '',
-        longitude: '',
-        outlet_code: '',
-        sio_type: '',
-        region: '',
-        area: '',
-        cycle: '',
-        visit_day: '',
-        odd_even: '',
-        remarks: '',
+        latitude: "",
+        longitude: "",
+        outlet_code: "",
+        sio_type: "",
+        region: "",
+        area: "",
+        cycle: "",
+        visit_day: "",
+        odd_even: "",
+        remarks: "",
         photos: [],
-        outlet_id: null
-      }
-      this.formValid = false
+        outlet_id: null,
+      };
+      this.formValid = false;
       if (this.$refs.form) {
-        this.$refs.form.resetValidation()
+        this.$refs.form.resetValidation();
       }
     },
 
     closeDialog() {
-      this.resetForm()
-      this.$emit('close')
+      this.resetForm();
+      this.$emit("close");
     },
 
     onRegionChange(item) {
-      this.itemData.region = item || null
+      this.itemData.region = item || null;
     },
 
     onAreaChange(item) {
-      this.itemData.area = item || null
+      this.itemData.area = item || null;
     },
 
     saveItem() {
       if (this.$refs.form.validate()) {
-        this.$emit('save', { ...this.itemData })
+        this.$emit("save", { ...this.itemData });
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>

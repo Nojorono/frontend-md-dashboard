@@ -1,26 +1,16 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    max-width="600px"
-    @click:outside="closeDialog"
-  >
+  <v-dialog v-model="dialog" max-width="600px" @click:outside="closeDialog">
     <v-card>
       <v-card-title>
-        <span class="headline">{{ isEdit ? "Edit User" : "Add New User" }}</span>
+        <span class="headline">{{
+          isEdit ? "Edit User" : "Add New User"
+        }}</span>
       </v-card-title>
 
       <v-card-text>
-        <v-form
-          ref="form"
-          v-model="formValid"
-        >
+        <v-form ref="form" v-model="formValid">
           <v-row>
-            <v-col
-              sm="6"
-              md="6"
-              lg="6"
-              xl="6"
-            >
+            <v-col sm="6" md="6" lg="6" xl="6">
               <!-- Username Input -->
               <v-text-field
                 v-model="itemData.username"
@@ -73,12 +63,7 @@
                 dense
               />
             </v-col>
-            <v-col
-              sm="6"
-              md="6"
-              lg="6"
-              xl="6"
-            >
+            <v-col sm="6" md="6" lg="6" xl="6">
               <!-- Region Input -->
               <v-autocomplete
                 v-model="itemData.region"
@@ -101,8 +86,8 @@
 
               <!-- Area Input -->
               <v-autocomplete
-                v-model="selectedAreas"
-                :items="areaOptions"
+                v-model="itemData.area"
+                :items="filteredAreaOptions"
                 item-text="area"
                 item-value="area"
                 label="Area"
@@ -196,7 +181,10 @@
                 <v-date-picker
                   v-model="itemData.valid_to"
                   @input="validEndMenu = false"
-                  :min="itemData.valid_from || new Date().toISOString().substr(0, 10)"
+                  :min="
+                    itemData.valid_from ||
+                    new Date().toISOString().substr(0, 10)
+                  "
                 />
               </v-menu>
             </v-col>
@@ -206,13 +194,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          color="grey darken-1"
-          text
-          @click="closeDialog"
-        >
-          Cancel
-        </v-btn>
+        <v-btn color="grey darken-1" text @click="closeDialog"> Cancel </v-btn>
         <v-btn
           color="primary"
           :loading="loading"
@@ -227,9 +209,9 @@
 </template>
 
 <script>
-import { getAllArea, getAllRegion} from '@/api/regionAreaService'
-import { getAllList } from '@/api/masterRoleService'
-import {mapGetters} from "vuex";
+import { getAllArea, getAllRegion } from "@/api/regionAreaService";
+import { getAllList } from "@/api/masterRoleService";
+import { mapGetters } from "vuex";
 
 export default {
   name: "FormUser",
@@ -242,24 +224,22 @@ export default {
     return {
       loading: false,
       itemData: {
-        username: '',
-        user_role_id: '',
-        fullname: '',
-        email: '',
-        phone: '',
-        type_md: '',
+        id: null,
+        username: "",
+        user_role_id: null,
+        fullname: "",
+        email: "",
+        phone: "",
+        type_md: "",
         area: [],
-        region: '',
-        valid_from: '',
-        valid_to: '',
+        region: "",
+        valid_from: "",
+        valid_to: "",
       },
-      selectedAreas: [],
       regionOptions: [],
       areaOptions: [],
       rolesOptions: [],
-      typeMD : [
-        'MOTOR', 'MOBIL'
-      ],
+      typeMD: ["MOTOR", "MOBIL"],
       formValid: false,
       validStartMenu: false,
       validEndMenu: false,
@@ -269,7 +249,7 @@ export default {
         (v) => v.length <= 50 || "Username must be less than 50 characters",
       ],
       fullnameRules: [
-        (v) => !!v || "FullName is required", 
+        (v) => !!v || "FullName is required",
         (v) => v.length >= 2 || "Username must be at least 2 characters",
         (v) => v.length <= 50 || "Full Name must be less than 50 characters",
       ],
@@ -283,24 +263,33 @@ export default {
         (v) => /^[0-9]*$/.test(v) || "Phone number must contain only numbers",
         (v) => v.length <= 20 || "Phone number must be less than 20 characters",
       ],
-      regionRules: [
-        (v) => !!v || "Region is required",
-      ],
-      areaRules: [
-        (v) => !!v || "Area is required",
-      ],
-      roleRules: [
-        (v) => !!v || "Role is required",
-      ],
-      dateRules: [
-        (v) => !!v || "Date is required",
-      ],
+      regionRules: [(v) => !!v || "Region is required"],
+      areaRules: [(v) => !!v || "Area is required"],
+      roleRules: [(v) => !!v || "Role is required"],
+      dateRules: [(v) => !!v || "Date is required"],
     };
   },
   computed: {
-    ...mapGetters(['getUser']),
+    ...mapGetters(["getUser"]),
     validEndDateRule() {
-      return (v) => !this.itemData.valid_from || !v || v >= this.itemData.valid_from || 'Valid To date must be after Valid From date'
+      return (v) =>
+        !this.itemData.valid_from ||
+        !v ||
+        v >= this.itemData.valid_from ||
+        "Valid To date must be after Valid From date";
+    },
+    filteredAreaOptions() {
+      if (!this.itemData.region) return this.areaOptions;
+      
+      const selectedRegion = this.regionOptions.find(
+        (region) => region.name === this.itemData.region
+      );
+      
+      if (!selectedRegion) return this.areaOptions;
+      
+      return this.areaOptions.filter(
+        (area) => area.region_id === selectedRegion.id
+      );
     }
   },
   watch: {
@@ -308,21 +297,31 @@ export default {
       immediate: true,
       handler(newItem) {
         if (newItem) {
-          this.itemData = { ...newItem };
-          // Handle area data for edit mode
-          if (Array.isArray(newItem.area)) {
-            this.selectedAreas = newItem.area.map(a => typeof a === 'string' ? a : a.area);
-          } else if (newItem.area) {
-            this.selectedAreas = [newItem.area];
-          }
+          // Deep copy the item to avoid reference issues
+          this.itemData = {
+            id: newItem.id || null,
+            username: newItem.username || "",
+            user_role_id: newItem.user_role_id || null,
+            fullname: newItem.fullname || "",
+            email: newItem.email || "",
+            phone: newItem.phone || "",
+            type_md: newItem.type_md || "",
+            area: Array.isArray(newItem.area) ? [...newItem.area] : 
+                  typeof newItem.area === 'string' ? [newItem.area] : [],
+            region: newItem.region || "",
+            valid_from: newItem.valid_from || "",
+            valid_to: newItem.valid_to || "",
+          };
         } else {
           this.resetForm();
         }
       },
     },
-    selectedAreas: {
-      handler(newVal) {
-        this.itemData.area = newVal;
+    'itemData.region': {
+      handler(newVal, oldVal) {
+        if (newVal !== oldVal && !this.isEdit) {
+          this.itemData.area = [];
+        }
       }
     }
   },
@@ -330,7 +329,7 @@ export default {
     await Promise.all([
       this.fetchRegion(),
       this.fetchArea(),
-      this.fetchRoles()
+      this.fetchRoles(),
     ]);
   },
   methods: {
@@ -378,18 +377,18 @@ export default {
     },
     resetForm() {
       this.itemData = {
-        username: '',
-        user_role_id: '',
-        fullname: '',
-        email: '',
-        phone: '',
-        type_md: '',
+        id: null,
+        username: "",
+        user_role_id: null,
+        fullname: "",
+        email: "",
+        phone: "",
+        type_md: "",
         area: [],
-        region: '',
-        valid_from: '',
-        valid_to: '',
+        region: "",
+        valid_from: "",
+        valid_to: "",
       };
-      this.selectedAreas = [];
       this.formValid = false;
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
@@ -403,30 +402,25 @@ export default {
       if (this.$refs.form.validate()) {
         const formattedData = {
           ...this.itemData,
-          area: this.selectedAreas
         };
         this.$emit("save", formattedData);
+        this.closeDialog();
       }
     },
     onRegionChange(item) {
       if (!item) {
-        this.itemData.region = '';
+        this.itemData.region = "";
         return;
-      }
-      const selectedRegion = this.regionOptions.find(region => region.name === item);
-      if (selectedRegion) {
-        this.itemData.region = selectedRegion.name;
-      }
-    },
-    onAreaChange(item) {
-      if (item) {
-        this.itemData.area = item.area;
-      } else {
-        this.itemData.area = null;
-      }
+      }else{
+        this.itemData.region = item;
+      } 
     },
     onRoleChange(item) {
-      this.itemData.user_role_id = item ? item.id : null;
+      if (item) {
+        this.itemData.user_role_id = item;
+      } else {
+        this.itemData.user_role_id = null;
+      }
     },
   },
 };

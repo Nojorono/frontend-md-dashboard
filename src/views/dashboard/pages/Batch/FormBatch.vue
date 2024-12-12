@@ -1,8 +1,9 @@
 <template>
   <v-dialog
-    v-model="dialog"
+    v-model="dialogLocal"
     max-width="600px"
     @click:outside="closeDialog"
+    @keydown.esc="closeDialog"
   >
     <v-card>
       <v-card-title>
@@ -16,7 +17,7 @@
         >
           <!-- Name Input -->
           <v-text-field
-            v-model="itemData.code_batch"
+            v-model.lazy="itemData.code_batch"
             :rules="nameRules"
             label="Code Batch"
             required
@@ -28,6 +29,7 @@
             :close-on-content-click="false"
             transition="scale-transition"
             min-width="290px"
+            @keydown.esc="startPlanMenu = false"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
@@ -54,6 +56,7 @@
             :close-on-content-click="false"
             transition="scale-transition"
             min-width="290px"
+            @keydown.esc="endPlanMenu = false"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
@@ -107,6 +110,7 @@ export default {
   },
   data() {
     return {
+      dialogLocal: this.dialog,
       itemData: {
         code_batch: '',
         start_plan: '',
@@ -126,6 +130,12 @@ export default {
     };
   },
   watch: {
+    dialog(newVal) {
+      this.dialogLocal = newVal;
+    },
+    dialogLocal(newVal) {
+      this.$emit('update:dialog', newVal);
+    },
     item: {
       immediate: true,
       handler(newItem) {
@@ -158,7 +168,9 @@ export default {
     saveItem() {
       if (this.$refs.form.validate()) {
         const formattedData = {
-          ...this.itemData
+          code_batch: this.itemData.code_batch.trim(),
+          start_plan: this.itemData.start_plan.trim(),
+          end_plan: this.itemData.end_plan.trim()
         };
         this.$emit("save", formattedData);
         this.closeDialog();

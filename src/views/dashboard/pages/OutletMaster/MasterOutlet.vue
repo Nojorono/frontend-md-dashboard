@@ -1,5 +1,7 @@
 <template>
-  <v-card class="v-card--material v-card v-sheet theme--light v-card--material--has-heading elevation-2">
+  <v-card
+    class="v-card--material v-card v-sheet theme--light v-card--material--has-heading elevation-2"
+  >
     <v-container fluid class="pa-4">
       <v-row class="mb-4" align="center">
         <v-col cols="4">
@@ -24,37 +26,37 @@
         <v-col cols="6">
           <div class="d-flex justify-end align-center">
             <v-autocomplete
-                v-model="filter.region"
-                :items="getRegionOptions" 
-                item-text="name"
-                item-value="name"
-                label="Region"
-                clearable
-                dense
-                outlined
-                hide-details
-                class="mr-4"
-                @change="handleRegionChange"
-                @click:clear="clearRegionFilter"
-              >
-              </v-autocomplete>
-              <v-autocomplete
-                v-model="filter.area"
-                :items="getAreaOptions"
-                item-text="name"
-                item-value="name"
-                label="Area"
-                :disabled="!filter.region"
-                clearable
-                dense
-                outlined
-                hide-details
-                small-chips
-                deletable-chips
-                @change="handleAreaChange"
-                @click:clear="clearAreaFilter"
-              >
-              </v-autocomplete>
+              v-model="filter.region"
+              :items="getRegionOptions"
+              item-text="name"
+              item-value="name"
+              label="Region"
+              clearable
+              dense
+              outlined
+              hide-details
+              class="mr-4"
+              @change="handleRegionChange"
+              @click:clear="clearRegionFilter"
+            >
+            </v-autocomplete>
+            <v-autocomplete
+              v-model="filter.area"
+              :items="filteredAreaOptions"
+              item-text="area"
+              item-value="area"
+              label="Area"
+              :disabled="!filter.region"
+              clearable
+              dense
+              outlined
+              hide-details
+              small-chips
+              deletable-chips
+              @change="handleAreaChange"
+              @click:clear="clearAreaFilter"
+            >
+            </v-autocomplete>
           </div>
         </v-col>
         <v-btn
@@ -68,7 +70,7 @@
           <v-icon size="24">mdi-refresh</v-icon>
         </v-btn>
       </v-row>
-      <v-row align="center" style="margin-top: -10px; margin-bottom: 5px;">
+      <v-row align="center" style="margin-top: -10px; margin-bottom: 5px">
         <v-col cols="4">
           <v-text-field
             v-model="search"
@@ -85,34 +87,34 @@
         <v-col cols="6">
           <div class="d-flex justify-end align-center">
             <v-autocomplete
-                v-model="filter.brand"
-                :items="getBrandOptions" 
-                item-text="brand"
-                item-value="brand"
-                label="Brand"
-                clearable
-                dense
-                outlined
-                hide-details
-                class="mr-4"
-                @change="handleBrandChange"
-                @click:clear="clearBrandFilter"
-              >
-              </v-autocomplete>
-              <v-autocomplete
-                v-model="filter.sio_type"
-                :items="getSioTypeOptions"
-                item-text="name"
-                item-value="name"
-                label="Sio Type"
-                clearable
-                dense
-                outlined
-                hide-details
-                @change="handleSioTypeChange"
-                @click:clear="clearSioTypeFilter"
-              >
-              </v-autocomplete>
+              v-model="filter.brand"
+              :items="getBrandOptions"
+              item-text="brand"
+              item-value="brand"
+              label="Brand"
+              clearable
+              dense
+              outlined
+              hide-details
+              class="mr-4"
+              @change="handleBrandChange"
+              @click:clear="clearBrandFilter"
+            >
+            </v-autocomplete>
+            <v-autocomplete
+              v-model="filter.sio_type"
+              :items="getSioTypeOptions"
+              item-text="name"
+              item-value="name"
+              label="Sio Type"
+              clearable
+              dense
+              outlined
+              hide-details
+              @change="handleSioTypeChange"
+              @click:clear="clearSioTypeFilter"
+            >
+            </v-autocomplete>
           </div>
         </v-col>
         <v-spacer></v-spacer>
@@ -141,17 +143,18 @@
               class="small-table"
               @update:options="fetchData"
             >
-
               <template v-slot:item="{ item, index }">
                 <tr>
-                  <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+                  <td>
+                    {{ (options.page - 1) * options.itemsPerPage + index + 1 }}
+                  </td>
                   <td>
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.region }}
@@ -166,7 +169,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.area }}
@@ -181,7 +184,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.address_line }}
@@ -196,7 +199,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.outlet_code }}
@@ -211,7 +214,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.name }}
@@ -226,7 +229,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.brand }}
@@ -241,7 +244,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.outlet_type }}
@@ -256,7 +259,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.cycle }}
@@ -280,10 +283,7 @@
               </template>
             </v-data-table>
 
-            <v-row
-              justify="center"
-              class="py-3"
-            >
+            <v-row justify="center" class="py-3">
               <v-pagination
                 v-model="page"
                 :length="totalPages"
@@ -310,19 +310,20 @@
               class="small-table"
               @update:options="fetchData"
             >
-              <template v-slot:top>
-              </template>
+              <template v-slot:top> </template>
 
               <template v-slot:item="{ item, index }">
                 <tr>
-                  <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
+                  <td>
+                    {{ (options.page - 1) * options.itemsPerPage + index + 1 }}
+                  </td>
                   <td>
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.region }}
@@ -337,7 +338,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.area }}
@@ -352,7 +353,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.address_line }}
@@ -367,7 +368,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.outlet_code }}
@@ -382,7 +383,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.name }}
@@ -397,7 +398,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.brand }}
@@ -412,7 +413,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.sio_type }}
@@ -427,7 +428,7 @@
                         <span
                           v-bind="attrs"
                           class="text-truncate"
-                          style="max-width: 150px; display: inline-block;"
+                          style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
                           {{ item?.cycle }}
@@ -451,10 +452,7 @@
               </template>
             </v-data-table>
 
-            <v-row
-              justify="center"
-              class="py-3"
-            >
+            <v-row justify="center" class="py-3">
               <v-pagination
                 v-model="page"
                 :length="totalPages"
@@ -486,137 +484,165 @@
 </template>
 
 <script>
-  import { deleteOutlet, getAllOutlets, uploadOutlet } from '@/api/masterOutletService'
-  import { mapGetters } from "vuex";
-  import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-  import Vue from "vue";
-  import {createData, updateData} from "@/api/userService";
-  import ImportOutlet from "@/views/dashboard/pages/OutletMaster/components/ImportOutlet.vue";
+import {
+  deleteOutlet,
+  getAllOutlets,
+  uploadOutlet,
+} from "@/api/masterOutletService";
+import { mapGetters } from "vuex";
+import ConfirmDeleteDialog from "@/components/base/ConfirmDeleteDialog.vue";
+import Vue from "vue";
+import { createData, updateData } from "@/api/userService";
+import ImportOutlet from "@/views/dashboard/pages/OutletMaster/components/ImportOutlet.vue";
 
-  export default {
-    name: 'MasterOutlet',
-    components: {
-      ImportOutlet,
-      ConfirmDeleteDialog,
-    },
-    data () {
-      return {
-        activeTab: 1,
-        tabs: [
-          { name: 'Non Active', label: 'Non Active', value: 0 },
-          { name: 'Active', label: 'Active', value: 1 },
-        ],
-        tableHeaders: [
-          { text: 'No', value: 'number', sortable: false, class: 'text-left', width: '5%' },
-          {
-            text: 'Region',
-            value: 'region',
-            sortable: false,
-          },
-          {
-            text: 'Area',
-            value: 'area',
-            sortable: false,
-          },
-          {
-            text: 'Address',
-            value: 'address_line',
-            sortable: false,
-          },
-          {
-            text: 'Outlet Code',
-            value: 'outlet_code',
-            sortable: false,
-          },
-          {
-            text: 'Name',
-            value: 'name',
-            sortable: false,
-          },
-          {
-            text: 'Brand',
-            value: 'brand',
-            sortable: false,
-          },
-          {
-            text: 'Outlet Sio Type',
-            value: 'outlet_type',
-            sortable: false,
-          },
-          {
-            text: 'Cycle',
-            value: 'cycle',
-            sortable: false,
-          },
-          {
-            text: 'Action',
-            value: 'Action',
-            sortable: false,
-          },
-        ],
-        tableData: [],
-        totalItems: 0,
-        totalPages: 0,
-        page: 1,
-        options: { page: 1, itemsPerPage: 10 },
-        loading: false,
-        selectedItem: null,
-        isImportDialogOpen: false,
-        isFormRoleDialog: false,
-        isEdit: false,
-        isConfirmDeleteDialogOpen: false,
-        search: '',
-        regionOptions: [],
-        areaOptions: [],
-        filter: {
-          region: '',
-          area: '',
-          brand: '',
-          sio_type: '',
+export default {
+  name: "MasterOutlet",
+  components: {
+    ImportOutlet,
+    ConfirmDeleteDialog,
+  },
+  data() {
+    return {
+      activeTab: 1,
+      tabs: [
+        { name: "Non Active", label: "Non Active", value: 0 },
+        { name: "Active", label: "Active", value: 1 },
+      ],
+      tableHeaders: [
+        {
+          text: "No",
+          value: "number",
+          sortable: false,
+          class: "text-left",
+          width: "5%",
         },
-      }
-    },
-    computed: {
-      ...mapGetters(['getUser','getAreaOptions', 'getRegionOptions', 'getBrandOptions', 'getSioTypeOptions']),
-    },
-    watch: {
-      page(value) {
-        this.options.page = value;
-        this.fetchData();
+        {
+          text: "Region",
+          value: "region",
+          sortable: false,
+        },
+        {
+          text: "Area",
+          value: "area",
+          sortable: false,
+        },
+        {
+          text: "Address",
+          value: "address_line",
+          sortable: false,
+        },
+        {
+          text: "Outlet Code",
+          value: "outlet_code",
+          sortable: false,
+        },
+        {
+          text: "Name",
+          value: "name",
+          sortable: false,
+        },
+        {
+          text: "Brand",
+          value: "brand",
+          sortable: false,
+        },
+        {
+          text: "Outlet Sio Type",
+          value: "outlet_type",
+          sortable: false,
+        },
+        {
+          text: "Cycle",
+          value: "cycle",
+          sortable: false,
+        },
+        {
+          text: "Action",
+          value: "Action",
+          sortable: false,
+        },
+      ],
+      tableData: [],
+      totalItems: 0,
+      totalPages: 0,
+      page: 1,
+      options: { page: 1, itemsPerPage: 10 },
+      loading: false,
+      selectedItem: null,
+      isImportDialogOpen: false,
+      isFormRoleDialog: false,
+      isEdit: false,
+      isConfirmDeleteDialogOpen: false,
+      search: "",
+      regionOptions: [],
+      areaOptions: [],
+      filter: {
+        region: "",
+        area: "",
+        brand: "",
+        sio_type: "",
       },
-      itemsPerPage(value) {
-        this.options.itemsPerPage = value;
-        this.fetchData();
-      },
-      activeTab() {
-        this.options.page = 1;
-        this.page = 1;
-        this.fetchData();
-      },
-    },
-    mounted () {
-      this.fetchData()
-    },
-    methods: {
+    };
+  },
+  computed: {
+    ...mapGetters([
+      "getUser",
+      "getAreaOptions",
+      "getRegionOptions",
+      "getBrandOptions",
+      "getSioTypeOptions",
+    ]),
+    filteredAreaOptions() {
+      if (!this.filter.region) return this.getAreaOptions;
 
+      const selectedRegion = this.getRegionOptions.find(
+        (region) => region.name === this.filter.region
+      );
+
+      if (!selectedRegion) return this.getAreaOptions;
+
+      return this.getAreaOptions.filter(
+        (area) => area.region_id === selectedRegion.id
+      );
+    },
+  },
+  watch: {
+    page(value) {
+      this.options.page = value;
+      this.fetchData();
+    },
+    itemsPerPage(value) {
+      this.options.itemsPerPage = value;
+      this.fetchData();
+    },
+    activeTab() {
+      this.options.page = 1;
+      this.page = 1;
+      this.fetchData();
+    },
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
     clearBrandFilter() {
-      this.filter.brand = '';
+      this.filter.brand = "";
       this.fetchData();
     },
 
     clearSioTypeFilter() {
-      this.filter.sio_type = '';
+      this.filter.sio_type = "";
       this.fetchData();
     },
 
     clearRegionFilter() {
-      this.filter.region = '';
-      this.filter.area = '';
+      this.filter.region = "";
+      this.filter.area = "";
       this.fetchData();
     },
 
     clearAreaFilter() {
-      this.filter.area = '';
+      this.filter.area = "";
       this.fetchData();
     },
 
@@ -635,7 +661,7 @@
     async handleRegionChange(value) {
       this.options.page = 1;
       this.filter.region = value;
-      this.filter.area = '';
+      this.filter.area = "";
       await this.fetchData();
     },
 
@@ -644,124 +670,123 @@
       this.filter.area = value;
       await this.fetchData();
     },
-      async handleDetail(id) {
-        await this.$router.push({
-          name: 'Outlet Detail',
-          params: { id },
-        });
-      },
-      onPageChange(newPage) {
-        this.page = newPage;
-      },
-      openHandleAdd() {
-        this.isEdit = false;
-        this.selectedItem = null;
-        this.isFormRoleDialog = true;
-      },
-      openHandleUpdate(item) {
-        this.isEdit = true;
-        this.selectedItem = {
-          id: item.id,
+    async handleDetail(id) {
+      await this.$router.push({
+        name: "Outlet Detail",
+        params: { id },
+      });
+    },
+    onPageChange(newPage) {
+      this.page = newPage;
+    },
+    openHandleAdd() {
+      this.isEdit = false;
+      this.selectedItem = null;
+      this.isFormRoleDialog = true;
+    },
+    openHandleUpdate(item) {
+      this.isEdit = true;
+      this.selectedItem = {
+        id: item.id,
+      };
+      this.isFormRoleDialog = true;
+    },
+    async handleSave(item) {
+      try {
+        if (this.isEdit) {
+          const { id, ...itemWithoutId } = item;
+          await updateData(id, itemWithoutId);
+          Vue.prototype.$toast.success(`Update data Successfully!`);
+        } else {
+          await createData(item);
+          Vue.prototype.$toast.success(`Create data Successfully!`);
         }
-        this.isFormRoleDialog = true;
-      },
-      async handleSave(item) {
-        try {
-          if (this.isEdit) {
-            const { id, ...itemWithoutId } = item;
-            await updateData(id, itemWithoutId);
-            Vue.prototype.$toast.success(`Update data Successfully!`);
-          } else {
-            await createData(item);
-            Vue.prototype.$toast.success(`Create data Successfully!`);
-          }
-          this.closeFormDialog();
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`);
-        } finally {
-          await this.fetchData();
-        }
-      },
-      closeFormDialog() {
-        this.isFormRoleDialog = false;
-      },
-      async fetchData () {
-        this.loading = true
-        try {
-          if (this.getRegionOptions.length === 1) {
-          this.filter.region = this.getRegionOptions[0];
+        this.closeFormDialog();
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data.message}`);
+      } finally {
+        await this.fetchData();
+      }
+    },
+    closeFormDialog() {
+      this.isFormRoleDialog = false;
+    },
+    async fetchData() {
+      this.loading = true;
+      try {
+        if (this.getRegionOptions.length === 1) {
+          this.filter.region = this.getRegionOptions[0].name;
         }
         if (this.getAreaOptions.length === 1) {
-          this.filter.area = this.getAreaOptions[0];
+          this.filter.area = this.getAreaOptions[0].area;
         }
-          const response = await getAllOutlets({
-            page: this.options.page,
-            limit: this.options.itemsPerPage,
-            searchTerm: this.search,
-            isActive: this.activeTab,
-            filter: this.filter,
-          });
-          this.tableData = response.data.data;
-          this.totalItems = response.data.totalItems;
-          this.totalPages = response.data.totalPages;
-          this.options.page = response.data.currentPage;
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
-        } finally {
-          this.loading = false
-        }
-      },
-      openImportDialog () {
-        this.isImportDialogOpen = true
-      },
-      closeImportDialog () {
-        this.isImportDialogOpen = false
-      },
-      async handleImportSubmit (data)
-      {
-        this.loading = true
-        try {
-          await uploadOutlet(data);
-          Vue.prototype.$toast.success(`Upload data Successfully!`);
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
-        } finally {
-          this.loading = false
-          await this.fetchData()
-        }
-      },
-      handleSearch() {
-        this.options.page = 1;
-        this.fetchData();
-      },
-      handleClearSearch() {
-        this.search = '';
-        this.options.page = 1;
-        this.fetchData();
-      },
-      openConfirmDeleteDialog(item) {
-        this.selectedItem = item;
-        this.isConfirmDeleteDialogOpen = true;
-      },
-      closeConfirmDeleteDialog() {
-        this.isConfirmDeleteDialogOpen = false;
-      },
-      async handleDelete() {
-        this.loading = true;
-        const data = this.selectedItem;
-        try {
-          await deleteOutlet(data.id);
-          Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`);
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data?.message}`);
-        } finally {
-          this.loading = false;
-          this.closeConfirmDeleteDialog();
-          await this.fetchData();
-        }
-      },
+        const response = await getAllOutlets({
+          page: this.options.page,
+          limit: this.options.itemsPerPage,
+          searchTerm: this.search,
+          isActive: this.activeTab,
+          filter: this.filter,
+        });
+        this.tableData = response.data.data;
+        this.totalItems = response.data.totalItems;
+        this.totalPages = response.data.totalPages;
+        this.options.page = response.data.currentPage;
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data.message}`);
+      } finally {
+        this.loading = false;
+      }
     },
-  }
+    openImportDialog() {
+      this.isImportDialogOpen = true;
+    },
+    closeImportDialog() {
+      this.isImportDialogOpen = false;
+    },
+    async handleImportSubmit(data) {
+      this.loading = true;
+      try {
+        await uploadOutlet(data);
+        Vue.prototype.$toast.success(`Upload data Successfully!`);
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data.message}`);
+      } finally {
+        this.loading = false;
+        await this.fetchData();
+      }
+    },
+    handleSearch() {
+      this.options.page = 1;
+      this.fetchData();
+    },
+    handleClearSearch() {
+      this.search = "";
+      this.options.page = 1;
+      this.fetchData();
+    },
+    openConfirmDeleteDialog(item) {
+      this.selectedItem = item;
+      this.isConfirmDeleteDialogOpen = true;
+    },
+    closeConfirmDeleteDialog() {
+      this.isConfirmDeleteDialogOpen = false;
+    },
+    async handleDelete() {
+      this.loading = true;
+      const data = this.selectedItem;
+      try {
+        await deleteOutlet(data.id);
+        Vue.prototype.$toast.success(`Deleted ${data.username} successfully!`);
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data?.message}`);
+      } finally {
+        this.loading = false;
+        this.closeConfirmDeleteDialog();
+        await this.fetchData();
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>

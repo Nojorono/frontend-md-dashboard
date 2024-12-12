@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import logo from '../public/logo-nna.png'
-import { getOutletArea, getOutletRegion } from "@/api/masterOutletService";
 import { getAllBrand } from "@/api/brandService";
 import { getAllSio } from "@/api/sioService";
+import { findLast } from "@/api/batchService";
+import { getAllRegion, getAllArea } from "@/api/regionAreaService";
 
 Vue.use(Vuex)
 
@@ -23,6 +24,7 @@ export default new Vuex.Store({
     areaOptions: JSON.parse(localStorage.getItem('areaOptions')) || [],
     brandOptions: JSON.parse(localStorage.getItem('brandOptions')) || [],
     sioTypeOptions: JSON.parse(localStorage.getItem('sioTypeOptions')) || [],
+    codeBatch: JSON.parse(localStorage.getItem('codeBatch')) || null,
   },
   mutations: {
     SET_BAR_IMAGE (state, payload) {
@@ -59,28 +61,38 @@ export default new Vuex.Store({
     SET_SIO_TYPE_OPTIONS(state, payload) {
       state.sioTypeOptions = payload
     },
+    SET_CODE_BATCH(state, payload) {
+      state.codeBatch = payload
+    },
   },
   actions: {
+    async fetchCodeBatch({ commit, state }) {
+      if (state.user) {
+        const response = await findLast();
+        commit('SET_CODE_BATCH', response.data)
+        localStorage.setItem('codeBatch', JSON.stringify(response.data))
+      }
+    },
     async fetchRegionOptions({ commit, state }) {
-      const response = await getOutletRegion();
+      const response = await getAllRegion();
       if (state.user.region) {
-        const data = response.data.filter(region => region === state.user.region) 
+        const data = response.data.data.filter(region => region.name === state.user.region) 
         commit('SET_REGION_OPTIONS', data)
         localStorage.setItem('regionOptions', JSON.stringify(data))
       } else {
-        commit('SET_REGION_OPTIONS', response.data)
-        localStorage.setItem('regionOptions', JSON.stringify(response.data))
+        commit('SET_REGION_OPTIONS', response.data.data)
+        localStorage.setItem('regionOptions', JSON.stringify(response.data.data))
       }
     },
     async fetchAreaOptions({ commit, state }) {
-      const response = await getOutletArea();
+      const response = await getAllArea();
       if (Array.isArray(state.user.area) && state.user.area.length > 0) {
-        const data = response.data.filter(area => state.user.area.includes(area))
+        const data = response.data.data.filter(area => state.user.area.includes(area.area))
         commit('SET_AREA_OPTIONS', data)
         localStorage.setItem('areaOptions', JSON.stringify(data))
       } else {
-        commit('SET_AREA_OPTIONS', response.data)
-        localStorage.setItem('areaOptions', JSON.stringify(response.data))
+        commit('SET_AREA_OPTIONS', response.data.data)
+        localStorage.setItem('areaOptions', JSON.stringify(response.data.data))
       }
     },
     async fetchBrandOptions({ commit, state }) {
@@ -139,5 +151,6 @@ export default new Vuex.Store({
     getAreaOptions: (state) => state.areaOptions,
     getBrandOptions: (state) => state.brandOptions,
     getSioTypeOptions: (state) => state.sioTypeOptions,
+    getCodeBatch: (state) => state.codeBatch,
   },
 })

@@ -74,6 +74,23 @@
               </div>
             </td>
             <td>{{ item?.sog.length }}</td>
+            <td>
+              <div>
+                <v-chip
+                  v-for="(branch, indexBranch) in item?.branch"
+                  :key="indexBranch"
+                  small
+                  outlined
+                  class="ma-1"
+                >
+                  {{ branch }}
+                </v-chip>
+              </div>
+            </td>
+            <td>{{ item?.branch.length }}</td>
+            <td :style="{ color: item?.color }">
+              <v-icon size="1rem" :color="item?.color">mdi-square</v-icon>
+            </td>
             <td
               class="d-flex"
               style="align-items: center"
@@ -151,7 +168,10 @@ export default {
         { text: "No", value: "no" },
         { text: "Brand", value: "brand" },
         { text: "SOG", value: "sog" },
-        { text: "Total SOG", value: "total" },
+        { text: "Total SOG", value: "totalSog" },
+        { text: "Branch", value: "branch" },
+        { text: "Total Branch", value: "totalBranch" },
+        { text: "Color", value: "color" },
         { text: "Action", value: "action" },
       ],
       tableData: [],
@@ -209,6 +229,8 @@ export default {
         id: item.id,
         brand: item.brand,
         sog: item.sog,
+        branch: item.branch,
+        color: item.color,
       }
       this.isFormRoleDialog = true
     },

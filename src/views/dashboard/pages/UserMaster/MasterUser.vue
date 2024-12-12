@@ -56,9 +56,9 @@
               </v-autocomplete>
               <v-autocomplete
                 v-model="filter.area"
-                :items="getAreaOptions"
-                item-text="name"
-                item-value="name"
+                :items="filteredAreaOptions"
+                item-text="area"
+                item-value="area"
                 label="Area"
                 :disabled="!filter.region"
                 :loading="areaLoading"
@@ -264,6 +264,19 @@ export default {
 
   computed: {
     ...mapGetters(['getRegionOptions', 'getAreaOptions']),
+    filteredAreaOptions() {
+      if (!this.filter.region) return this.getAreaOptions;
+
+      const selectedRegion = this.getRegionOptions.find(
+        (region) => region.name === this.filter.region
+      );
+
+      if (!selectedRegion) return this.getAreaOptions;
+
+      return this.getAreaOptions.filter(
+        (area) => area.region_id === selectedRegion.id
+      );
+    },
   },
 
   mounted() {
@@ -372,10 +385,10 @@ export default {
       this.loading = true;
       try {
         if (this.getRegionOptions.length === 1) {
-          this.filter.region = this.getRegionOptions[0];
+          this.filter.region = this.getRegionOptions[0].name;
         }
         if (this.getAreaOptions.length === 1) {
-          this.filter.area = this.getAreaOptions[0];
+          this.filter.area = this.getAreaOptions[0].area;
         }
         const response = await getAll({
           page: this.options.page,

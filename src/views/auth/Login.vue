@@ -7,21 +7,25 @@
             :src="imagePath"
             cover
             class="responsive-cover-img"
-            style="border-radius: 20px;"
+            style="border-radius: 20px"
           />
         </v-col>
         <v-col
-          justify="center" 
+          justify="center"
           class="login-filled"
-          style="justify-content: center; align-content: center; text-align: -webkit-center;"
+          style="
+            justify-content: center;
+            align-content: center;
+            text-align: -webkit-center;
+          "
         >
           <v-card
             class="elevation-12 login-card"
-            style="padding: 20px; max-width: 600px; border-radius: 20px;"
+            style="padding: 20px; max-width: 600px; border-radius: 20px"
           >
             <v-card-title
               class="headline text-center black--text"
-              style="padding: 20px; justify-content: center;"
+              style="padding: 20px; justify-content: center"
             >
               <v-img
                 :src="imagePathLogo"
@@ -29,7 +33,6 @@
                 max-height="100"
                 class="mb-4"
               />
-             
             </v-card-title>
             <v-card-text>
               <v-form
@@ -88,7 +91,10 @@
                   />
                 </v-col>
                 <v-col cols="auto">
-                  <router-link to="/forgot-password" class="forgot-password-link">
+                  <router-link
+                    to="/forgot-password"
+                    class="forgot-password-link"
+                  >
                     Forgot Password?
                   </router-link>
                 </v-col>
@@ -102,30 +108,31 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import { Login } from '@/api/authService'
+import { mapActions } from "vuex";
+import { Login } from "@/api/authService";
 import Vue from "vue";
-import loginImage from '@/assets/login-nna.png';
+import loginImage from "@/assets/login-nna.png";
 
 export default {
-  name: 'Login',
+  name: "Login",
   data() {
     return {
-      imagePathLogo: '/logo-nna.png',
+      imagePathLogo: "/logo-nna.png",
       imagePath: loginImage,
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       valid: false,
       showPassword: false,
       rememberMe: false,
       loading: false,
       rules: {
-        required: value => !!value || 'This field is required',
-        email: value => {
-          const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-          return pattern.test(value) || 'Please enter a valid email address'
+        required: (value) => !!value || "This field is required",
+        email: (value) => {
+          const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return pattern.test(value) || "Please enter a valid email address";
         },
-        minLength: v => v.length >= 6 || 'Password must be at least 6 characters'
+        minLength: (v) =>
+          v.length >= 6 || "Password must be at least 6 characters",
       },
     };
   },
@@ -133,8 +140,8 @@ export default {
     this.checkRememberedCredentials();
   },
   methods: {
-    ...mapActions(['login', 'showLoading', 'hideLoading']),
-    
+    ...mapActions(["login", "showLoading", "hideLoading"]),
+
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
@@ -142,18 +149,19 @@ export default {
     async initializeApp() {
       try {
         await Promise.all([
-          this.$store.dispatch('fetchBrandOptions'),
-          this.$store.dispatch('fetchSioTypeOptions'),
-          this.$store.dispatch('fetchRegionOptions'),
-          this.$store.dispatch('fetchAreaOptions')
+          this.$store.dispatch("fetchBrandOptions"),
+          this.$store.dispatch("fetchSioTypeOptions"),
+          this.$store.dispatch("fetchRegionOptions"),
+          this.$store.dispatch("fetchAreaOptions"),
+          this.$store.dispatch("fetchCodeBatch"),
         ]);
       } catch (error) {
-        Vue.prototype.$toast.error('Failed to initialize application');
+        Vue.prototype.$toast.error("Failed to initialize application");
       }
     },
 
     checkRememberedCredentials() {
-      const savedEmail = localStorage.getItem('rememberedEmail');
+      const savedEmail = localStorage.getItem("rememberedEmail");
       if (savedEmail) {
         this.email = savedEmail;
         this.rememberMe = true;
@@ -162,9 +170,9 @@ export default {
 
     saveCredentials() {
       if (this.rememberMe) {
-        localStorage.setItem('rememberedEmail', this.email);
+        localStorage.setItem("rememberedEmail", this.email);
       } else {
-        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem("rememberedEmail");
       }
     },
 
@@ -176,7 +184,7 @@ export default {
 
       try {
         const response = await Login(this.email, this.password);
-        
+
         if (response.data.statusCode === 404) {
           Vue.prototype.$toast.error(response.data.message);
           return;
@@ -184,18 +192,19 @@ export default {
 
         if (response.statusCode === 200) {
           this.saveCredentials();
-          Vue.prototype.$toast.success('Login Successful! Redirecting...');
-          await this.login({ 
-            token: response.data.accessToken, 
-            user: response.data.user 
+          Vue.prototype.$toast.success("Login Successful! Redirecting...");
+          await this.login({
+            token: response.data.accessToken,
+            user: response.data.user,
           });
           await this.initializeApp();
           setTimeout(() => {
-            this.$router.push('/');
+            this.$router.push("/");
           }, 1500);
         }
       } catch (error) {
-        const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
+        const errorMessage =
+          error.response?.data?.message || "Login failed. Please try again.";
         Vue.prototype.$toast.error(errorMessage);
       } finally {
         this.loading = false;
@@ -239,12 +248,12 @@ export default {
 
 .login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .responsive-cover-img {
   height: 96vh;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -252,7 +261,7 @@ export default {
   .img-filled {
     display: none;
   }
-  
+
   .login-filled {
     width: 100%;
   }
