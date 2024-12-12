@@ -28,6 +28,7 @@ export const EXISTING_SURVEY_STATUS = {
 
   [STATUS_PIC_REJECTED]: 'Ditolak PIC',
   [STATUS_HO_REJECTED]: 'Ditolak HO',
+  [STATUS_HO_PROCESSING]: 'Proses HO',
   [STATUS_CANCELLED]: 'Schedule Dibatalkan',
 };
 
@@ -64,4 +65,12 @@ export const STATUS_COLORS = {
   [STATUS_COMPLETED]: 'success',
   [STATUS_OUTLET_AGREED]: 'success',
   [STATUS_APPROVED]: 'success',
+};
+
+export const getStatusLabel = (value) => {
+  return EXISTING_SURVEY_STATUS[value] ? EXISTING_SURVEY_STATUS[value] : NEW_SURVEY_STATUS[value];
+};
+
+export const getStatusColor = (status) => {
+  return STATUS_COLORS[status];
 };

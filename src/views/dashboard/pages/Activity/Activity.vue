@@ -20,10 +20,11 @@
             class="justify-space-between align-center px-4 py-3"
           >
             <v-col
-              cols="4"
+              cols="7"
               class="d-flex align-center"
             >
               <v-autocomplete
+                v-model="filter.region"
                 item-text="name"
                 item-value="name"
                 label="Region"
@@ -34,6 +35,7 @@
                 class="mr-4"
                 hide-details
                 return-object
+                @change="handleFilterChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -42,6 +44,7 @@
                 </template>
               </v-autocomplete>
               <v-autocomplete
+                v-model="filter.area"
                 item-text="name"
                 item-value="name"
                 label="Area"
@@ -51,6 +54,8 @@
                 outlined
                 hide-details
                 return-object
+                class="mr-4"
+                @change="handleFilterChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -58,8 +63,26 @@
                   </v-list-item>
                 </template>
               </v-autocomplete>
+              <v-autocomplete
+                v-model="filter.status"
+                :items="statusOptions"
+                label="Status"
+                clearable
+                dense
+                outlined
+                hide-details
+                :item-text="(item) => getStatusLabelOption(item.value)"
+                item-value="value"
+                @change="handleFilterChange"
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-content>Status not found</v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="3">
               <v-text-field
                 v-model="search"
                 label="Search"
@@ -67,11 +90,12 @@
                 outlined
                 hide-details
                 clearable
-                append-icon="mdi-magnify"
-                @click:append="handleSearch"
+                prepend-inner-icon="mdi-magnify"
+                @keyup.enter="handleSearch"
+                @click:clear="handleClearSearch"
               />
             </v-col>
-            <v-col cols="4" class="d-flex justify-end">
+            <v-col cols="1" class="d-flex justify-end">
               <v-btn
                 icon
                 color="primary"
@@ -98,6 +122,8 @@
                 {{ item?.outlet_name ? 'Existing' : 'New' }}
               </v-chip>
             </td>
+            <td class="font-weight-medium">{{ item?.code_batch }}</td>
+            <td class="font-weight-medium">{{ item?.user_name }}</td>
             <td class="font-weight-medium">{{ item?.outlet_name || item?.survey_name }}</td>
             <td>{{ item?.region }}</td>
             <td>{{ item?.area }}</td>
@@ -143,7 +169,7 @@
                     </v-btn>
                   </template>
                   <v-list dense>
-                    <template v-if="getUser?.roles === 'ADMIN' || getUser?.roles === 'NASIONAL'">
+                    <template v-if="(getUser?.roles === 'ADMIN' || getUser?.roles === 'NASIONAL' || getUser?.roles === 'SUPERADMIN') && item?.status === 101">
                       <v-list-item
                         v-for="(status, index) in statusLevel2Options"
                         :key="index"
@@ -157,7 +183,7 @@
                         <v-list-item-title>{{ getStatusLabelOption(status.value) }}</v-list-item-title>
                       </v-list-item>
                     </template>
-                    <template v-else-if="getUser?.roles === 'AMO' || getUser?.roles === 'REGIONAL' || getUser?.roles === 'TL'">
+                    <template v-else-if="(getUser?.roles === 'AMO' || getUser?.roles === 'REGIONAL' || getUser?.roles === 'TL') && item?.status === 101">
                       <v-list-item
                         v-for="(status, index) in statusLevel1Options"
                         :key="index"
@@ -173,8 +199,7 @@
                       </v-list-item>
                     </template>
                     <template v-else>
-                      <v-list-item
-                      >
+                      <v-list-item>
                         <v-list-item-icon class="mr-2">
                             <v-icon small>mdi-circle-small</v-icon>
                         </v-list-item-icon>
@@ -226,7 +251,7 @@
 
 <script>
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-  import { createData, deleteData, updateData, getAll } from '@/api/activityService'
+  import { createData, deleteData, updateData, getAll, updateStatus } from '@/api/activityService'
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
   import Vue from "vue";
   import { mapGetters } from "vuex";
@@ -243,7 +268,9 @@
         refreshDataTrigger : false,
         tableHeaders: [
           { text: 'No', value: 'number', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
-          { text: 'Type', value: 'type', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+          { text: 'Type', value: 'type', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
+          { text: 'Code Batch', value: 'code_batch', sortable: false, class: 'text-left font-weight-bold', width: '12%' },
+          { text: 'MD', value: 'user_name', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
           { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
           { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
           { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
@@ -266,6 +293,22 @@
         search: '',
         regionOptions: [],
         areaOptions: [],
+        statusOptions: [
+          // { value: 100 }, // STATUS_PROCESSING
+          { value: 101 }, // STATUS_HO_PROCESSING
+          // { value: 400 }, // STATUS_NOT_VISITED 
+          { value: 401 }, // STATUS_TEMP_CLOSED
+          { value: 402 }, // STATUS_PERM_CLOSED
+          { value: 403 }, // STATUS_NOT_FOUND
+          { value: 404 }, // STATUS_REJECTED
+          // { value: 405 }, // STATUS_CANCELLED
+          { value: 406 }, // STATUS_PIC_REJECTED
+          { value: 407 }, // STATUS_HO_REJECTED
+          { value: 200 }, // STATUS_VISITED
+          { value: 201 }, // STATUS_COMPLETED
+          { value: 202 }, // STATUS_OUTLET_AGREED
+          { value: 203 }, // STATUS_APPROVED
+        ],
         statusLevel1Options: [
           { value: 101 },
           { value: 406 },
@@ -278,6 +321,11 @@
         statusUpdate: '',
         statusUpdateItem: null,
         menu: false,
+        filter: {
+          region: '',
+          area: '',
+          status: '',
+        },
       }
     },
     computed: {
@@ -295,6 +343,10 @@
     },
   
     methods: {
+      handleFilterChange() {
+        this.options.page = 1;
+        this.fetchData();
+      },
       getStatusLabel(item) {
         return item?.outlet_name ? EXISTING_SURVEY_STATUS[item?.status] : NEW_SURVEY_STATUS[item?.status];
       },
@@ -360,6 +412,11 @@
         this.options.page = 1;
         this.fetchData();
       },
+      handleClearSearch() {
+        this.search = '';
+        this.options.page = 1;
+        this.fetchData();
+      },
       async fetchData() {
         this.loading = true
         try {
@@ -367,6 +424,7 @@
             page: this.options.page,
             limit: this.options.itemsPerPage,
             searchTerm: this.search,
+            filter: this.filter,
           });
           this.tableData = response.data.result;
           this.totalItems = response.data.totalRecords;
@@ -407,8 +465,20 @@
           await this.fetchData()
         }
       },
-      updateStatus(item, status) {
-        item.status = status;
+      async updateStatus(item, status) {
+        const data = {
+          status: status,
+        }
+        try {
+          const res = await updateStatus(item.id, data)
+          if (res.statusCode === 200) {
+            Vue.prototype.$toast.success(`Update status Successfully!`)
+            await this.fetchData()
+          }
+        } catch (error) {
+          Vue.prototype.$toast.error(`${error.data.message}`)
+          console.error(error)
+        }
       },
     },
   }

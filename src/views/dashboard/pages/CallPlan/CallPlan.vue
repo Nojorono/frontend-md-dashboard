@@ -266,19 +266,17 @@
       },
       async handleSave(item) {
         try {
+          let res;
           if (this.isEdit) {
             const { id, ...itemWithoutId } = item
-            const res  = await updateData(id, itemWithoutId)
-            if (res.statusCode === 200) {
-              Vue.prototype.$toast.success(`Update data Successfully!`)
-              this.closeFormDialog()
-            }
+            res = await updateData(id, itemWithoutId)
           } else {
-            const res = await createData(item)
-            if (res.statusCode === 200) {
-              Vue.prototype.$toast.success(`Create data Successfully!`)
-              this.closeFormDialog()
-            }
+            res = await createData(item)
+          }
+
+          if (res.statusCode === 200 || res.statusCode === 201) {
+            Vue.prototype.$toast.success(`${this.isEdit ? 'Update' : 'Create'} data Successfully!`)
+            this.closeFormDialog()
           }
         } catch (error) {
           Vue.prototype.$toast.error(`${error.data.message}`)

@@ -173,11 +173,16 @@
                           <v-list-item-content>
                             <div class="d-flex align-start mb-2">
                               <v-icon left>mdi-clipboard-text</v-icon>
-                              <div class="d-flex flex-column justify-start">
-                                <div class="font-weight-bold" style="font-size: 1.2rem; padding-bottom: 3px;">Activity {{ activity.id }}</div>
+                              <div class="d-flex flex-column justify-start" style="gap: 5px;">
+                                <div class="font-weight-bold" style="font-size: 1.2rem; padding-bottom: 3px;">Activity {{ activity.id }} - MD {{ activity.created_by }}</div>
                                 <div class="caption grey--text" style="padding-bottom: 3px;">{{ formatDate(activity.start_time) }} - {{ formatDate(activity.end_time) }}</div>
-                                <div class="caption grey--text" style="padding-bottom: 3px;">{{ activity.status }}</div>
-                                <div class="caption grey--text" style="padding-bottom: 3px;">{{ activity.created_by }}</div>
+                                <div class="caption" :class="`${getActivityStatusColor(activity.status)}--text`" style="padding-bottom: 3px;">{{ getActivityStatusLabel(activity.status) }}</div>
+                          
+                                <div class="d-flex align-center justify-space-between pt-2">
+                                  <v-icon left>mdi-comment</v-icon>
+                                  <v-chip small color="error">{{ activity.comments?.length || 0 }} Comments</v-chip>
+                                  <div class="px-2 caption grey--text"> Last Comment {{ formatDate(activity.comments[0].created_at) }}</div>
+                                </div>
                               </div>
                               <v-btn style="margin-left: auto;" icon small @click="handleActivityDetail(activity.id)">
                                 <v-icon>mdi-chevron-right</v-icon>
@@ -224,6 +229,7 @@
 
 <script>
 import { getOutletById, updateOutletStatus } from '@/api/masterOutletService';
+import { getStatusLabel, getStatusColor } from '@/constants/status';
 import Vue from 'vue';
 
 export default {
@@ -236,27 +242,6 @@ export default {
       loading: false,
       switchLoading: false,
       activities: [
-        {
-          text: "Activity 1",
-          timestamp: new Date(),
-          comments: [
-            { user: "Admin", text: "Welcome back!" },
-            { user: "User1", text: "Thanks!" },
-            { user: "User2", text: "Good to see you!" },
-            { user: "User3", text: "Happy to be here!" },
-          ],
-          newComment: "",
-          showAllComments: false,
-        },
-        {
-          text: "Activity 2",
-          timestamp: new Date(),
-          comments: [
-            { user: "Admin", text: "Profile updated successfully" },
-          ],
-          newComment: "",
-          showAllComments: false,
-        },
       ],
     };
   },
@@ -291,6 +276,14 @@ export default {
   },
 
   methods: {
+    getActivityStatusLabel(status) {
+      return getStatusLabel(status);
+    },
+
+    getActivityStatusColor(status) {
+      return getStatusColor(status);
+    },
+
     handleActivityDetail(id) {
       this.$router.push(`/activity/detail/${id}`);
     },

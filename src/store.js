@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import logo from '../public/logo-nna.png'
 import { getOutletArea, getOutletRegion } from "@/api/masterOutletService";
+import { getAllBrand } from "@/api/brandService";
+import { getAllSio } from "@/api/sioService";
 
 Vue.use(Vuex)
 
@@ -19,6 +21,8 @@ export default new Vuex.Store({
     type: 'success',
     regionOptions: JSON.parse(localStorage.getItem('regionOptions')) || [],
     areaOptions: JSON.parse(localStorage.getItem('areaOptions')) || [],
+    brandOptions: JSON.parse(localStorage.getItem('brandOptions')) || [],
+    sioTypeOptions: JSON.parse(localStorage.getItem('sioTypeOptions')) || [],
   },
   mutations: {
     SET_BAR_IMAGE (state, payload) {
@@ -49,6 +53,12 @@ export default new Vuex.Store({
     SET_AREA_OPTIONS(state, payload) {
       state.areaOptions = payload
     },
+    SET_BRAND_OPTIONS(state, payload) {
+      state.brandOptions = payload
+    },
+    SET_SIO_TYPE_OPTIONS(state, payload) {
+      state.sioTypeOptions = payload
+    },
   },
   actions: {
     async fetchRegionOptions({ commit, state }) {
@@ -71,6 +81,28 @@ export default new Vuex.Store({
       } else {
         commit('SET_AREA_OPTIONS', response.data)
         localStorage.setItem('areaOptions', JSON.stringify(response.data))
+      }
+    },
+    async fetchBrandOptions({ commit, state }) {
+      const response = await getAllBrand();
+      if (state.user) {
+        const data = response.data.data
+        commit('SET_BRAND_OPTIONS', data)
+        localStorage.setItem('brandOptions', JSON.stringify(data))
+      } else {
+        commit('SET_BRAND_OPTIONS', response.data.data)
+        localStorage.setItem('brandOptions', JSON.stringify(response.data.data))
+      }
+    },
+    async fetchSioTypeOptions({ commit, state }) {
+      const response = await getAllSio();
+      if (state.user) {
+        const data = response.data.data
+        commit('SET_SIO_TYPE_OPTIONS', data)
+        localStorage.setItem('sioTypeOptions', JSON.stringify(data))
+      } else {
+        commit('SET_SIO_TYPE_OPTIONS', response.data.data)
+        localStorage.setItem('sioTypeOptions', JSON.stringify(response.data.data))
       }
     },
     // Action to log in
@@ -105,5 +137,7 @@ export default new Vuex.Store({
     getLoading: (state) => state.loading,
     getRegionOptions: (state) => state.regionOptions,
     getAreaOptions: (state) => state.areaOptions,
+    getBrandOptions: (state) => state.brandOptions,
+    getSioTypeOptions: (state) => state.sioTypeOptions,
   },
 })

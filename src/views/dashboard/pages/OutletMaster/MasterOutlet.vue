@@ -20,16 +20,6 @@
             </v-tab>
           </v-tabs>
         </v-col>
-        
-        <v-btn
-          icon
-          color="primary"
-          class="mx-2"
-          :loading="loading"
-          @click="fetchData"
-        >
-          <v-icon size="24">mdi-refresh</v-icon>
-        </v-btn>
 
         <v-col cols="6">
           <div class="d-flex justify-end align-center">
@@ -67,8 +57,75 @@
               </v-autocomplete>
           </div>
         </v-col>
+        <v-btn
+          fab
+          small
+          color="primary"
+          class="mx-2 align-self-center"
+          :loading="loading"
+          @click="fetchData"
+        >
+          <v-icon size="24">mdi-refresh</v-icon>
+        </v-btn>
       </v-row>
-
+      <v-row align="center" style="margin-top: -10px; margin-bottom: 5px;">
+        <v-col cols="4">
+          <v-text-field
+            v-model="search"
+            label="Search"
+            dense
+            outlined
+            hide-details
+            clearable
+            prepend-inner-icon="mdi-magnify"
+            @keyup.enter="handleSearch"
+            @click:clear="handleClearSearch"
+          />
+        </v-col>
+        <v-col cols="6">
+          <div class="d-flex justify-end align-center">
+            <v-autocomplete
+                v-model="filter.brand"
+                :items="getBrandOptions" 
+                item-text="brand"
+                item-value="brand"
+                label="Brand"
+                clearable
+                dense
+                outlined
+                hide-details
+                class="mr-4"
+                @change="handleBrandChange"
+                @click:clear="clearBrandFilter"
+              >
+              </v-autocomplete>
+              <v-autocomplete
+                v-model="filter.sio_type"
+                :items="getSioTypeOptions"
+                item-text="name"
+                item-value="name"
+                label="Sio Type"
+                clearable
+                dense
+                outlined
+                hide-details
+                @change="handleSioTypeChange"
+                @click:clear="clearSioTypeFilter"
+              >
+              </v-autocomplete>
+          </div>
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-btn
+          v-if="activeTab === 1"
+          color="primary"
+          class="text-none"
+          @click="openImportDialog()"
+        >
+          <v-icon left>mdi-plus-box-multiple</v-icon>
+          Import
+        </v-btn>
+      </v-row>
       <!-- Tab Content -->
       <v-tabs-items v-model="activeTab">
         <v-tab-item>
@@ -84,23 +141,6 @@
               class="small-table"
               @update:options="fetchData"
             >
-              <template v-slot:top>
-                <v-row class="px-4 py-2" align="center">
-                  <v-col cols="4">
-                    <v-text-field
-                      v-model="search"
-                      label="Search"
-                      dense
-                      outlined
-                      hide-details
-                      clearable
-                      prepend-inner-icon="mdi-magnify"
-                      @keyup.enter="handleSearch"
-                      @click:clear="handleClearSearch"
-                    />
-                  </v-col>
-                </v-row>
-              </template>
 
               <template v-slot:item="{ item, index }">
                 <tr>
@@ -271,30 +311,6 @@
               @update:options="fetchData"
             >
               <template v-slot:top>
-                <v-row class="px-4 py-2" align="center">
-                  <v-col cols="4">
-                    <v-text-field
-                      v-model="search"
-                      label="Search"
-                      dense
-                      outlined
-                      hide-details
-                      clearable
-                      prepend-inner-icon="mdi-magnify"
-                      @keyup.enter="handleSearch"
-                      @click:clear="handleClearSearch"
-                    />
-                  </v-col>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="primary"
-                    class="text-none"
-                    @click="openImportDialog()"
-                  >
-                    <v-icon left>mdi-plus-box-multiple</v-icon>
-                    Import
-                  </v-btn>
-                </v-row>
               </template>
 
               <template v-slot:item="{ item, index }">
@@ -495,38 +511,47 @@
           {
             text: 'Region',
             value: 'region',
+            sortable: false,
           },
           {
             text: 'Area',
             value: 'area',
+            sortable: false,
           },
           {
             text: 'Address',
             value: 'address_line',
+            sortable: false,
           },
           {
             text: 'Outlet Code',
             value: 'outlet_code',
+            sortable: false,
           },
           {
             text: 'Name',
             value: 'name',
+            sortable: false,
           },
           {
             text: 'Brand',
             value: 'brand',
+            sortable: false,
           },
           {
             text: 'Outlet Sio Type',
             value: 'outlet_type',
+            sortable: false,
           },
           {
             text: 'Cycle',
             value: 'cycle',
+            sortable: false,
           },
           {
             text: 'Action',
             value: 'Action',
+            sortable: false,
           },
         ],
         tableData: [],
@@ -546,11 +571,13 @@
         filter: {
           region: '',
           area: '',
+          brand: '',
+          sio_type: '',
         },
       }
     },
     computed: {
-      ...mapGetters(['getUser','getAreaOptions', 'getRegionOptions']),
+      ...mapGetters(['getUser','getAreaOptions', 'getRegionOptions', 'getBrandOptions', 'getSioTypeOptions']),
     },
     watch: {
       page(value) {
@@ -572,6 +599,16 @@
     },
     methods: {
 
+    clearBrandFilter() {
+      this.filter.brand = '';
+      this.fetchData();
+    },
+
+    clearSioTypeFilter() {
+      this.filter.sio_type = '';
+      this.fetchData();
+    },
+
     clearRegionFilter() {
       this.filter.region = '';
       this.filter.area = '';
@@ -580,6 +617,18 @@
 
     clearAreaFilter() {
       this.filter.area = '';
+      this.fetchData();
+    },
+
+    handleBrandChange(value) {
+      this.options.page = 1;
+      this.filter.brand = value;
+      this.fetchData();
+    },
+
+    handleSioTypeChange(value) {
+      this.options.page = 1;
+      this.filter.sio_type = value;
       this.fetchData();
     },
 

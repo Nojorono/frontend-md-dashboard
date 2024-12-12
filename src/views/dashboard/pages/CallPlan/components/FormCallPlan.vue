@@ -259,7 +259,6 @@ export default {
       try {
         this.loading = true;
         await this.$emit("save", { ...this.itemData });
-        this.$toast.success(`Call Plan successfully ${this.isEdit ? 'updated' : 'created'}`);
         this.closeDialog();
       } catch (error) {
         this.$toast.error(`Failed to ${this.isEdit ? 'update' : 'create'} Call Plan`);

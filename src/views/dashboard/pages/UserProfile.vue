@@ -9,18 +9,18 @@
         cols="12"
         md="8"
       >
-        <base-material-card class="elevation-10">
+        <base-material-card class="elevation-10" color="primary">
           <template v-slot:heading>
-            <div class="display-2 font-weight-light primary--text">
+            <div class="display-2 font-weight-light white--text">
               Edit Profile
             </div>
-            <div class="subtitle-1 font-weight-light grey--text">
+            <div class="subtitle-1 font-weight-light white--text">
               Complete your profile information
             </div>
           </template>
 
           <v-form>
-            <v-container class="py-0">
+            <v-container class="py-8">
               <v-row>
                 <v-col
                   cols="12"

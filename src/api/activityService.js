@@ -53,6 +53,15 @@ export const updateData = async (id, data) => {
   }
 };
 
+export const updateStatus = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/activity/status/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
 // Function to delete
 export const deleteData = async (id) => {
   try {
