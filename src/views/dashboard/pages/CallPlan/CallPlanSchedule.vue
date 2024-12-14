@@ -372,6 +372,7 @@ export default {
       this.fetchData(this.id);
     },
     async fetchUsers () {
+      console.log(this.region, this.area)
       const response = await getAllMdRole(this.region , this.area)
       this.userOptions = response.data
     },

@@ -87,6 +87,7 @@ export default {
           { title: 'Sio', icon: 'mdi-package-variant-closed', to: '/master/sio' },
           { title: 'Batch', icon: 'mdi-archive-outline', to: '/master/batch' },
           { title: 'Region & Area', icon: 'mdi-map-marker-radius-outline', to: '/master/region' },
+          { title: 'Program', icon: 'mdi-library-outline', to: '/master/program' },
         ],
       },
       { title: 'Call Plan', icon: 'mdi-calendar-clock', to: '/call-plan' },

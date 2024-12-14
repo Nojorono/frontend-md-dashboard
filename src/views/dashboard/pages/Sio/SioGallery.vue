@@ -4,6 +4,37 @@
       class="v-card--material v-card v-sheet theme--light v-card--material--has-heading"
       style="padding: 20px; border-radius: 20px"
     >
+      <v-row>
+        <v-col cols="5">
+          <v-btn small fab outlined color="primary" @click="handleBack">
+            <v-icon>mdi-backburger</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <h3>{{ sioName }}</h3>
+        </v-col>
+        <v-col cols="3">
+          <div class="d-flex justify-end">
+            <v-icon
+              style="width: 40px; border-radius: 50%; margin-right: 1rem"
+              color="primary"
+              size="2rem"
+              :loading="loading"
+              @click="fetchData"
+            >
+              mdi-refresh
+            </v-icon>
+            <v-btn
+              color="primary"
+              style="margin: unset !important"
+              @click="openHandleAdd"
+            >
+              <v-icon>mdi-plus-box-multiple</v-icon>
+              <span class="mx-1">Add</span>
+            </v-btn>
+          </div>
+        </v-col>
+      </v-row>
       <v-data-table
         :headers="tableHeaders"
         :items="tableData"
@@ -14,45 +45,8 @@
         @update:options="fetchData"
       >
         <template v-slot:top>
-          <v-row
-            class="justify-space-between"
-            style="align-items: baseline"
-          >
-            <v-col cols="4">
-              <v-text-field
-                v-model="search"
-                label="Search"
-                class="mx-5"
-                clearable
-                append-icon="mdi-magnify"
-                @click:append="handleSearch"
-              />
-            </v-col>
-            <v-col cols="4">
-              <div
-                class="d-flex justify-space-between"
-                style="align-self: center;"
-              >
-                <v-icon
-                  style="
-                width: 40px; border-radius: 50%;"
-                  color="primary"
-                  size="2rem"
-                  :loading="loading"
-                  @click="fetchData"
-                >
-                  mdi-refresh
-                </v-icon>
-                <v-btn
-                  color="primary"
-                  style="margin: unset!important;"
-                  @click="openHandleAdd"
-                >
-                  <v-icon>mdi-plus-box-multiple</v-icon>
-                  <span class="mx-1">Add</span>
-                </v-btn>
-              </div>
-            </v-col>
+          <v-row class="align-center" style="align-items: baseline">
+            <v-col cols="12"> </v-col>
           </v-row>
         </template>
         <!-- Mapping Item Properties -->
@@ -60,10 +54,15 @@
           <tr>
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
             <td>{{ item?.name }}</td>
-            <td
-              class="d-flex"
-              style="align-items: center"
-            >
+            <td>
+              <v-img
+                :src="item?.photo"
+                width="100"
+                height="100"
+                style="object-fit: cover"
+              />
+            </td>
+            <td class="d-flex" style="align-items: center">
               <v-btn
                 class="mx-1"
                 outlined
@@ -81,22 +80,11 @@
               >
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
-              <v-btn
-                class="mx-1"
-                outlined
-                small
-                @click="openSioGallery(item)"
-              >
-                <v-icon>mdi-image</v-icon>
-              </v-btn>
             </td>
           </tr>
         </template>
       </v-data-table>
-      <v-row
-        justify="center"
-        class="py-3"
-      >
+      <v-row justify="center" class="py-3">
         <v-pagination
           v-model="page"
           :length="totalPages"
@@ -114,7 +102,7 @@
       @close="closeConfirmDeleteDialog"
     />
     <!-- Create & Update Dialog -->
-    <form-sio
+    <form-sio-gallery
       :dialog="isFormRoleDialog"
       :is-edit="isEdit"
       :item="selectedItem"
@@ -125,22 +113,28 @@
 </template>
 
 <script>
-import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-import { createData, deleteData, getAll, updateData } from '@/api/sioService'
+import ConfirmDeleteDialog from "@/components/base/ConfirmDeleteDialog.vue";
+import {
+  createGallery,
+  deleteGallery,
+  getGallery,
+  updateGallery,
+} from "@/api/sioService";
 import Vue from "vue";
-import {mapActions, mapGetters} from "vuex";
-import FormSio from "@/views/dashboard/pages/Sio/components/FormSio.vue";
+import { mapActions, mapGetters } from "vuex";
+import FormSioGallery from "@/views/dashboard/pages/Sio/components/FormSioGallery.vue";
 
 export default {
-  name: "MasterSio",
-  components: {FormSio, ConfirmDeleteDialog },
+  name: "SioGallery",
+  components: { FormSioGallery, ConfirmDeleteDialog },
   data() {
     return {
+      sioId: parseInt(this.$route.params.id, 10),
+      sioName: this.$route.params.name,
       tableHeaders: [
         { text: "No", value: "no" },
-        { text: "name", value: "name" },
-        { text: "Component", value: "component" },
-        { text: "Total Component", value: "total" },
+        { text: "Name", value: "name" },
+        { text: "Photo", value: "photo" },
         { text: "Action", value: "action" },
       ],
       tableData: [],
@@ -153,11 +147,11 @@ export default {
       isFormRoleDialog: false,
       isEdit: false,
       isConfirmDeleteDialogOpen: false,
-      search: '',
+      search: "",
     };
   },
   computed: {
-    ...mapGetters(['getUser', 'getLoading']),
+    ...mapGetters(["getUser", "getLoading"]),
   },
   watch: {
     page(value) {
@@ -172,64 +166,63 @@ export default {
       this.checkUserMenuLoaded(newUser);
     },
     getLoading(state) {
-      this.loading =  state;
+      this.loading = state;
     },
   },
   created() {
     this.fetchData();
   },
+  mounted() {
+    
+  },
   methods: {
-    ...mapActions(['showLoading', 'hideLoading']),
+    ...mapActions(["showLoading", "hideLoading"]),
     onPageChange(newPage) {
       this.page = newPage;
-    },
-    openSioGallery(item) {
-      this.$router.push({
-        name: 'Sio Gallery',
-        params: { id: item.id, name: item.name },
-      });
     },
     handleSearch() {
       this.options.page = 1;
       this.fetchData();
     },
     openHandleAdd() {
-      this.isEdit = false
-      this.selectedItem = null
-      this.isFormRoleDialog = true
+      this.isEdit = false;
+      this.selectedItem = {
+        sio_type_id: this.sioId,
+      };
+      this.isFormRoleDialog = true;
     },
     openHandleUpdate(item) {
-      this.isEdit = true
+      this.isEdit = true;
       this.selectedItem = {
         id: item.id,
-        component: item.component,
+        photo: item.photo,
         name: item.name,
-      }
-      this.isFormRoleDialog = true
+      };
+      this.isFormRoleDialog = true;
     },
-    async handleSave(item) {
-      this.showLoading()
+    async handleSave(formData) {
+      this.showLoading();
       try {
         if (this.isEdit) {
-          const { id, ...itemWithoutId } = item
-          const res  = await updateData(id, itemWithoutId)
+          const id = formData.get('id');
+          const res = await updateGallery(id, formData);
           if (res.statusCode === 200) {
-            Vue.prototype.$toast.success(`Update data Successfully!`)
-            this.closeFormDialog()
+            Vue.prototype.$toast.success(`Update data Successfully!`);
+            this.closeFormDialog();
           }
         } else {
-          const res = await createData(item)
+          const res = await createGallery(formData);
           if (res.statusCode === 200) {
-            Vue.prototype.$toast.success(`Create data Successfully!`)
-            this.closeFormDialog()
+            Vue.prototype.$toast.success(`Create data Successfully!`);
+            this.closeFormDialog();
           }
         }
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
-        console.error(error)
+        Vue.prototype.$toast.error(`${error.data.message}`);
+        console.error(error);
       } finally {
-        this.hideLoading()
-        await this.fetchData()
+        this.hideLoading();
+        await this.fetchData();
       }
     },
     closeFormDialog() {
@@ -239,7 +232,8 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
-        const response = await getAll({
+        const response = await getGallery({
+          sioTypeId: this.sioId,
           page: this.options.page,
           limit: this.options.itemsPerPage,
           searchTerm: this.search,
@@ -264,19 +258,24 @@ export default {
       this.isConfirmDeleteDialogOpen = false;
     },
     async handleDelete() {
-      this.loading = true
-      const data = this.selectedItem
+      this.loading = true;
+      const data = this.selectedItem;
       try {
-        await deleteData(data.id)
-        Vue.prototype.$toast.success(`Deleted Code ${data.code_batch} successfully!`)
+        await deleteGallery(data.id);
+        Vue.prototype.$toast.success(
+          `Deleted Code ${data.code_batch} successfully!`
+        );
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
-        console.error(error)
+        Vue.prototype.$toast.error(`${error.data.message}`);
+        console.error(error);
       } finally {
-        this.loading = false
-        this.closeConfirmDeleteDialog()
-        await this.fetchData()
+        this.loading = false;
+        this.closeConfirmDeleteDialog();
+        await this.fetchData();
       }
+    },
+    handleBack() {
+      this.$router.back();
     },
   },
 };

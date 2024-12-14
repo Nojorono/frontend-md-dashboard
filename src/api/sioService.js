@@ -59,3 +59,44 @@ export const deleteData = async (id) => {
     throw error.response;
   }
 };
+
+export const getGallery = async (params) => {
+  try {
+    console.log(params);
+    const response = await axiosInstance.get(`/sio-gallery`, {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const createGallery = async (data) => {
+  try {
+    const response = await axiosInstance.post('/sio-gallery', data);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const updateGallery = async (id, data) => {
+  try {
+    console.log(id);
+    const intId = parseInt(id, 10);
+    const response = await axiosInstance.put(`/sio-gallery/${intId}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const deleteGallery = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/sio-gallery/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};

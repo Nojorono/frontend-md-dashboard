@@ -54,6 +54,12 @@ export default [
         meta: requiresAuth, // Protect this route
       },
       {
+        name: 'Sio Gallery',
+        path: '/sio/gallery/:id',
+        component: () => import('@/views/dashboard/pages/Sio/SioGallery.vue'),
+        meta: requiresAuth, // Protect this route
+      },
+      {
         name: 'Master Region',
         path: '/master/region',
         component: () => import('@/views/dashboard/pages/RegionArea/MasterRegion.vue'),
@@ -111,6 +117,12 @@ export default [
         name: 'Call Plan Schedule',
         path: '/call-plan/schedule/:id',
         component: () => import('@/views/dashboard/pages/CallPlan/CallPlanSchedule.vue'),
+        meta: requiresAuth, // Protect this route
+      },
+      {
+        name: 'Master Program',
+        path: '/master/program',
+        component: () => import('@/views/dashboard/pages/Program/MasterProgram.vue'),
         meta: requiresAuth, // Protect this route
       },
       {
