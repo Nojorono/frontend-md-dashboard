@@ -93,6 +93,7 @@ export default {
       { title: 'Call Plan', icon: 'mdi-calendar-clock', to: '/call-plan' },
       { title: 'Activity MD', icon: 'mdi-calendar-check', to: '/activity' },
       { title: 'Survey New Outlet', icon: 'mdi-clipboard-text-search', to: '/survey' },
+      { title: 'Absensi', icon: 'mdi-account-clock-outline', to: '/absensi' },
       {
         title: 'Settings',
         icon: 'mdi-cog-outline',

@@ -34,7 +34,6 @@
                 outlined
                 class="mr-4"
                 hide-details
-                return-object
                 @change="handleFilterChange"
               >
                 <template v-slot:no-data>
@@ -53,31 +52,12 @@
                 dense
                 outlined
                 hide-details
-                return-object
                 class="mr-4"
                 @change="handleFilterChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-content>Area not found</v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-autocomplete>
-              <v-autocomplete
-                v-model="filter.status"
-                :items="statusOptions"
-                label="Status"
-                clearable
-                dense
-                outlined
-                hide-details
-                :item-text="(item) => getStatusLabelOption(item.value)"
-                item-value="value"
-                @change="handleFilterChange"
-              >
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <v-list-item-content>Status not found</v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
@@ -112,106 +92,80 @@
         <template v-slot:item="{ item, index }">
           <tr>
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
-            <td>
-              <v-chip
-                :color="item?.outlet_name ? 'primary' : 'warning'"
-                small
-                label
-                text-color="white"
-              >
-                {{ item?.outlet_name ? 'Existing' : 'New' }}
-              </v-chip>
-            </td>
-            <td class="font-weight-medium">{{ item?.code_batch }}</td>
-            <td class="font-weight-medium">{{ item?.user_name }}</td>
-            <td class="font-weight-medium">{{ item?.outlet_name || item?.survey_name }}</td>
             <td>{{ item?.region }}</td>
             <td>{{ item?.area }}</td>
-            <td>{{ item?.brand }}</td>
-            <td>{{ item?.type_sio }}</td>
             <td>
               <v-chip
-                :color="getStatusColor(item?.status)"
                 small
                 label
                 text-color="white"
+                :color="item?.status === 'On Time' ? 'primary' : 'warning'"
               >
-              {{ getStatusLabel(item) }}
-            </v-chip>
+                <div class="d-flex flex-column">
+                  <div class="d-flex align-center">
+                    <v-icon small class="mr-1">mdi-account</v-icon>
+                    {{ item?.user_name }}
+                  </div>
+                  <!-- <div class="d-flex align-center">
+                    <v-icon small class="mr-1">mdi-email</v-icon>
+                    {{ item?.user_email }}
+                  </div> -->
+                </div>
+              </v-chip>
             </td>
-            <td>{{ formatDate(item?.created_at) }}</td>
+            <td class="font-weight-medium">{{ formatDate(item?.date) }}</td>
+            <td class="font-weight-medium">{{ formatTime(item?.clockIn) }}</td>
+            <td class="font-weight-medium">{{ formatTime(item?.clockOut) }}</td>
+            <td>{{ item?.remarks }}</td>
             <td>
+              <v-chip
+                small
+                label
+                text-color="white"
+                :color="item?.status === 'On Time' ? 'primary' : 'warning'"
+              >
+                {{ item?.status }}
+              </v-chip>
+            </td>
+            <td>
+              <v-btn
+                small
+                color="primary"
+                outlined
+                :disabled="!item?.clockIn"
+                @click="openMap(item?.latitudeIn, item?.longitudeIn)"
+              >
+                <v-icon small class="mr-1">mdi-map</v-icon>
+                Location In
+              </v-btn>
+            </td>
+            <td>
+              <v-btn
+                small
+                color="primary"
+                outlined
+                :disabled="!item?.clockOut"
+                @click="openMap(item?.latitudeOut, item?.longitudeOut)"
+              >
+                <v-icon small class="mr-1">mdi-map</v-icon>
+                Location Out
+              </v-btn>
+            </td>
+            <!-- <td>
               <div class="d-flex align-center">
+
                 <v-btn
-                  color="warning"
+                  color="primary"
                   outlined
                   small
                   class="mr-2"
-                  @click="handleDetail(item.id)"
+                  @click="openHandleUpdate(item)"
                 >
-                  <v-icon small class="mr-1">mdi-calendar-arrow-right</v-icon>
-                  Detail
+                  <v-icon small class="mr-1">mdi-pencil</v-icon>
+                  Edit
                 </v-btn>
-
-                <v-menu
-                  offset-y
-                  :close-on-content-click="false"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      color="primary"
-                      outlined
-                      small
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      <v-icon small>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list dense>
-                    <template v-if="(getUser?.roles === 'ADMIN' || getUser?.roles === 'NASIONAL' || getUser?.roles === 'SUPERADMIN') && item?.status === 101">
-                      <v-list-item
-                        v-for="(status, index) in statusLevel2Options"
-                        :key="index"
-                        @click="updateStatus(item, status.value)"
-                      >
-                        <v-list-item-icon class="mr-2">
-                          <v-icon small :color="getStatusColor(status.value)">
-                            mdi-circle-small
-                          </v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>{{ getStatusLabelOption(status.value) }}</v-list-item-title>
-                      </v-list-item>
-                    </template>
-                    <template v-else-if="(getUser?.roles === 'AMO' || getUser?.roles === 'REGIONAL' || getUser?.roles === 'TL') && item?.status === 101">
-                      <v-list-item
-                        v-for="(status, index) in statusLevel1Options"
-                        :key="index"
-                        @click="updateStatus(item, status.value)"
-                        class="cursor-pointer"
-                      >
-                        <v-list-item-icon class="mr-2">
-                          <v-icon small :color="getStatusColor(status.value)">
-                            mdi-circle-small
-                          </v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>{{ getStatusLabelOption(status.value) }}</v-list-item-title>
-                      </v-list-item>
-                    </template>
-                    <template v-else>
-                      <v-list-item>
-                        <v-list-item-icon class="mr-2">
-                            <v-icon small>mdi-circle-small</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>
-                            {{ getStatusLabel(item) }}
-                        </v-list-item-title>
-                      </v-list-item>
-                    </template>
-                  </v-list>
-                </v-menu>
               </div>
-            </td>
+            </td> -->
           </tr>
         </template>
       </v-data-table>
@@ -251,14 +205,13 @@
 
 <script>
   import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-  import { createData, deleteData, updateData, getAll, updateStatus } from '@/api/activityService'
+  import { createData, deleteData, updateData, getAll } from '@/api/absensiService'
   import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
   import Vue from "vue";
   import { mapGetters } from "vuex";
-  import { EXISTING_SURVEY_STATUS, NEW_SURVEY_STATUS, STATUS_COLORS } from '@/constants/status';
 
   export default {
-    name: 'Activity',
+    name: 'Absensi',
     components: {
       FormCallPlan,
       ConfirmDeleteDialog,
@@ -268,17 +221,17 @@
         refreshDataTrigger : false,
         tableHeaders: [
           { text: 'No', value: 'number', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
-          { text: 'Type', value: 'type', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
-          { text: 'Code Batch', value: 'code_batch', sortable: false, class: 'text-left font-weight-bold', width: '12%' },
-          { text: 'MD', value: 'user_name', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
-          { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+          { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '12%' },
           { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Brand', value: 'brand', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Type SIO', value: 'type_sio', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
-          { text: 'Status', value: 'status', sortable: false, class: 'text-left font-weight-bold', width: '11%' },
-          { text: 'Created At', value: 'created_at', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
-          { text: 'Actions', value: 'actions', sortable: false, class: 'text-center font-weight-bold' },
+          { text: 'User', value: 'user_name', sortable: false, class: 'text-left font-weight-bold', width: '12%' },
+          { text: 'Date', value: 'date', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Clock In', value: 'clock_in', sortable: false, class: 'text-left font-weight-bold', width: '8%' },
+          { text: 'Clock Out', value: 'clock_out', sortable: false, class: 'text-left font-weight-bold', width: '8%' },
+          { text: 'Remarks', value: 'remarks', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
+          { text: 'Status', value: 'status', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
+          { text: 'Location In', value: 'created_at', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
+          { text: 'Location Out', value: 'updated_at', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
+          // { text: 'Actions', value: 'actions', sortable: false, class: 'text-center font-weight-bold' },
         ],
         tableData: [],
         totalItems: 0,
@@ -293,30 +246,6 @@
         search: '',
         regionOptions: [],
         areaOptions: [],
-        statusOptions: [
-          // { value: 100 }, // STATUS_PROCESSING
-          { value: 101 }, // STATUS_HO_PROCESSING
-          // { value: 400 }, // STATUS_NOT_VISITED 
-          { value: 401 }, // STATUS_TEMP_CLOSED
-          { value: 402 }, // STATUS_PERM_CLOSED
-          { value: 403 }, // STATUS_NOT_FOUND
-          { value: 404 }, // STATUS_REJECTED
-          // { value: 405 }, // STATUS_CANCELLED
-          { value: 406 }, // STATUS_PIC_REJECTED
-          { value: 407 }, // STATUS_HO_REJECTED
-          { value: 200 }, // STATUS_VISITED
-          { value: 201 }, // STATUS_COMPLETED
-          { value: 202 }, // STATUS_OUTLET_AGREED
-          { value: 203 }, // STATUS_APPROVED
-        ],
-        statusLevel1Options: [
-          { value: 101 },
-          { value: 406 },
-        ],
-        statusLevel2Options: [
-          { value: 203 },
-          { value: 407 },
-        ],
         status: '',
         statusUpdate: '',
         statusUpdateItem: null,
@@ -324,7 +253,6 @@
         filter: {
           region: '',
           area: '',
-          status: '',
         },
       }
     },
@@ -343,26 +271,28 @@
     },
   
     methods: {
-      handleFilterChange() {
-        this.options.page = 1;
-        this.fetchData();
-      },
-      getStatusLabel(item) {
-        return item?.outlet_name ? EXISTING_SURVEY_STATUS[item?.status] : NEW_SURVEY_STATUS[item?.status];
-      },
-      getStatusLabelOption(value) {
-        return EXISTING_SURVEY_STATUS[value] ? EXISTING_SURVEY_STATUS[value] : NEW_SURVEY_STATUS[value];
-      },
-      getStatusColor(status) {
-        return STATUS_COLORS[status];
+      openMap(latitude, longitude) {
+        window.open(`https://maps.google.com/?q=${latitude},${longitude}`, '_blank');
       },
       formatDate(date) {
         if (!date) return '';
-        return new Date(date).toLocaleDateString('en-US', {
+        return new Date(date).toLocaleDateString('id-ID', {
           year: 'numeric',
           month: 'short',
           day: 'numeric'
         });
+      },
+      formatTime(time) {
+        if (!time) return '';
+        return new Date(time).toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+      },
+      handleFilterChange() {
+        this.options.page = 1;
+        this.fetchData();
       },
       onPageChange(newPage) {
         this.page = newPage;
@@ -463,21 +393,6 @@
           this.loading = false
           this.closeConfirmDeleteDialog()
           await this.fetchData()
-        }
-      },
-      async updateStatus(item, status) {
-        const data = {
-          status: status,
-        }
-        try {
-          const res = await updateStatus(item.id, data)
-          if (res.statusCode === 200) {
-            Vue.prototype.$toast.success(`Update status Successfully!`)
-            await this.fetchData()
-          }
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
-          console.error(error)
         }
       },
     },

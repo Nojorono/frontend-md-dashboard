@@ -120,6 +120,12 @@ export default [
         meta: requiresAuth, // Protect this route
       },
       {
+        name: 'Absensi',
+        path: '/absensi',
+        component: () => import('@/views/dashboard/pages/Absensi/Absensi.vue'),
+        meta: requiresAuth, // Protect this route
+      },
+      {
         name: 'Master Program',
         path: '/master/program',
         component: () => import('@/views/dashboard/pages/Program/MasterProgram.vue'),

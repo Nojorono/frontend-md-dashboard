@@ -27,6 +27,13 @@ Vue.filter('formatDate', function(value, format = 'dddd, DD MMM YYYY') {
   }
   return ''
 })
+
+Vue.filter('formatTime', function(value, format = 'HH:mm') {
+  if (value) {
+    return moment(value).format(format)
+  }
+  return ''
+})
 const toastOptions = {
   position: "top-right",
   timeout: 5000,
