@@ -1,19 +1,12 @@
 <template>
-  <v-container
-    id="dashboard"
-    fluid
-    tag="section"
-  >
+  <v-container id="dashboard" fluid tag="section">
     <v-row>
       <v-col cols="12">
         <leaflet-map />
       </v-col>
     </v-row>
     <v-row>
-      <v-col
-        cols="12"
-        lg="4"
-      >
+      <v-col cols="12" lg="4">
         <base-material-chart-card
           :data="emailsSubscriptionChart.data"
           :options="emailsSubscriptionChart.options"
@@ -21,6 +14,7 @@
           color="#E91E63"
           hover-reveal
           type="Bar"
+          class="elevation-6"
         >
           <template v-slot:reveal-actions>
             <v-tooltip bottom>
@@ -30,16 +24,13 @@
                   color="info"
                   icon
                   v-on="on"
+                  @click="refreshData"
                 >
-                  <v-icon
-                    color="info"
-                  >
-                    mdi-refresh
-                  </v-icon>
+                  <v-icon color="info"> mdi-refresh </v-icon>
                 </v-btn>
               </template>
 
-              <span>Refresh</span>
+              <span>Refresh Data</span>
             </v-tooltip>
 
             <v-tooltip bottom>
@@ -49,45 +40,57 @@
                   light
                   icon
                   v-on="on"
+                  @click="openDatePicker"
                 >
-                  <v-icon>mdi-pencil</v-icon>
+                  <v-icon>mdi-calendar</v-icon>
                 </v-btn>
               </template>
 
-              <span>Change Date</span>
+              <span>Select Date Range</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ attrs, on }">
+                <v-btn
+                  v-bind="attrs"
+                  light
+                  icon
+                  v-on="on"
+                  @click="downloadReport"
+                >
+                  <v-icon>mdi-download</v-icon>
+                </v-btn>
+              </template>
+
+              <span>Download Report</span>
             </v-tooltip>
           </template>
 
           <h4 class="card-title font-weight-light mt-2 ml-2">
-            Website Views
+            Website Analytics
           </h4>
 
           <p class="d-inline-flex font-weight-light ml-2 mt-1">
-            Last Campaign Performance
+            Performance Metrics & Insights
           </p>
 
           <template v-slot:actions>
-            <v-icon
-              class="mr-1"
-              small
+            <v-icon class="mr-1" small> mdi-clock-outline </v-icon>
+            <span class="caption grey--text font-weight-light"
+              >Last updated {{ lastUpdated }}</span
             >
-              mdi-clock-outline
-            </v-icon>
-            <span class="caption grey--text font-weight-light">updated 10 minutes ago</span>
           </template>
         </base-material-chart-card>
       </v-col>
 
-      <v-col
-        cols="12"
-        lg="4"
-      >
+      <v-col cols="12" lg="4">
         <base-material-chart-card
           :data="dailySalesChart.data"
           :options="dailySalesChart.options"
           color="success"
           hover-reveal
           type="Line"
+          class="elevation-6"
         >
           <template v-slot:reveal-actions>
             <v-tooltip bottom>
@@ -97,16 +100,13 @@
                   color="info"
                   icon
                   v-on="on"
+                  @click="refreshSalesData"
                 >
-                  <v-icon
-                    color="info"
-                  >
-                    mdi-refresh
-                  </v-icon>
+                  <v-icon color="info"> mdi-refresh </v-icon>
                 </v-btn>
               </template>
 
-              <span>Refresh</span>
+              <span>Refresh Sales Data</span>
             </v-tooltip>
 
             <v-tooltip bottom>
@@ -116,52 +116,59 @@
                   light
                   icon
                   v-on="on"
+                  @click="openSalesDatePicker"
                 >
-                  <v-icon>mdi-pencil</v-icon>
+                  <v-icon>mdi-calendar</v-icon>
                 </v-btn>
               </template>
 
-              <span>Change Date</span>
+              <span>Select Sales Period</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ attrs, on }">
+                <v-btn
+                  v-bind="attrs"
+                  light
+                  icon
+                  v-on="on"
+                  @click="downloadSalesReport"
+                >
+                  <v-icon>mdi-file-download</v-icon>
+                </v-btn>
+              </template>
+
+              <span>Download Sales Report</span>
             </v-tooltip>
           </template>
 
           <h4 class="card-title font-weight-light mt-2 ml-2">
-            Daily Sales
+            Sales Performance
           </h4>
 
           <p class="d-inline-flex font-weight-light ml-2 mt-1">
-            <v-icon
-              color="green"
-              small
-            >
-              mdi-arrow-up
-            </v-icon>
-            <span class="green--text">55%</span>&nbsp;
-            increase in today's sales
+            <v-icon color="green" small> mdi-arrow-up </v-icon>
+            <span class="green--text">{{ salesIncrease }}%</span>&nbsp; increase
+            in today's sales
           </p>
 
           <template v-slot:actions>
-            <v-icon
-              class="mr-1"
-              small
+            <v-icon class="mr-1" small> mdi-clock-outline </v-icon>
+            <span class="caption grey--text font-weight-light"
+              >Last updated {{ salesLastUpdated }}</span
             >
-              mdi-clock-outline
-            </v-icon>
-            <span class="caption grey--text font-weight-light">updated 4 minutes ago</span>
           </template>
         </base-material-chart-card>
       </v-col>
 
-      <v-col
-        cols="12"
-        lg="4"
-      >
+      <v-col cols="12" lg="4">
         <base-material-chart-card
           :data="dataCompletedTasksChart.data"
           :options="dataCompletedTasksChart.options"
           hover-reveal
           color="info"
           type="Line"
+          class="elevation-6"
         >
           <template v-slot:reveal-actions>
             <v-tooltip bottom>
@@ -171,16 +178,13 @@
                   color="info"
                   icon
                   v-on="on"
+                  @click="refreshTaskData"
                 >
-                  <v-icon
-                    color="info"
-                  >
-                    mdi-refresh
-                  </v-icon>
+                  <v-icon color="info"> mdi-refresh </v-icon>
                 </v-btn>
               </template>
 
-              <span>Refresh</span>
+              <span>Refresh Task Data</span>
             </v-tooltip>
 
             <v-tooltip bottom>
@@ -190,420 +194,448 @@
                   light
                   icon
                   v-on="on"
+                  @click="openTaskDatePicker"
                 >
-                  <v-icon>mdi-pencil</v-icon>
+                  <v-icon>mdi-calendar</v-icon>
                 </v-btn>
               </template>
 
-              <span>Change Date</span>
+              <span>Select Task Period</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ attrs, on }">
+                <v-btn
+                  v-bind="attrs"
+                  light
+                  icon
+                  v-on="on"
+                  @click="exportTaskReport"
+                >
+                  <v-icon>mdi-export</v-icon>
+                </v-btn>
+              </template>
+
+              <span>Export Task Report</span>
             </v-tooltip>
           </template>
 
           <h3 class="card-title font-weight-light mt-2 ml-2">
-            Completed Tasks
+            Task Completion Metrics
           </h3>
 
           <p class="d-inline-flex font-weight-light ml-2 mt-1">
-            Last Last Campaign Performance
+            Task completion trends and analysis
           </p>
 
           <template v-slot:actions>
-            <v-icon
-              class="mr-1"
-              small
+            <v-icon class="mr-1" small> mdi-clock-outline </v-icon>
+            <span class="caption grey--text font-weight-light"
+              >Last updated {{ taskLastUpdated }}</span
             >
-              mdi-clock-outline
-            </v-icon>
-            <span class="caption grey--text font-weight-light">campaign sent 26 minutes ago</span>
           </template>
         </base-material-chart-card>
       </v-col>
 
-      <v-col
-        cols="12"
-        sm="6"
-        lg="3"
-      >
+      <v-col cols="12" sm="6" lg="3">
         <base-material-stats-card
           color="info"
           icon="mdi-twitter"
-          title="Followers"
-          value="+245"
-          sub-icon="mdi-clock"
-          sub-text="Just Updated"
+          title="Social Media Reach"
+          :value="socialStats.followers"
+          sub-icon="mdi-trending-up"
+          :sub-text="socialStats.growth"
+          class="elevation-6"
+          @click="showSocialDetails"
         />
       </v-col>
 
-      <v-col
-        cols="12"
-        sm="6"
-        lg="3"
-      >
+      <v-col cols="12" sm="6" lg="3">
         <base-material-stats-card
           color="primary"
           icon="mdi-poll"
-          title="Website Visits"
-          value="75.521"
-          sub-icon="mdi-tag"
-          sub-text="Tracked from Google Analytics"
+          title="Website Analytics"
+          :value="websiteStats.visits"
+          sub-icon="mdi-chart-line"
+          :sub-text="websiteStats.trend"
+          class="elevation-6"
+          @click="showAnalyticsDetails"
         />
       </v-col>
 
-      <v-col
-        cols="12"
-        sm="6"
-        lg="3"
-      >
+      <v-col cols="12" sm="6" lg="3">
         <base-material-stats-card
           color="success"
           icon="mdi-store"
-          title="Revenue"
-          value="$ 34,245"
+          title="Revenue Overview"
+          :value="revenueStats.total"
           sub-icon="mdi-calendar"
-          sub-text="Last 24 Hours"
+          :sub-text="revenueStats.period"
+          class="elevation-6"
+          @click="showRevenueDetails"
         />
       </v-col>
 
-      <v-col
-        cols="12"
-        sm="6"
-        lg="3"
-      >
+      <v-col cols="12" sm="6" lg="3">
         <base-material-stats-card
-          color="orange"
+          :color="bookingStats.status"
           icon="mdi-sofa"
-          title="Bookings"
-          value="184"
+          title="Booking Status"
+          :value="bookingStats.count"
           sub-icon="mdi-alert"
-          sub-icon-color="red"
-          sub-text="Get More Space..."
+          :sub-icon-color="bookingStats.alertColor"
+          :sub-text="bookingStats.message"
+          class="elevation-6"
+          @click="showBookingDetails"
         />
       </v-col>
 
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <base-material-card
-          color="warning"
-          class="px-5 py-3"
-        >
+      <v-col cols="12" md="12">
+        <base-material-card color="warning" class="px-5 py-3 elevation-6">
           <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              Employees Stats
-            </div>
+            <div class="display-2 font-weight-light">Target Allocation HO</div>
 
             <div class="subtitle-1 font-weight-light">
-              New employees on 15th September, 2016
+              {{ employeeStatsDate }}
             </div>
           </template>
           <v-card-text>
-            <v-data-table
-              :headers="headers"
-              :items="items"
-            />
+            <dashboard-batch-target />
           </v-card-text>
         </base-material-card>
       </v-col>
 
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <base-material-card class="px-5 py-3">
-          <template v-slot:heading>
-            <v-tabs
-              v-model="tabs"
-              background-color="transparent"
-              slider-color="white"
-            >
-              <span
-                class="subheading font-weight-light mx-3"
-                style="align-self: center"
-              >Tasks:</span>
-              <v-tab class="mr-3">
-                <v-icon class="mr-2">
-                  mdi-bug
-                </v-icon>
-                Bugs
-              </v-tab>
-              <v-tab class="mr-3">
-                <v-icon class="mr-2">
-                  mdi-code-tags
-                </v-icon>
-                Website
-              </v-tab>
-              <v-tab>
-                <v-icon class="mr-2">
-                  mdi-cloud
-                </v-icon>
-                Server
-              </v-tab>
-            </v-tabs>
-          </template>
-
-          <v-tabs-items
-            v-model="tabs"
-            class="transparent"
-          >
-            <v-tab-item
-              v-for="n in 3"
-              :key="n"
-            >
-              <v-card-text>
-                <template v-for="(task, i) in tasks[tabs]">
-                  <v-row
-                    :key="i"
-                    align="center"
-                  >
-                    <v-col cols="1">
-                      <v-list-item-action>
-                        <v-checkbox
-                          v-model="task.value"
-                          color="secondary"
-                        />
-                      </v-list-item-action>
-                    </v-col>
-
-                    <v-col cols="9">
-                      <div
-                        class="font-weight-light"
-                        v-text="task.text"
-                      />
-                    </v-col>
-
-                    <v-col
-                      cols="2"
-                      class="text-right"
-                    >
-                      <v-icon class="mx-1">
-                        mdi-pencil
-                      </v-icon>
-                      <v-icon
-                        color="error"
-                        class="mx-1"
-                      >
-                        mdi-close
-                      </v-icon>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-card-text>
-            </v-tab-item>
-          </v-tabs-items>
-        </base-material-card>
+      <v-col cols="12" md="6">
+        
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-  import LeafletMap from "@/views/dashboard/components/dashboard/LeafletMap.vue";
+import LeafletMap from "@/views/dashboard/components/dashboard/LeafletMap.vue";
+import DashboardBatchTarget from "@/views/dashboard/components/dashboard/BatchTarget.vue";
 
-  export default {
-    name: 'DashboardDashboard',
-    components: {LeafletMap},
+export default {
+  name: "DashboardDashboard",
+  components: { LeafletMap, DashboardBatchTarget },
 
-    data () {
-      return {
-        dailySalesChart: {
-          data: {
-            labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-            series: [
-              [12, 17, 7, 17, 23, 18, 38],
-            ],
-          },
-          options: {
-            lineSmooth: this.$chartist.Interpolation.cardinal({
-              tension: 0,
-            }),
-            low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-            chartPadding: {
-              top: 0,
-              right: 0,
-              bottom: 0,
-              left: 0,
-            },
+  data() {
+    return {
+      search: "",
+      sortBy: "name",
+      sortDesc: false,
+      loading: false,
+      lastUpdated: new Date().toLocaleString(),
+      salesLastUpdated: new Date().toLocaleString(),
+      taskLastUpdated: new Date().toLocaleString(),
+      employeeStatsDate: new Date().toLocaleDateString(),
+      salesIncrease: 55,
+
+      socialStats: {
+        followers: "+245",
+        growth: "+12% this week",
+      },
+
+      websiteStats: {
+        visits: "75,521",
+        trend: "Trending upward",
+      },
+
+      revenueStats: {
+        total: "$ 34,245",
+        period: "Last 24 Hours",
+      },
+
+      bookingStats: {
+        count: "184",
+        status: "orange",
+        alertColor: "red",
+        message: "High demand period",
+      },
+
+      dailySalesChart: {
+        data: {
+          labels: ["M", "T", "W", "T", "F", "S", "S"],
+          series: [[12, 17, 7, 17, 23, 18, 38]],
+        },
+        options: {
+          lineSmooth: this.$chartist.Interpolation.cardinal({
+            tension: 0,
+          }),
+          low: 0,
+          high: 50,
+          chartPadding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
           },
         },
-        dataCompletedTasksChart: {
-          data: {
-            labels: ['12am', '3pm', '6pm', '9pm', '12pm', '3am', '6am', '9am'],
-            series: [
-              [230, 750, 450, 300, 280, 240, 200, 190],
-            ],
-          },
-          options: {
-            lineSmooth: this.$chartist.Interpolation.cardinal({
-              tension: 0,
-            }),
-            low: 0,
-            high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-            chartPadding: {
-              top: 0,
-              right: 0,
-              bottom: 0,
-              left: 0,
-            },
+      },
+      dataCompletedTasksChart: {
+        data: {
+          labels: ["12am", "3pm", "6pm", "9pm", "12pm", "3am", "6am", "9am"],
+          series: [[230, 750, 450, 300, 280, 240, 200, 190]],
+        },
+        options: {
+          lineSmooth: this.$chartist.Interpolation.cardinal({
+            tension: 0,
+          }),
+          low: 0,
+          high: 1000,
+          chartPadding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
           },
         },
-        emailsSubscriptionChart: {
-          data: {
-            labels: ['Ja', 'Fe', 'Ma', 'Ap', 'Mai', 'Ju', 'Jul', 'Au', 'Se', 'Oc', 'No', 'De'],
-            series: [
-              [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
-
-            ],
+      },
+      emailsSubscriptionChart: {
+        data: {
+          labels: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ],
+          series: [
+            [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
+          ],
+        },
+        options: {
+          axisX: {
+            showGrid: false,
           },
-          options: {
-            axisX: {
-              showGrid: false,
-            },
-            low: 0,
-            high: 1000,
-            chartPadding: {
-              top: 0,
-              right: 5,
-              bottom: 0,
-              left: 0,
-            },
+          low: 0,
+          high: 1000,
+          chartPadding: {
+            top: 0,
+            right: 5,
+            bottom: 0,
+            left: 0,
           },
-          responsiveOptions: [
-            ['screen and (max-width: 640px)', {
+        },
+        responsiveOptions: [
+          [
+            "screen and (max-width: 640px)",
+            {
               seriesBarDistance: 5,
               axisX: {
                 labelInterpolationFnc: function (value) {
-                  return value[0]
+                  return value[0];
                 },
               },
-            }],
+            },
           ],
+        ],
+      },
+      headers: [
+        {
+          sortable: true,
+          text: "ID",
+          value: "id",
         },
-        headers: [
+        {
+          sortable: true,
+          text: "Name",
+          value: "name",
+        },
+        {
+          sortable: true,
+          text: "Salary",
+          value: "salary",
+          align: "right",
+        },
+        {
+          sortable: true,
+          text: "Country",
+          value: "country",
+          align: "right",
+        },
+        {
+          sortable: true,
+          text: "City",
+          value: "city",
+          align: "right",
+        },
+      ],
+      items: [
+        {
+          id: 1,
+          name: "Dakota Rice",
+          country: "Niger",
+          city: "Oud-Tunrhout",
+          salary: "$35,738",
+        },
+        {
+          id: 2,
+          name: "Minerva Hooper",
+          country: "Curaçao",
+          city: "Sinaai-Waas",
+          salary: "$23,738",
+        },
+        {
+          id: 3,
+          name: "Sage Rodriguez",
+          country: "Netherlands",
+          city: "Overland Park",
+          salary: "$56,142",
+        },
+        {
+          id: 4,
+          name: "Philip Chanley",
+          country: "Korea, South",
+          city: "Gloucester",
+          salary: "$38,735",
+        },
+        {
+          id: 5,
+          name: "Doris Greene",
+          country: "Malawi",
+          city: "Feldkirchen in Kārnten",
+          salary: "$63,542",
+        },
+      ],
+      tabs: 0,
+      tasks: {
+        0: [
           {
-            sortable: false,
-            text: 'ID',
-            value: 'id',
+            text: 'Sign contract for "What are conference organizers afraid of?"',
+            value: true,
+            dueDate: "2024-01-20",
           },
           {
-            sortable: false,
-            text: 'Name',
-            value: 'name',
+            text: "Lines From Great Russian Literature? Or E-mails From My Boss?",
+            value: false,
+            dueDate: "2024-01-21",
           },
           {
-            sortable: false,
-            text: 'Salary',
-            value: 'salary',
-            align: 'right',
+            text: "Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit",
+            value: false,
+            dueDate: "2024-01-22",
           },
           {
-            sortable: false,
-            text: 'Country',
-            value: 'country',
-            align: 'right',
-          },
-          {
-            sortable: false,
-            text: 'City',
-            value: 'city',
-            align: 'right',
+            text: "Create 4 Invisible User Experiences you Never Knew About",
+            value: true,
+            dueDate: "2024-01-23",
           },
         ],
-        items: [
+        1: [
           {
-            id: 1,
-            name: 'Dakota Rice',
-            country: 'Niger',
-            city: 'Oud-Tunrhout',
-            salary: '$35,738',
+            text: "Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit",
+            value: true,
+            dueDate: "2024-01-24",
           },
           {
-            id: 2,
-            name: 'Minerva Hooper',
-            country: 'Curaçao',
-            city: 'Sinaai-Waas',
-            salary: '$23,738',
-          },
-          {
-            id: 3,
-            name: 'Sage Rodriguez',
-            country: 'Netherlands',
-            city: 'Overland Park',
-            salary: '$56,142',
-          },
-          {
-            id: 4,
-            name: 'Philip Chanley',
-            country: 'Korea, South',
-            city: 'Gloucester',
-            salary: '$38,735',
-          },
-          {
-            id: 5,
-            name: 'Doris Greene',
-            country: 'Malawi',
-            city: 'Feldkirchen in Kārnten',
-            salary: '$63,542',
+            text: 'Sign contract for "What are conference organizers afraid of?"',
+            value: false,
+            dueDate: "2024-01-25",
           },
         ],
-        tabs: 0,
-        tasks: {
-          0: [
-            {
-              text: 'Sign contract for "What are conference organizers afraid of?"',
-              value: true,
-            },
-            {
-              text: 'Lines From Great Russian Literature? Or E-mails From My Boss?',
-              value: false,
-            },
-            {
-              text: 'Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit',
-              value: false,
-            },
-            {
-              text: 'Create 4 Invisible User Experiences you Never Knew About',
-              value: true,
-            },
-          ],
-          1: [
-            {
-              text: 'Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit',
-              value: true,
-            },
-            {
-              text: 'Sign contract for "What are conference organizers afraid of?"',
-              value: false,
-            },
-          ],
-          2: [
-            {
-              text: 'Lines From Great Russian Literature? Or E-mails From My Boss?',
-              value: false,
-            },
-            {
-              text: 'Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit',
-              value: true,
-            },
-            {
-              text: 'Sign contract for "What are conference organizers afraid of?"',
-              value: true,
-            },
-          ],
-        },
-        list: {
-          0: false,
-          1: false,
-          2: false,
-        },
-      }
+        2: [
+          {
+            text: "Lines From Great Russian Literature? Or E-mails From My Boss?",
+            value: false,
+            dueDate: "2024-01-26",
+          },
+          {
+            text: "Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit",
+            value: true,
+            dueDate: "2024-01-27",
+          },
+          {
+            text: 'Sign contract for "What are conference organizers afraid of?"',
+            value: true,
+            dueDate: "2024-01-28",
+          },
+        ],
+      },
+    };
+  },
+
+  methods: {
+    refreshData() {
+      // Implement refresh logic
+      this.lastUpdated = new Date().toLocaleString();
     },
 
-    methods: {
-      complete (index) {
-        this.list[index] = !this.list[index]
-      },
+    openDatePicker() {
+      // Implement date picker logic
     },
-  }
+
+    downloadReport() {
+      // Implement report download
+    },
+
+    refreshSalesData() {
+      // Implement sales refresh logic
+      this.salesLastUpdated = new Date().toLocaleString();
+    },
+
+    refreshTaskData() {
+      // Implement task refresh logic
+      this.taskLastUpdated = new Date().toLocaleString();
+    },
+
+    showSocialDetails() {
+      // Implement social details view
+    },
+
+    showAnalyticsDetails() {
+      // Implement analytics details view
+    },
+
+    showRevenueDetails() {
+      // Implement revenue details view
+    },
+
+    showBookingDetails() {
+      // Implement booking details view
+    },
+
+    updateTaskStatus(task) {
+      console.log(task);
+      // Implement task status update logic
+    },
+
+    editTask(task) {
+      console.log(task);
+      // Implement task edit logic
+    },
+
+    deleteTask(task) {
+      console.log(task);
+      // Implement task delete logic
+    },
+  },
+};
 </script>
+
+<style scoped>
+.task-row {
+  transition: background-color 0.2s;
+}
+
+.task-row:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.task-text {
+  transition: color 0.2s;
+}
+
+.completed-task {
+  text-decoration: line-through;
+  color: #888;
+}
+</style>
