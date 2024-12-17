@@ -2,7 +2,11 @@
   <v-container fluid>
     <v-card
       class="v-card--material v-card v-sheet theme--light elevation-4"
-      style="padding: 24px; border-radius: 16px; background: linear-gradient(to right, #ffffff, #f8f9fa)"
+      style="
+        padding: 24px;
+        border-radius: 16px;
+        background: linear-gradient(to right, #ffffff, #f8f9fa);
+      "
     >
       <v-data-table
         :headers="tableHeaders"
@@ -16,13 +20,8 @@
         @update:options="fetchData"
       >
         <template v-slot:top>
-          <v-row
-            class="justify-space-between align-center px-4 py-3"
-          >
-            <v-col
-              cols="7"
-              class="d-flex align-center"
-            >
+          <v-row class="justify-space-between align-center px-4 py-3">
+            <v-col cols="4" class="d-flex align-center">
               <v-autocomplete
                 v-model="filter.region"
                 item-text="name"
@@ -34,7 +33,6 @@
                 outlined
                 class="mr-4"
                 hide-details
-                return-object
                 @change="handleFilterChange"
               >
                 <template v-slot:no-data>
@@ -48,13 +46,12 @@
                 item-text="area"
                 item-value="area"
                 label="Area"
-                :items="getAreaOptions"
+                :disabled="!filter.region"
+                :items="filteredAreaOptions"
                 clearable
                 dense
                 outlined
                 hide-details
-                return-object
-                class="mr-4"
                 @change="handleFilterChange"
               >
                 <template v-slot:no-data>
@@ -63,7 +60,38 @@
                   </v-list-item>
                 </template>
               </v-autocomplete>
-              <v-autocomplete
+            </v-col>
+            <v-col cols="7">
+              <div class="d-flex justify-end align-center">
+                <v-autocomplete
+                  v-model="filter.brand"
+                  :items="getBrandOptions"
+                  item-text="brand"
+                  item-value="brand"
+                  label="Brand"
+                  clearable
+                  dense
+                  outlined
+                  hide-details
+                  class="mr-4"
+                  @change="handleFilterChange"
+                >
+                </v-autocomplete>
+                <v-autocomplete
+                  v-model="filter.sio_type"
+                  :items="getSioTypeOptions"
+                  item-text="name"
+                  item-value="name"
+                  label="Sio Type"
+                  class="mr-4"
+                  clearable
+                  dense
+                  outlined
+                  hide-details
+                  @change="handleFilterChange"
+                >
+                </v-autocomplete>
+                <v-autocomplete
                 v-model="filter.status"
                 :items="statusOptions"
                 label="Status"
@@ -81,7 +109,21 @@
                   </v-list-item>
                 </template>
               </v-autocomplete>
+              </div>
             </v-col>
+            <v-col cols="1" class="d-flex justify-end">
+              <v-btn
+                fab
+                color="primary"
+                class="ml-2"
+                :loading="loading"
+                @click="fetchData"
+              >
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row class="justify-space-between align-center px-4 mb-4">
             <v-col cols="3">
               <v-text-field
                 v-model="search"
@@ -94,17 +136,6 @@
                 @keyup.enter="handleSearch"
                 @click:clear="handleClearSearch"
               />
-            </v-col>
-            <v-col cols="1" class="d-flex justify-end">
-              <v-btn
-                icon
-                color="primary"
-                class="mr-2"
-                :loading="loading"
-                @click="fetchData"
-              >
-                <v-icon>mdi-refresh</v-icon>
-              </v-btn>
             </v-col>
           </v-row>
         </template>
@@ -119,12 +150,14 @@
                 label
                 text-color="white"
               >
-                {{ item?.outlet_name ? 'Existing' : 'New' }}
+                {{ item?.outlet_name ? "Existing" : "New" }}
               </v-chip>
             </td>
             <td class="font-weight-medium">{{ item?.code_batch }}</td>
             <td class="font-weight-medium">{{ item?.user_name }}</td>
-            <td class="font-weight-medium">{{ item?.outlet_name || item?.survey_name }}</td>
+            <td class="font-weight-medium">
+              {{ item?.outlet_name || item?.survey_name }}
+            </td>
             <td>{{ item?.region }}</td>
             <td>{{ item?.area }}</td>
             <td>{{ item?.brand }}</td>
@@ -136,10 +169,11 @@
                 label
                 text-color="white"
               >
-              {{ getStatusLabel(item) }}
-            </v-chip>
+                {{ getStatusLabel(item) }}
+              </v-chip>
             </td>
-            <td>{{ formatDate(item?.created_at) }}</td>
+            <td>{{ formatDateTime(item?.start_time) }}</td>
+            <td>{{ formatDateTime(item?.end_time) }}</td>
             <td>
               <div class="d-flex align-center">
                 <v-btn
@@ -153,10 +187,7 @@
                   Detail
                 </v-btn>
 
-                <v-menu
-                  offset-y
-                  :close-on-content-click="false"
-                >
+                <v-menu offset-y :close-on-content-click="false">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
                       color="primary"
@@ -169,7 +200,14 @@
                     </v-btn>
                   </template>
                   <v-list dense>
-                    <template v-if="(getUser?.roles === 'ADMIN' || getUser?.roles === 'NASIONAL' || getUser?.roles === 'SUPERADMIN') && item?.status === 101">
+                    <template
+                      v-if="
+                        (getUser?.roles === 'ADMIN' ||
+                          getUser?.roles === 'NASIONAL' ||
+                          getUser?.roles === 'SUPERADMIN') &&
+                        item?.status === 101
+                      "
+                    >
                       <v-list-item
                         v-for="(status, index) in statusLevel2Options"
                         :key="index"
@@ -180,10 +218,19 @@
                             mdi-circle-small
                           </v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>{{ getStatusLabelOption(status.value) }}</v-list-item-title>
+                        <v-list-item-title>{{
+                          getStatusLabelOption(status.value)
+                        }}</v-list-item-title>
                       </v-list-item>
                     </template>
-                    <template v-else-if="(getUser?.roles === 'AMO' || getUser?.roles === 'REGIONAL' || getUser?.roles === 'TL') && item?.status === 101">
+                    <template
+                      v-else-if="
+                        (getUser?.roles === 'AMO' ||
+                          getUser?.roles === 'REGIONAL' ||
+                          getUser?.roles === 'TL') &&
+                        item?.status === 101
+                      "
+                    >
                       <v-list-item
                         v-for="(status, index) in statusLevel1Options"
                         :key="index"
@@ -195,16 +242,18 @@
                             mdi-circle-small
                           </v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>{{ getStatusLabelOption(status.value) }}</v-list-item-title>
+                        <v-list-item-title>{{
+                          getStatusLabelOption(status.value)
+                        }}</v-list-item-title>
                       </v-list-item>
                     </template>
                     <template v-else>
                       <v-list-item>
                         <v-list-item-icon class="mr-2">
-                            <v-icon small>mdi-circle-small</v-icon>
+                          <v-icon small>mdi-circle-small</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>
-                            {{ getStatusLabel(item) }}
+                          {{ getStatusLabel(item) }}
                         </v-list-item-title>
                       </v-list-item>
                     </template>
@@ -216,10 +265,7 @@
         </template>
       </v-data-table>
 
-      <v-row
-        justify="center"
-        class="pt-4"
-      >
+      <v-row justify="center" class="pt-4">
         <v-pagination
           v-model="page"
           :length="totalPages"
@@ -250,238 +296,349 @@
 </template>
 
 <script>
-  import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-  import { createData, deleteData, updateData, getAll, updateStatus } from '@/api/activityService'
-  import FormCallPlan from '@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue'
-  import Vue from "vue";
-  import { mapGetters } from "vuex";
-  import { EXISTING_SURVEY_STATUS, NEW_SURVEY_STATUS, STATUS_COLORS } from '@/constants/status';
+import ConfirmDeleteDialog from "@/components/base/ConfirmDeleteDialog.vue";
+import {
+  createData,
+  deleteData,
+  updateData,
+  getAll,
+  updateStatus,
+} from "@/api/activityService";
+import FormCallPlan from "@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue";
+import Vue from "vue";
+import { mapGetters } from "vuex";
+import {
+  EXISTING_SURVEY_STATUS,
+  NEW_SURVEY_STATUS,
+  STATUS_COLORS,
+} from "@/constants/status";
 
-  export default {
-    name: 'Activity',
-    components: {
-      FormCallPlan,
-      ConfirmDeleteDialog,
-    },
-    data() {
-      return {
-        refreshDataTrigger : false,
-        tableHeaders: [
-          { text: 'No', value: 'number', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
-          { text: 'Type', value: 'type', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
-          { text: 'Code Batch', value: 'code_batch', sortable: false, class: 'text-left font-weight-bold', width: '12%' },
-          { text: 'MD', value: 'user_name', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Outlet Name', value: 'outlet_name', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
-          { text: 'Region', value: 'region', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Area', value: 'area', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Brand', value: 'brand', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
-          { text: 'Type SIO', value: 'type_sio', sortable: false, class: 'text-left font-weight-bold', width: '15%' },
-          { text: 'Status', value: 'status', sortable: false, class: 'text-left font-weight-bold', width: '11%' },
-          { text: 'Created At', value: 'created_at', sortable: false, class: 'text-left font-weight-bold', width: '20%' },
-          { text: 'Actions', value: 'actions', sortable: false, class: 'text-center font-weight-bold' },
-        ],
-        tableData: [],
-        totalItems: 0,
-        totalPages: 0,
-        page: 1,
-        options: { page: 1, itemsPerPage: 10 },
-        loading: false,
-        selectedItem: null,
-        isFormRoleDialog: false,
-        isEdit: false,
-        isConfirmDeleteDialogOpen: false,
-        search: '',
-        regionOptions: [],
-        areaOptions: [],
-        statusOptions: [
-          // { value: 100 }, // STATUS_PROCESSING
-          { value: 101 }, // STATUS_HO_PROCESSING
-          // { value: 400 }, // STATUS_NOT_VISITED 
-          { value: 401 }, // STATUS_TEMP_CLOSED
-          { value: 402 }, // STATUS_PERM_CLOSED
-          { value: 403 }, // STATUS_NOT_FOUND
-          { value: 404 }, // STATUS_REJECTED
-          // { value: 405 }, // STATUS_CANCELLED
-          { value: 406 }, // STATUS_PIC_REJECTED
-          { value: 407 }, // STATUS_HO_REJECTED
-          { value: 200 }, // STATUS_VISITED
-          { value: 201 }, // STATUS_COMPLETED
-          { value: 202 }, // STATUS_OUTLET_AGREED
-          { value: 203 }, // STATUS_APPROVED
-        ],
-        statusLevel1Options: [
-          { value: 101 },
-          { value: 406 },
-        ],
-        statusLevel2Options: [
-          { value: 203 },
-          { value: 407 },
-        ],
-        status: '',
-        statusUpdate: '',
-        statusUpdateItem: null,
-        menu: false,
-        filter: {
-          region: '',
-          area: '',
-          status: '',
+export default {
+  name: "Activity",
+  components: {
+    FormCallPlan,
+    ConfirmDeleteDialog,
+  },
+  data() {
+    return {
+      refreshDataTrigger: false,
+      tableHeaders: [
+        {
+          text: "No",
+          value: "number",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "2%",
         },
+        {
+          text: "Type",
+          value: "type",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "5%",
+        },
+        {
+          text: "Code Batch",
+          value: "code_batch",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "6%",
+        },
+        {
+          text: "MD",
+          value: "user_name",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "6%",
+        },
+        {
+          text: "Outlet Name",
+          value: "outlet_name",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "10%",
+        },
+        {
+          text: "Region",
+          value: "region",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "6%",
+        },
+        {
+          text: "Area",
+          value: "area",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "6%",
+        },
+        {
+          text: "Brand",
+          value: "brand",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "6%",
+        },
+        {
+          text: "Type SIO",
+          value: "type_sio",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "15%",
+        },
+        {
+          text: "Status",
+          value: "status",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "11%",
+        },
+        {
+          text: "Start Time",
+          value: "start_time",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "15%",
+        },
+        {
+          text: "End Time",
+          value: "end_time",
+          sortable: false,
+          class: "text-left font-weight-bold",
+          width: "15%",
+        },
+        {
+          text: "Actions",
+          value: "actions",
+          sortable: false,
+          class: "text-center font-weight-bold",
+        },
+      ],
+      tableData: [],
+      totalItems: 0,
+      totalPages: 0,
+      page: 1,
+      options: { page: 1, itemsPerPage: 10 },
+      loading: false,
+      selectedItem: null,
+      isFormRoleDialog: false,
+      isEdit: false,
+      isConfirmDeleteDialogOpen: false,
+      search: "",
+      regionOptions: [],
+      areaOptions: [],
+      statusOptions: [
+        // { value: 100 }, // STATUS_PROCESSING
+        { value: 101 }, // STATUS_HO_PROCESSING
+        // { value: 400 }, // STATUS_NOT_VISITED
+        { value: 401 }, // STATUS_TEMP_CLOSED
+        { value: 402 }, // STATUS_PERM_CLOSED
+        { value: 403 }, // STATUS_NOT_FOUND
+        { value: 404 }, // STATUS_REJECTED
+        // { value: 405 }, // STATUS_CANCELLED
+        { value: 406 }, // STATUS_PIC_REJECTED
+        { value: 407 }, // STATUS_HO_REJECTED
+        { value: 200 }, // STATUS_VISITED
+        { value: 201 }, // STATUS_COMPLETED
+        { value: 202 }, // STATUS_OUTLET_AGREED
+        { value: 203 }, // STATUS_APPROVED
+      ],
+      statusLevel1Options: [{ value: 101 }, { value: 406 }],
+      statusLevel2Options: [{ value: 203 }, { value: 407 }],
+      status: "",
+      statusUpdate: "",
+      statusUpdateItem: null,
+      menu: false,
+      filter: {
+        region: "",
+        area: "",
+        status: "",
+        brand: "",
+        sio_type: "",
+      },
+    };
+  },
+  computed: {
+    ...mapGetters(["getUser", "getRegionOptions", "getAreaOptions", "getBrandOptions", "getSioTypeOptions"]),
+    filteredAreaOptions() {
+      if (!this.filter.region) return this.getAreaOptions;
+
+      const selectedRegion = this.getRegionOptions.find(
+        (region) => region.name === this.filter.region
+      );
+
+      if (!selectedRegion) return this.getAreaOptions;
+
+      return this.getAreaOptions.filter(
+        (area) => area.region_id === selectedRegion.id
+      );
+    },
+  },
+  watch: {
+    page(value) {
+      this.options.page = value;
+      this.fetchData();
+    },
+    itemsPerPage(value) {
+      this.options.itemsPerPage = value;
+      this.fetchData();
+    },
+  },
+
+  methods: {
+    handleFilterChange() {
+      this.options.page = 1;
+      this.fetchData();
+    },
+    getStatusLabel(item) {
+      return item?.outlet_name
+        ? EXISTING_SURVEY_STATUS[item?.status]
+        : NEW_SURVEY_STATUS[item?.status];
+    },
+    getStatusLabelOption(value) {
+      return EXISTING_SURVEY_STATUS[value]
+        ? EXISTING_SURVEY_STATUS[value]
+        : NEW_SURVEY_STATUS[value];
+    },
+    getStatusColor(status) {
+      return STATUS_COLORS[status];
+    },
+    formatDate(date) {
+      if (!date) return "";
+      return new Date(date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+    formatDateTime(date) {
+      if (!date) return "";
+      return new Date(date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+      });
+    },
+    onPageChange(newPage) {
+      this.page = newPage;
+    },
+    openHandleAdd() {
+      this.isEdit = false;
+      this.selectedItem = null;
+      this.isFormRoleDialog = true;
+    },
+    openHandleUpdate(item) {
+      this.isEdit = true;
+      this.selectedItem = item;
+      this.isFormRoleDialog = true;
+    },
+    async handleStatusUpdate(item, status) {
+      this.statusUpdateItem = item;
+      this.statusUpdate = status;
+    },
+    async handleSave(item) {
+      try {
+        if (this.isEdit) {
+          const { id, ...itemWithoutId } = item;
+          const res = await updateData(id, itemWithoutId);
+          if (res.statusCode === 200) {
+            Vue.prototype.$toast.success(`Update data Successfully!`);
+            this.closeFormDialog();
+          }
+        } else {
+          const res = await createData(item);
+          if (res.statusCode === 200) {
+            Vue.prototype.$toast.success(`Create data Successfully!`);
+            this.closeFormDialog();
+          }
+        }
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data.message}`);
+        console.error(error);
+      } finally {
+        await this.fetchData();
       }
     },
-    computed: {
-      ...mapGetters(['getUser', 'getRegionOptions', 'getAreaOptions']),
+    closeFormDialog() {
+      this.isFormRoleDialog = false;
+      this.isEdit = false;
     },
-    watch: {
-      page(value) {
-        this.options.page = value;
-        this.fetchData();
-      },
-      itemsPerPage(value) {
-        this.options.itemsPerPage = value;
-        this.fetchData();
-      },
+    handleSearch() {
+      this.options.page = 1;
+      this.fetchData();
     },
-  
-    methods: {
-      handleFilterChange() {
-        this.options.page = 1;
-        this.fetchData();
-      },
-      getStatusLabel(item) {
-        return item?.outlet_name ? EXISTING_SURVEY_STATUS[item?.status] : NEW_SURVEY_STATUS[item?.status];
-      },
-      getStatusLabelOption(value) {
-        return EXISTING_SURVEY_STATUS[value] ? EXISTING_SURVEY_STATUS[value] : NEW_SURVEY_STATUS[value];
-      },
-      getStatusColor(status) {
-        return STATUS_COLORS[status];
-      },
-      formatDate(date) {
-        if (!date) return '';
-        return new Date(date).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
+    handleClearSearch() {
+      this.search = "";
+      this.options.page = 1;
+      this.fetchData();
+    },
+    async fetchData() {
+      this.loading = true;
+      try {
+        const response = await getAll({
+          page: this.options.page,
+          limit: this.options.itemsPerPage,
+          searchTerm: this.search,
+          filter: this.filter,
         });
-      },
-      onPageChange(newPage) {
-        this.page = newPage;
-      },
-      openHandleAdd() {
-        this.isEdit = false
-        this.selectedItem = null
-        this.isFormRoleDialog = true
-      },
-      openHandleUpdate(item) {
-        this.isEdit = true
-        this.selectedItem = item
-        this.isFormRoleDialog = true
-      },
-      async handleStatusUpdate(item, status) {
-        this.statusUpdateItem = item
-        this.statusUpdate = status
-      },
-      async handleSave(item) {
-        try {
-          if (this.isEdit) {
-            const { id, ...itemWithoutId } = item
-            const res  = await updateData(id, itemWithoutId)
-            if (res.statusCode === 200) {
-              Vue.prototype.$toast.success(`Update data Successfully!`)
-              this.closeFormDialog()
-            }
-          } else {
-            const res = await createData(item)
-            if (res.statusCode === 200) {
-              Vue.prototype.$toast.success(`Create data Successfully!`)
-              this.closeFormDialog()
-            }
-          }
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
-          console.error(error)
-        } finally {
-          await this.fetchData()
-        }
-      },
-      closeFormDialog() {
-        this.isFormRoleDialog = false
-        this.isEdit = false
-      },
-      handleSearch() {
-        this.options.page = 1;
-        this.fetchData();
-      },
-      handleClearSearch() {
-        this.search = '';
-        this.options.page = 1;
-        this.fetchData();
-      },
-      async fetchData() {
-        this.loading = true
-        try {
-          const response = await getAll({
-            page: this.options.page,
-            limit: this.options.itemsPerPage,
-            searchTerm: this.search,
-            filter: this.filter,
-          });
-          this.tableData = response.data.result;
-          this.totalItems = response.data.totalRecords;
-          this.totalPages = response.data.totalPages;
-          this.options.page = response.data.currentPage;
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
-          console.error(error)
-        } finally {
-          this.loading = false
-        }
-      },
-      openConfirmDeleteDialog(data) {
-        this.selectedItem = data
-        this.isConfirmDeleteDialogOpen = true
-      },
-      async handleDetail(id) {
-        await this.$router.push({
-          name: 'Detail Activity',
-          params: { id },
-        });
-      },
-      closeConfirmDeleteDialog() {
-        this.isConfirmDeleteDialogOpen = false
-      },
-      async handleDelete() {
-        this.loading = true
-        const data = this.selectedItem
-        try {
-          await deleteData(data.id)
-          Vue.prototype.$toast.success(`Deleted Area ${data.area} successfully!`)
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
-          console.error(error)
-        } finally {
-          this.loading = false
-          this.closeConfirmDeleteDialog()
-          await this.fetchData()
-        }
-      },
-      async updateStatus(item, status) {
-        const data = {
-          status: status,
-        }
-        try {
-          const res = await updateStatus(item.id, data)
-          if (res.statusCode === 200) {
-            Vue.prototype.$toast.success(`Update status Successfully!`)
-            await this.fetchData()
-          }
-        } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
-          console.error(error)
-        }
-      },
+        this.tableData = response.data.result;
+        this.totalItems = response.data.totalRecords;
+        this.totalPages = response.data.totalPages;
+        this.options.page = response.data.currentPage;
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data.message}`);
+        console.error(error);
+      } finally {
+        this.loading = false;
+      }
     },
-  }
+    openConfirmDeleteDialog(data) {
+      this.selectedItem = data;
+      this.isConfirmDeleteDialogOpen = true;
+    },
+    async handleDetail(id) {
+      await this.$router.push({
+        name: "Detail Activity",
+        params: { id },
+      });
+    },
+    closeConfirmDeleteDialog() {
+      this.isConfirmDeleteDialogOpen = false;
+    },
+    async handleDelete() {
+      this.loading = true;
+      const data = this.selectedItem;
+      try {
+        await deleteData(data.id);
+        Vue.prototype.$toast.success(`Deleted Area ${data.area} successfully!`);
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data.message}`);
+        console.error(error);
+      } finally {
+        this.loading = false;
+        this.closeConfirmDeleteDialog();
+        await this.fetchData();
+      }
+    },
+    async updateStatus(item, status) {
+      const data = {
+        status: status,
+      };
+      try {
+        const res = await updateStatus(item.id, data);
+        if (res.statusCode === 200) {
+          Vue.prototype.$toast.success(`Update status Successfully!`);
+          await this.fetchData();
+        }
+      } catch (error) {
+        Vue.prototype.$toast.error(`${error.data.message}`);
+        console.error(error);
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>

@@ -139,8 +139,6 @@ export default {
       tableHeaders: [
         { text: "No", value: "no" },
         { text: "name", value: "name" },
-        { text: "Component", value: "component" },
-        { text: "Total Component", value: "total" },
         { text: "Action", value: "action" },
       ],
       tableData: [],
