@@ -15,14 +15,12 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'Batch Code', value: 'batch_code' },
         { text: 'Regional', value: 'batch_target_regional' },
         { text: 'AMO', value: 'batch_target_amo' },
         { text: 'Brand', value: 'batch_target_brand' },
         { text: 'SIO Type', value: 'batch_target_sio_type' },
         { text: 'Brand Type SIO', value: 'batch_target_brand_type_sio' },
         { text: 'AMO Brand Type', value: 'batch_target_amo_brand_type' },
-        // { text: 'Total Master', value: 'batch_target_total_master' },
         { text: 'Allocation HO', value: 'batch_target_allocation_ho' },
         { text: 'Activity Count', value: 'activity_count' },
       ],
