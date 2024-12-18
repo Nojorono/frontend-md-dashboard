@@ -167,7 +167,7 @@
           :options="dataCompletedTasksChart.options"
           hover-reveal
           color="info"
-          type="Line"
+          type="Bar"
           class="elevation-6"
         >
           <template v-slot:reveal-actions>
@@ -221,11 +221,11 @@
           </template>
 
           <h3 class="card-title font-weight-light mt-2 ml-2">
-            Task Completion Metrics
+            Task Completion Distribution
           </h3>
 
           <p class="d-inline-flex font-weight-light ml-2 mt-1">
-            Task completion trends and analysis
+            Task completion percentage breakdown
           </p>
 
           <template v-slot:actions>
@@ -237,7 +237,7 @@
         </base-material-chart-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3">
+      <!-- <v-col cols="12" sm="6" lg="3">
         <base-material-stats-card
           color="info"
           icon="mdi-twitter"
@@ -288,7 +288,7 @@
           class="elevation-6"
           @click="showBookingDetails"
         />
-      </v-col>
+      </v-col> -->
 
       <v-col cols="12" md="12">
         <base-material-card color="warning" class="px-5 py-3 elevation-6">
