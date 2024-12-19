@@ -22,7 +22,7 @@ export default {
         { text: 'Brand Type SIO', value: 'batch_target_brand_type_sio' },
         { text: 'AMO Brand Type', value: 'batch_target_amo_brand_type' },
         { text: 'Allocation HO', value: 'batch_target_allocation_ho' },
-        { text: 'Activity Count', value: 'activity_count' },
+        { text: 'Actual', value: 'activity_count' },
       ],
       items: [],
       search: '',

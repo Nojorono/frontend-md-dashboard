@@ -15,6 +15,17 @@ export const getDashboardBatchTarget = async (codeBatch) => {
   }
 };
 
+export const getAllOutletByFilter = async (params) => {
+  try {
+    const response = await axiosInstance.get('/dashboard/outlet', {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
 export const getAllRegion = async () => {
   try {
     const response = await axiosInstance.get(`/region/all`);

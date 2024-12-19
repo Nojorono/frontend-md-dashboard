@@ -180,7 +180,6 @@
 import LeafletMap from "@/views/dashboard/components/dashboard/LeafletMap.vue";
 import DashboardBatchTarget from "@/views/dashboard/components/dashboard/BatchTarget.vue";
 import MaterialChartCard from "@/components/base/MaterialChartCard.vue";
-import { mapActions, mapState } from 'vuex';
 
 export default {
   name: "DashboardDashboard",
@@ -231,19 +230,10 @@ export default {
   },
 
   computed: {
-    ...mapState({
-      outletData: state => state.outlet.data,
-      regionData: state => state.region.data,
-      typeData: state => state.type.data
-    })
+   
   },
 
   methods: {
-    ...mapActions({
-      fetchOutlets: 'outlet/fetchData',
-      fetchRegions: 'region/fetchData', 
-      fetchTypes: 'type/fetchData'
-    }),
 
     async fetchOutletStatusData() {
       this.loading = true;
