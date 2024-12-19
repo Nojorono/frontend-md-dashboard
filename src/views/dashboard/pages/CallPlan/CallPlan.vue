@@ -45,8 +45,8 @@
               </v-autocomplete>
               <v-autocomplete
                 v-model="selectedArea"
-                item-text="name"
-                item-value="name"
+                item-text="area"
+                item-value="area"
                 label="Area"
                 :items="getAreaOptions"
                 clearable
