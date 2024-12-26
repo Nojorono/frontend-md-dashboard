@@ -19,10 +19,10 @@
             clearable
             dense
             outlined
-            @clear="filter.area = ''"
+            @click:clear="filter.area = ''"
             @change="filterMarkers"
           />
-          
+
           <v-autocomplete
             v-model="filter.area"
             :items="filteredAreaOptions"
@@ -89,7 +89,7 @@
   import 'leaflet.markercluster/dist/MarkerCluster.css';
   import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
   import { getAllOutletByFilter } from '@/api/dashboardService';
-  import { mapGetters } from 'vuex';
+  import { mapGetters, mapActions } from 'vuex';
 
   export default {
     name: 'LeafletMap',
@@ -112,7 +112,8 @@
       };
     },
     computed: {
-      ...mapGetters(["getUser", "getRegionOptions", "getAreaOptions", "getBrandOptions", "getSioTypeOptions"]),
+      ...mapGetters(["getUser", "getRegionOptions", "getAreaOptions", "getBrandOptions", "getSioTypeOptions", "getLoading"]),
+      ...mapActions(["showLoading", "hideLoading"]),
       filteredAreaOptions() {
         if (!this.filter.region) return this.getAreaOptions;
 
@@ -148,6 +149,7 @@
       },
 
       async fetchData() {
+        this.$store.dispatch('showLoading');
         try {
           const response = await getAllOutletByFilter({
             filter: this.filter,
@@ -156,6 +158,8 @@
           this.addMarkersToMap(this.markersData);
         } catch (error) {
           console.error('Error fetching data:', error);
+        } finally {
+          this.$store.dispatch('hideLoading');
         }
       },
 

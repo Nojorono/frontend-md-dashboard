@@ -61,7 +61,6 @@
     },
 
     mounted() {
-      console.log(this.options)
     }
   }
 </script>

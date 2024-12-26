@@ -326,14 +326,11 @@
         regionOptions: [],
         areaOptions: [],
         statusOptions: [
-          // { value: 100 }, // STATUS_PROCESSING
           { value: 101 }, // STATUS_HO_PROCESSING
-          // { value: 400 }, // STATUS_NOT_VISITED
           { value: 401 }, // STATUS_TEMP_CLOSED
           { value: 402 }, // STATUS_PERM_CLOSED
           { value: 403 }, // STATUS_NOT_FOUND
           { value: 404 }, // STATUS_REJECTED
-          // { value: 405 }, // STATUS_CANCELLED
           { value: 406 }, // STATUS_PIC_REJECTED
           { value: 407 }, // STATUS_HO_REJECTED
           { value: 200 }, // STATUS_VISITED

@@ -62,7 +62,6 @@ export const deleteData = async (id) => {
 
 export const getGallery = async (params) => {
   try {
-    console.log(params);
     const response = await axiosInstance.get(`/sio-gallery`, {
       params: params,
     });
@@ -83,7 +82,6 @@ export const createGallery = async (data) => {
 
 export const updateGallery = async (id, data) => {
   try {
-    console.log(id);
     const intId = parseInt(id, 10);
     const response = await axiosInstance.put(`/sio-gallery/${intId}`, data);
     return response.data;

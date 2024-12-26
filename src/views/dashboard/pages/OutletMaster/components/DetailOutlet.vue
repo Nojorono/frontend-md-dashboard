@@ -181,7 +181,7 @@
                                 <div class="d-flex align-center justify-space-between pt-2">
                                   <v-icon left>mdi-comment</v-icon>
                                   <v-chip small color="error">{{ activity.comments?.length || 0 }} Comments</v-chip>
-                                  <div class="px-2 caption grey--text"> Last Comment {{ formatDate(activity.comments[0].created_at) }}</div>
+                                  <div class="px-2 caption grey--text"> Last Comment {{ formatDate(activity.comments?.[0]?.created_at) }}</div>
                                 </div>
                               </div>
                               <v-btn style="margin-left: auto;" icon small @click="handleActivityDetail(activity.id)">
@@ -336,7 +336,6 @@ export default {
     },
 
     async handleSwitchChange(data, isActive) {
-      console.log(data, isActive);
       this.switchLoading = true;
       try {
         await this.$swal.fire({

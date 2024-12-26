@@ -180,6 +180,7 @@
 import LeafletMap from "@/views/dashboard/components/dashboard/LeafletMap.vue";
 import DashboardBatchTarget from "@/views/dashboard/components/dashboard/BatchTarget.vue";
 import MaterialChartCard from "@/components/base/MaterialChartCard.vue";
+import Vue from 'vue';
 
 export default {
   name: "DashboardDashboard",
@@ -243,9 +244,10 @@ export default {
         this.outletLastUpdated = new Date().toLocaleString();
         this.totalOutlets = this.outletData.series.reduce((a,b) => a + b, 0);
       } catch (error) {
-        console.error('Error fetching outlet status data:', error);
+        Vue.prototype.$toast.error(`${error.data.message}`)
+      } finally {
+        this.loading = false;
       }
-      this.loading = false;
     },
 
     async fetchOutletRegionData() {
@@ -256,9 +258,10 @@ export default {
         this.regionLastUpdated = new Date().toLocaleString();
         this.activeRegions = this.regionData.labels.length;
       } catch (error) {
-        console.error('Error fetching region data:', error);
+        Vue.prototype.$toast.error(`${error.data.message}`)
+      } finally {
+        this.loading = false;
       }
-      this.loading = false;
     },
 
     async fetchOutletTypeData() {
@@ -269,9 +272,10 @@ export default {
         this.typeLastUpdated = new Date().toLocaleString();
         this.totalTypes = this.typeData.labels.length;
       } catch (error) {
-        console.error('Error fetching type data:', error);
+        Vue.prototype.$toast.error(`${error.data.message}`)
+      } finally {
+        this.loading = false;
       }
-      this.loading = false;
     },
 
     async downloadOutletReport() {
@@ -279,9 +283,10 @@ export default {
       try {
         await this.downloadReport('outlet');
       } catch (error) {
-        console.error('Error downloading outlet report:', error);
+        Vue.prototype.$toast.error(`${error.data.message}`)
+      } finally {
+        this.downloading = false;
       }
-      this.downloading = false;
     },
 
     async downloadRegionReport() {
@@ -289,9 +294,10 @@ export default {
       try {
         await this.downloadReport('region');
       } catch (error) {
-        console.error('Error downloading region report:', error);
+        Vue.prototype.$toast.error(`${error.data.message}`)
+      } finally {
+        this.downloading = false;
       }
-      this.downloading = false;
     },
 
     async downloadTypeReport() {
@@ -299,9 +305,10 @@ export default {
       try {
         await this.downloadReport('type');
       } catch (error) {
-        console.error('Error downloading type report:', error);
+        Vue.prototype.$toast.error(`${error.data.message}`)
+      } finally {
+        this.downloading = false;
       }
-      this.downloading = false;
     },
 
     async downloadReport(type) {
@@ -311,13 +318,13 @@ export default {
     }
   },
 
-  async created() {
-    await Promise.all([
-      this.fetchOutletStatusData(),
-      this.fetchOutletRegionData(),
-      this.fetchOutletTypeData()
-    ]);
-  }
+  // async created() {
+  //   await Promise.all([
+  //     this.fetchOutletStatusData(),
+  //     this.fetchOutletRegionData(),
+  //     this.fetchOutletTypeData()
+  //   ]);
+  // }
 }
 </script>
 

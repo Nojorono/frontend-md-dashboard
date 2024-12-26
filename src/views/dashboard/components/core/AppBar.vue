@@ -275,7 +275,7 @@
         this.$swal.fire({
           title: 'Are you sure?',
           text: "You will be logged out of the system",
-          icon: 'warning',
+          icon: 'warning', 
           showCancelButton: true,
           confirmButtonColor: '#FF5733',
           cancelButtonColor: '#6B7A8F',
@@ -283,8 +283,10 @@
           cancelButtonText: 'Cancel',
         }).then((result) => {
           if (result.isConfirmed) {
-            // Use replace instead of push to avoid navigation guard issues
-            this.$router.replace('/logout');
+            this.$router.replace({ path: '/logout' })
+              .then(() => {
+                this.$router.push({ path: '/login' });
+              });
           }
         });
       },

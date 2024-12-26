@@ -6,10 +6,21 @@ export default [
     component: () => import('@/views/dashboard/Index'),
     children: [
       {
+        name: 'Forbidden',
+        path: '/forbidden',
+        component: () => import('@/views/dashboard/pages/Forbidden'),
+      },
+      {
         name: 'Dashboard',
         path: '/',
         component: () => import('@/views/dashboard/Dashboard'),
         meta: requiresAuth, // Add this to protect the route
+      },
+      {
+        name: 'Report',
+        path: '/report',
+        component: () => import('@/views/dashboard/pages/Report/Report.vue'),
+        meta: requiresAuth, // Protect this route
       },
       {
         name: 'User Profile',
@@ -136,30 +147,6 @@ export default [
         path: '/components/notifications',
         component: () => import('@/views/dashboard/component/Notifications'),
         meta: requiresAuth, // Protect this route
-      },
-      {
-        name: 'Icons',
-        path: '/components/icons',
-        component: () => import('@/views/dashboard/component/Icons'),
-        meta: requiresAuth, // Protect this route
-      },
-      {
-        name: 'Typography',
-        path: '/components/typography',
-        component: () => import('@/views/dashboard/component/Typography'),
-        meta: requiresAuth, // Protect this route
-      },
-      {
-        name: 'Regular Tables',
-        path: '/tables/regular-tables',
-        component: () => import('@/views/dashboard/tables/RegularTables'),
-        meta: requiresAuth, // Protect this route
-      },
-      {
-        name: 'Google Maps',
-        path: '/maps/google-maps',
-        component: () => import('@/views/dashboard/maps/GoogleMaps'),
-        meta: requiresAuth,
       },
     ],
   },

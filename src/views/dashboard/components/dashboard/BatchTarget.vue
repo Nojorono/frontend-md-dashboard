@@ -40,7 +40,6 @@ export default {
   methods: {
     async getBatchTarget() {
       const codeBatch = this.getCodeBatch.code_batch;
-      console.log(codeBatch);
       const batchTarget = await getDashboardBatchTarget(codeBatch);
       this.items = batchTarget.data;
     }

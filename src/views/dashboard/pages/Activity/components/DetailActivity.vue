@@ -247,7 +247,7 @@
 
               <!-- Activity Section -->
               <v-col cols="8">
-                <v-card outlined>
+                <v-card outlined style="padding-bottom: 20px;">
                   <v-card-title class="d-flex justify-space-between">
                     <h3 class="text-h4 font-weight-medium mb-3">Activity</h3>
                   </v-card-title>
@@ -270,9 +270,11 @@
                     </v-col>
 
                     <v-col cols="6">
-                      <v-card-title class="text-h5 font-weight-medium">Activity SOG</v-card-title>
-                      <v-card-text>
-                        <div style="max-height: 500px; overflow-y: auto;">
+                      <v-row>
+                        <v-col cols="12" v-if="activitySogs.length > 0">
+                          <v-card-title class="text-h5 font-weight-medium">Activity SOG</v-card-title>
+                          <v-card-text>
+                            <div style="max-height: 500px; overflow-y: auto;">
                           <v-simple-table dense class="elevation-1" style="padding: 5px;">
                             <template v-slot:default>
                               <thead>
@@ -295,6 +297,35 @@
                           </v-simple-table>
                         </div>
                       </v-card-text>
+                      </v-col>
+                      <v-col cols="12" v-if="activityBranches.length > 0">
+                          <v-card-title class="text-h5 font-weight-medium">Activity Branch</v-card-title>
+                          <v-card-text>
+                            <div style="max-height: 500px; overflow-y: auto;">
+                          <v-simple-table dense class="elevation-1" style="padding: 5px;">
+                            <template v-slot:default>
+                              <thead>
+                                <tr>
+                                  <th>No</th>
+                                  <th>Name</th>
+                                  <th>Description</th>
+                                  <th>Notes</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(item, index) in activityBranches" :key="item.id">
+                                  <td>{{ index + 1 }}</td>
+                                  <td>{{ item.name }}</td>
+                                  <td>{{ item.description }}</td>
+                                  <td>{{ item.notes }}</td>
+                                </tr>
+                              </tbody>
+                            </template>
+                          </v-simple-table>
+                        </div>
+                      </v-card-text>
+                      </v-col>
+                      </v-row>
                     </v-col>
                   </v-row>
 
@@ -302,7 +333,7 @@
 
                   <!-- Activity SIO -->
                   <v-row>
-                    <v-col cols="12">
+                    <v-col cols="12" v-if="activitySios.length > 0">
                       <v-card-title class="d-flex justify-space-between">
                         <h3 class="text-h4 font-weight-medium">Activity SIO</h3>
                       </v-card-title>
@@ -376,6 +407,7 @@
         loading: false,
         activitySios: [],
         activitySogs: [],
+        activityBranches: [],
         comments: [],
         dialog: false,
         previewImage: '',
@@ -558,6 +590,7 @@
           this.data = response.data;
           this.activitySios = response.data.activitySios;
           this.activitySogs = response.data.activitySogs;
+          this.activityBranches = response.data.activityBranches;
         } catch (error) {
           Vue.prototype.$toast.error(error.response?.data?.message || "Failed to load data");
         } finally {

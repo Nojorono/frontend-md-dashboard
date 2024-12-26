@@ -6,6 +6,7 @@ import { getAllSio } from "@/api/sioService";
 import { findLast } from "@/api/batchService";
 import { getAllRegion, getAllArea } from "@/api/regionAreaService";
 
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({

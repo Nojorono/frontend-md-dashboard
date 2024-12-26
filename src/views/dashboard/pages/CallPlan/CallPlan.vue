@@ -279,7 +279,7 @@
             this.closeFormDialog()
           }
         } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
+          Vue.prototype.$toast.error(error?.data?.message || 'An error occurred')
           console.error(error)
         } finally {
           await this.fetchData()
@@ -318,7 +318,7 @@
           this.totalPages = response.data.totalPages;
           this.options.page = response.data.currentPage;
         } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
+          Vue.prototype.$toast.error(error?.data?.message || 'Failed to fetch data')
           console.error(error)
         } finally {
           this.loading = false
@@ -344,7 +344,7 @@
           await deleteData(data.id)
           Vue.prototype.$toast.success(`Deleted Area ${data.area} successfully!`)
         } catch (error) {
-          Vue.prototype.$toast.error(`${error.data.message}`)
+          Vue.prototype.$toast.error(error?.data?.message || 'Failed to delete')
           console.error(error)
         } finally {
           this.loading = false

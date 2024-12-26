@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <!-- Show loading indicator while menu is loading -->
-    <v-overlay v-if="loading" absolute :opacity="0.8">
+    <v-overlay v-if="loading" absolute :opacity="0.8" style="z-index: 999999999;">
       <v-progress-circular indeterminate color="primary" size="65" />
     </v-overlay>
     <dashboard-core-app-bar />
@@ -77,14 +77,17 @@ export default {
           text: "You will be logged out of the system",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
+          confirmButtonColor: "#FF5733",
+          cancelButtonColor: "#6B7A8F",
           confirmButtonText: "Yes, logout",
           cancelButtonText: "Cancel",
         })
         .then((result) => {
           if (result.isConfirmed) {
-            this.$router.push("/logout");
+            this.$router.replace({ path: '/logout' })
+              .then(() => {
+                this.$router.push({ path: '/login' });
+              });
           }
         });
     },

@@ -18,5 +18,6 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'vue/valid-v-slot': 'off', // Disable this rule since it's not relevant in Vue 2
     'vue/multi-word-component-names': 'off',
+    // 'prettier/prettier': ['error', { endOfLine: 'auto' }],
   },
 };

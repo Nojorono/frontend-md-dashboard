@@ -92,7 +92,6 @@ export default {
     item: {
       immediate: true,
       handler(newItem) {
-        console.log(newItem);
         if (newItem) {
           this.itemData = { ...newItem };
           if (typeof this.itemData.photo === 'string') {

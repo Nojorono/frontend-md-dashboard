@@ -10,17 +10,26 @@ export default [
   {
     path: '/logout',
     name: 'Logout',
-    beforeEnter: (to, from, next) => {
-      store.dispatch('logout')
-        .then(() => {
-          toastSuccess('Logout successfully');
-            next('/login'); // Redirect to login after successful logout
-        })
-        .catch((error) => {
-          console.error('Logout error:', error);
-          toastError('Logout failed. Please try again.');
-          next('/login'); // Redirect to login even if logout fails
+    beforeEnter: async (to, from, next) => {
+      try {
+        
+        await store.dispatch('logout');
+        
+        const intervals = window.intervals || [];
+        intervals.forEach(clearInterval);
+        
+        toastSuccess('Logout successfully');
+        
+        return next();
+      } catch (error) {
+        console.error('Logout error:', error);
+        toastError('Logout failed. Please try again.');
+        
+        return next({ 
+          path: '/login',
+          query: { error: 'logout_failed' }
         });
+      }
     },
   },
   {
