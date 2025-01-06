@@ -1,22 +1,22 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="800"
+    max-width="1000"
     persistent
     @click:outside="closeDialog"
   >
     <v-card class="rounded-lg">
       <v-card-title class="primary white--text py-4">
-        <v-icon left color="white">{{ isEdit ? 'mdi-calendar-edit' : 'mdi-calendar-plus' }}</v-icon>
-        <span class="text-h6">{{ isEdit ? "Edit Schedule Plan" : "New Schedule Plan" }}</span>
+        <v-icon left color="white">{{
+          isEdit ? "mdi-calendar-edit" : "mdi-calendar-plus"
+        }}</v-icon>
+        <span class="text-h6">{{
+          isEdit ? "Edit Schedule Plan" : "New Schedule Plan"
+        }}</span>
       </v-card-title>
 
       <v-card-text class="pt-6">
-        <v-form
-          ref="form"
-          v-model="formValid"
-          lazy-validation
-        >
+        <v-form ref="form" v-model="formValid" lazy-validation>
           <v-row>
             <v-col cols="12" sm="6">
               <v-select
@@ -30,7 +30,7 @@
                 class="rounded-lg"
               />
             </v-col>
-            
+
             <v-col cols="12" sm="6">
               <v-autocomplete
                 v-model="itemData.user_id"
@@ -51,7 +51,9 @@
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-content class="text-center">
-                      <v-icon large color="grey lighten-1">mdi-account-off</v-icon>
+                      <v-icon large color="grey lighten-1"
+                        >mdi-account-off</v-icon
+                      >
                       <div class="mt-2">No users found</div>
                     </v-list-item-content>
                   </v-list-item>
@@ -83,7 +85,9 @@
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-content class="text-center">
-                      <v-icon large color="grey lighten-1">mdi-store-off</v-icon>
+                      <v-icon large color="grey lighten-1"
+                        >mdi-store-off</v-icon
+                      >
                       <div class="mt-2">No outlets found</div>
                     </v-list-item-content>
                   </v-list-item>
@@ -115,7 +119,9 @@
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-content class="text-center">
-                      <v-icon large color="grey lighten-1">mdi-clipboard-off</v-icon>
+                      <v-icon large color="grey lighten-1"
+                        >mdi-clipboard-off</v-icon
+                      >
                       <div class="mt-2">No survey outlets found</div>
                     </v-list-item-content>
                   </v-list-item>
@@ -123,7 +129,31 @@
               </v-autocomplete>
             </template>
           </v-slide-y-transition>
-          
+
+          <v-row>
+            <v-col cols="6" sm="6">
+              <v-checkbox
+                v-model="isProgram"
+                label="Program"
+                @change="onProgramChange"
+              />
+            </v-col>
+            <v-col cols="6" sm="6">
+              <v-autocomplete
+                v-if="isProgram"
+                v-model="itemData.program_id"
+                :items="programOptions"
+                item-text="name"
+                item-value="id"
+                label="Select Program"
+                outlined
+                dense
+                prepend-inner-icon="mdi-calendar"
+                @click:clear="itemData.program_id = null"
+              />
+            </v-col>
+          </v-row>
+
           <v-row class="mt-3">
             <v-col cols="12" sm="6">
               <v-textarea
@@ -141,37 +171,48 @@
                 class="rounded-lg"
               />
             </v-col>
-            
             <v-col cols="12" sm="6">
-              <v-menu
-                ref="startPlanMenu"
-                v-model="startPlanMenu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                min-width="290px"
-                offset-y
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
+              <div>
+                <v-menu
+                  ref="startPlanMenu"
+                  v-model="startPlanMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  min-width="290px"
+                  offset-y
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="itemData.day_plan"
+                      label="Day Plan"
+                      outlined
+                      dense
+                      readonly
+                      prepend-inner-icon="mdi-calendar"
+                      :rules="startPlanRules"
+                      v-bind="attrs"
+                      v-on="on"
+                      class="rounded-lg"
+                    />
+                  </template>
+                  <v-date-picker
                     v-model="itemData.day_plan"
-                    label="Day Plan"
-                    outlined
-                    dense
-                    readonly
-                    prepend-inner-icon="mdi-calendar"
-                    :rules="startPlanRules"
-                    v-bind="attrs"
-                    v-on="on"
-                    class="rounded-lg"
+                    color="primary"
+                    :min="new Date().toISOString().substr(0, 10)"
+                    @input="startPlanMenu = false"
                   />
-                </template>
-                <v-date-picker
-                  v-model="itemData.day_plan"
-                  color="primary"
-                  :min="new Date().toISOString().substr(0, 10)"
-                  @input="startPlanMenu = false"
+                </v-menu>
+
+                <v-select
+                  v-if="isEdit"
+                  v-model="itemData.status"
+                  :items="statusOptions"
+                  label="Status"
+                  outlined
+                  dense
+                  prepend-inner-icon="mdi-check-circle"
                 />
-              </v-menu>
+              </div>
             </v-col>
           </v-row>
         </v-form>
@@ -181,12 +222,7 @@
 
       <v-card-actions class="pa-4">
         <v-spacer />
-        <v-btn
-          text
-          color="grey darken-1"
-          @click="closeDialog"
-          class="px-4"
-        >
+        <v-btn text color="grey darken-1" @click="closeDialog" class="px-4">
           <v-icon left>mdi-close</v-icon>
           Cancel
         </v-btn>
@@ -197,7 +233,7 @@
           class="px-6"
           elevation="2"
         >
-          <v-icon left>{{ isEdit ? 'mdi-content-save' : 'mdi-plus' }}</v-icon>
+          <v-icon left>{{ isEdit ? "mdi-content-save" : "mdi-plus" }}</v-icon>
           {{ isEdit ? "Save Changes" : "Add Schedule" }}
         </v-btn>
       </v-card-actions>
@@ -206,9 +242,10 @@
 </template>
 
 <script>
-import { getOutletByType } from '@/api/masterOutletService'
+import { getOutletByType } from "@/api/masterOutletService";
 import { getAllMdRole } from "@/api/userService";
-import { getAllSurveyOutlet } from '@/api/surveyService';
+import { getAllSurveyOutlet } from "@/api/surveyService";
+import { getAllProgram } from "@/api/programService";
 
 export default {
   name: "FormCallPlanSchedule",
@@ -225,65 +262,78 @@ export default {
       itemData: {
         user_id: null,
         outlet_id: [],
-        notes: '',
-        day_plan: '',
+        notes: "",
+        day_plan: "",
         type: 0,
         survey_outlet_id: null,
+        program_id: null,
+        status: 400,
       },
       formValid: false,
       startPlanMenu: false,
       endPlanMenu: false,
+      isProgram: false,
       outletsOptions: [],
       surveyOutletOptions: [],
       userOptions: [],
-      typeOptions: [
+      programOptions: [],
+      statusOptions: [
         {
-          text: 'Visit Schedule',
-          value: 0,
-          icon: 'mdi-store-check'
+          text: "Belum Dikunjungi",
+          value: 400,
         },
         {
-          text: 'Survey Schedule',
+          text: "Schedule Dibatalkan",
+          value: 405,
+        },
+      ],
+      typeOptions: [
+        {
+          text: "Visit Schedule",
+          value: 0,
+          icon: "mdi-store-check",
+        },
+        {
+          text: "Survey Schedule",
           value: 1,
-          icon: 'mdi-clipboard-check'
+          icon: "mdi-clipboard-check",
         },
       ],
       outletRules: [
-        v => {
+        (v) => {
           if (Array.isArray(v)) {
-            return v.length > 0 || 'Please select at least one outlet';
+            return v.length > 0 || "Please select at least one outlet";
           } else {
-            return !!v || 'Please select an outlet';
+            return !!v || "Please select an outlet";
           }
         },
       ],
-      userRules: [
-        v => !!v || 'User selection is required',
-      ],
+      userRules: [(v) => !!v || "User selection is required"],
       notesRules: [
-        v => !!v || 'Notes are required',
-        v => v.length <= 300 || 'Notes must be 300 characters or less',
+        (v) => !!v || "Notes are required",
+        (v) => v.length <= 300 || "Notes must be 300 characters or less",
       ],
-      startPlanRules: [
-        v => !!v || 'Day plan date is required',
-      ],
+      startPlanRules: [(v) => !!v || "Day plan date is required"],
       endPlanRules: [
-        v => !!v || 'End plan date is required',
-        v => !this.itemData.start_plan || new Date(v) >= new Date(this.itemData.start_plan) || 'End plan must be after start plan',
+        (v) => !!v || "End plan date is required",
+        (v) =>
+          !this.itemData.start_plan ||
+          new Date(v) >= new Date(this.itemData.start_plan) ||
+          "End plan must be after start plan",
       ],
     };
   },
   computed: {
     userLogin() {
-      return this.$store.getters.getUser
-    }
+      return this.$store.getters.getUser;
+    },
   },
   watch: {
     dialog(newValue) {
       if (newValue) {
-        this.call_plan_id = this.$route.params.id
-        this.fetchOutlets()
-        this.fetchSurveyOutlet()
+        this.call_plan_id = this.$route.params.id;
+        this.fetchOutlets();
+        this.fetchSurveyOutlet();
       }
     },
     item: {
@@ -294,7 +344,12 @@ export default {
           if (this.isEdit && Array.isArray(this.itemData.outlet_id)) {
             this.itemData.outlet_id = this.itemData.outlet_id[0] || null;
           } else if (!this.isEdit && !Array.isArray(this.itemData.outlet_id)) {
-            this.itemData.outlet_id = this.itemData.outlet_id ? [this.itemData.outlet_id] : [];
+            this.itemData.outlet_id = this.itemData.outlet_id
+              ? [this.itemData.outlet_id]
+              : [];
+          }
+          if (this.itemData.program_id) {
+            this.isProgram = true;
           }
         } else {
           this.resetForm();
@@ -306,10 +361,13 @@ export default {
     this.fetchOutlets();
     this.fetchUsers();
     this.fetchSurveyOutlet();
+    this.fetchProgram();
   },
   methods: {
     getOutletText(item) {
-      return item ? `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area} - ${item.sio_type} - ${item.brand}` : '';
+      return item
+        ? `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area} - ${item.sio_type} - ${item.brand}`
+        : "";
     },
     onSurveyOutletChange(surveyOutlet) {
       if (surveyOutlet) {
@@ -319,13 +377,16 @@ export default {
       }
     },
     resetForm() {
+      this.isProgram = false;
       this.itemData = {
         outlet_id: [],
-        notes: '',
-        day_plan: '',
+        notes: "",
+        day_plan: "",
         survey_outlet_id: null,
         type: 0,
         user_id: null,
+        program_id: null,
+        status: 400,
       };
       this.formValid = false;
       if (this.$refs.form) {
@@ -338,35 +399,49 @@ export default {
     },
     saveItem() {
       if (this.$refs.form.validate()) {
-        this.itemData.call_plan_id = this.$route.params.id;
+        if (!this.isEdit) {
+          this.itemData.call_plan_id = this.$route.params.id;
+        }
         this.$emit("save", { ...this.itemData });
       }
     },
     async fetchUsers() {
       try {
-        const response = await getAllMdRole(this.region, this.area)
-        this.userOptions = response.data || []
+        const response = await getAllMdRole(this.region, this.area);
+        this.userOptions = response.data || [];
       } catch (error) {
-        console.error('Error fetching users:', error)
-        this.userOptions = []
+        console.error("Error fetching users:", error);
+        this.userOptions = [];
+      }
+    },
+    async fetchProgram() {
+      try {
+        const response = await getAllProgram();
+        this.programOptions = response.data.data || [];
+      } catch (error) {
+        console.error("Error fetching programs:", error);
+        this.programOptions = [];
       }
     },
     async fetchOutlets() {
       try {
-        const response = await getOutletByType({region: this.region, area: this.area});
-        this.outletsOptions = response.data || []
+        const response = await getOutletByType({
+          region: this.region,
+          area: this.area,
+        });
+        this.outletsOptions = response.data || [];
       } catch (error) {
-        console.error('Error fetching outlets:', error)
-        this.outletsOptions = []
+        console.error("Error fetching outlets:", error);
+        this.outletsOptions = [];
       }
     },
     async fetchSurveyOutlet() {
       try {
         const response = await getAllSurveyOutlet(this.call_plan_id);
-        this.surveyOutletOptions = response.data || []
+        this.surveyOutletOptions = response.data || [];
       } catch (error) {
-        console.error('Error fetching survey outlets:', error)
-        this.surveyOutletOptions = []
+        console.error("Error fetching survey outlets:", error);
+        this.surveyOutletOptions = [];
       }
     },
     onUserChange(user) {
@@ -374,6 +449,11 @@ export default {
         this.itemData.user_id = user.id;
       } else {
         this.itemData.user_id = null;
+      }
+    },
+    onProgramChange() {
+      if (!this.isProgram) {
+        this.itemData.program_id = null;
       }
     },
   },

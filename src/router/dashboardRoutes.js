@@ -126,7 +126,7 @@ export default [
       },
       {
         name: 'Call Plan Schedule',
-        path: '/call-plan/schedule/:id',
+        path: '/call-plan/schedule/:id/:region/:area',
         component: () => import('@/views/dashboard/pages/CallPlan/CallPlanSchedule.vue'),
         meta: requiresAuth, // Protect this route
       },

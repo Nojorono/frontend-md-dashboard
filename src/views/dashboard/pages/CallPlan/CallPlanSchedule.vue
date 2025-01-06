@@ -332,6 +332,8 @@ export default {
         user_id: item.user_id,
         survey_outlet_id: item.survey_outlet_id,
         type: item.type,
+        program_id: item.program_id,
+        status: item.status,
       }
       this.isFormRoleDialog = true
     },
