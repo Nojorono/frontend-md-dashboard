@@ -100,7 +100,8 @@ export default {
         expanded: null,
         children: [
           { title: 'Profile', icon: 'mdi-account-circle-outline', to: '/pages/user' },
-          { title: 'Notifications', icon: 'mdi-bell-ring-outline', to: '/components/notifications' },
+          { title: 'Report', icon: 'mdi-file-document-outline', to: '/report' },
+          // { title: 'Notifications', icon: 'mdi-bell-ring-outline', to: '/components/notifications' },
         ],
       },
     ]
