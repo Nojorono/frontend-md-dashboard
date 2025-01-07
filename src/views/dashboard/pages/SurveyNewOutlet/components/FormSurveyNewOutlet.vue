@@ -22,7 +22,7 @@
                 <v-autocomplete
                   v-model="itemData.outlet_id"
                   :items="outletOptions"
-                  item-text="name"
+                  :item-text="getOutletText"
                   item-value="id"
                   label="Outlet yang diganti"
                   clearable
@@ -309,6 +309,12 @@ export default {
 
     async batchCode() {
       this.itemData.batch_code = this.getCodeBatch.code_batch;
+    },
+
+    getOutletText(item) {
+      return item
+        ? `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area} - ${item.sio_type} - ${item.brand}`
+        : "";
     },
 
     async deleteImage(index) {
