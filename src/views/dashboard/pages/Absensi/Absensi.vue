@@ -151,21 +151,29 @@
                 Location Out
               </v-btn>
             </td>
-            <!-- <td>
-              <div class="d-flex align-center">
-
-                <v-btn
-                  color="primary"
-                  outlined
-                  small
-                  class="mr-2"
-                  @click="openHandleUpdate(item)"
-                >
-                  <v-icon small class="mr-1">mdi-pencil</v-icon>
-                  Edit
-                </v-btn>
-              </div>
-            </td> -->
+            <td>
+              <v-btn
+                small
+                color="primary"
+                outlined
+                :disabled="!item?.photoIn"
+                @click="openPhoto(item?.photoIn)"
+              >
+                <v-icon small class="mr-1">mdi-image</v-icon>
+                Photo In
+              </v-btn>
+            </td>
+            <td>
+              <v-btn
+                small
+                color="primary"
+                outlined
+                :disabled="!item?.photoOut"
+                @click="openPhoto(item?.photoOut)"
+              >
+                Photo Out
+              </v-btn>
+            </td>
           </tr>
         </template>
       </v-data-table>
@@ -231,6 +239,8 @@
           { text: 'Status', value: 'status', sortable: false, class: 'text-left font-weight-bold', width: '10%' },
           { text: 'Location In', value: 'created_at', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
           { text: 'Location Out', value: 'updated_at', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
+          { text: 'Photo In', value: 'photo_in', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
+          { text: 'Photo Out', value: 'photo_out', sortable: false, class: 'text-left font-weight-bold', width: '5%' },
           // { text: 'Actions', value: 'actions', sortable: false, class: 'text-center font-weight-bold' },
         ],
         tableData: [],
@@ -271,6 +281,9 @@
     },
   
     methods: {
+      openPhoto(photo) {
+        window.open(photo, '_blank');
+      },
       openMap(latitude, longitude) {
         window.open(`https://maps.google.com/?q=${latitude},${longitude}`, '_blank');
       },
