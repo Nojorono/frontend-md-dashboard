@@ -441,11 +441,22 @@
                     <v-btn
                       small
                       color="warning"
-                      class="text-none px-2"
+                      class="text-none pl-2"
                       @click="handleDetail(item.id)"
                     >
                       <v-icon small left>mdi-details</v-icon>
                       Detail
+                    </v-btn>
+                  </td>
+                  <td>
+                    <v-btn
+                      small
+                      color="secondary"
+                      class="text-none"
+                      @click="openHandleUpdate(item)"
+                    >
+                      <v-icon small left>mdi-pencil</v-icon>
+                      Edit
                     </v-btn>
                   </td>
                 </tr>
@@ -479,6 +490,13 @@
         @close="closeImportDialog"
         @upload="handleImportSubmit"
       />
+      <form-outlet
+        :dialog="isFormRoleDialog"
+        @close="closeFormDialog"
+        @save="handleSave"
+        :isEdit="isEdit"
+        :item="selectedItem"
+      />
     </v-container>
   </v-card>
 </template>
@@ -492,14 +510,16 @@ import {
 import { mapGetters } from "vuex";
 import ConfirmDeleteDialog from "@/components/base/ConfirmDeleteDialog.vue";
 import Vue from "vue";
-import { createData, updateData } from "@/api/userService";
+import { createOutlet, updateOutlet } from "@/api/masterOutletService";
 import ImportOutlet from "@/views/dashboard/pages/OutletMaster/components/ImportOutlet.vue";
+import FormOutlet from "@/views/dashboard/pages/OutletMaster/components/FormOutlet.vue";
 
 export default {
   name: "MasterOutlet",
   components: {
     ImportOutlet,
     ConfirmDeleteDialog,
+    FormOutlet,
   },
   data() {
     return {
@@ -548,7 +568,7 @@ export default {
         },
         {
           text: "Outlet Sio Type",
-          value: "outlet_type",
+          value: "sio_type",
           sortable: false,
         },
         {
@@ -688,6 +708,23 @@ export default {
       this.isEdit = true;
       this.selectedItem = {
         id: item.id,
+        name: item.name,
+        brand: item.brand,
+        address_line: item.address_line,
+        sio_type: item.sio_type,
+        cycle: item.cycle,
+        region: item.region,
+        area: item.area,
+        sub_district: item.sub_district,
+        district: item.district,
+        city_or_regency: item.city_or_regency,
+        postal_code: item.postal_code,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        outlet_code: item.outlet_code,
+        visit_day: item.visit_day,
+        odd_even: item.odd_even,
+        remarks: item.remarks,
       };
       this.isFormRoleDialog = true;
     },
@@ -695,10 +732,10 @@ export default {
       try {
         if (this.isEdit) {
           const { id, ...itemWithoutId } = item;
-          await updateData(id, itemWithoutId);
+          await updateOutlet(id, itemWithoutId);
           Vue.prototype.$toast.success(`Update data Successfully!`);
         } else {
-          await createData(item);
+          await createOutlet(item);
           Vue.prototype.$toast.success(`Create data Successfully!`);
         }
         this.closeFormDialog();
