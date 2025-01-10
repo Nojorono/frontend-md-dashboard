@@ -301,16 +301,6 @@ export default {
       immediate: true,
       handler(newItem) {
         if (newItem) {
-          let parsedArea;
-          try {
-            parsedArea = typeof newItem.area === 'string' ? 
-              JSON.parse(newItem.area) : 
-              Array.isArray(newItem.area) ? 
-                newItem.area : [];
-          } catch (e) {
-            parsedArea = [];
-            console.error('Error parsing area:', e);
-          }
 
           this.itemData = {
             id: newItem.id || null,
@@ -320,7 +310,7 @@ export default {
             email: newItem.email || "",
             phone: newItem.phone || "",
             type_md: newItem.type_md || "",
-            area: parsedArea,
+            area: newItem.area || [],
             region: newItem.region || "",
             valid_from: newItem.valid_from || "",
             valid_to: newItem.valid_to || "",
@@ -415,7 +405,7 @@ export default {
       if (this.$refs.form.validate()) {
         const formattedData = {
           ...this.itemData,
-          area: JSON.stringify(this.itemData.area)
+          area: this.itemData.area
         };
         this.$emit("save", formattedData);
         this.closeDialog();
