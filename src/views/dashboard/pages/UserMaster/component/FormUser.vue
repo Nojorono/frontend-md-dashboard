@@ -91,17 +91,21 @@
                 item-text="area"
                 item-value="area"
                 label="Area"
-                multiple
                 chips
                 deletable-chips
-                :rules="areaRules"
                 required
+                :rules="areaRules"
                 outlined
                 dense
+                multiple
+                :disabled="!itemData.region"
+                @change="onAreaChange"
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-content>Area not found</v-list-item-content>
+                    <v-list-item-content>
+                      {{ !itemData.region ? 'Please select a region first' : 'Area not found' }}
+                    </v-list-item-content>
                   </v-list-item>
                 </template>
               </v-autocomplete>
@@ -279,13 +283,13 @@ export default {
         "Valid To date must be after Valid From date";
     },
     filteredAreaOptions() {
-      if (!this.itemData.region) return this.areaOptions;
+      if (!this.itemData.region) return [];
       
       const selectedRegion = this.regionOptions.find(
         (region) => region.name === this.itemData.region
       );
       
-      if (!selectedRegion) return this.areaOptions;
+      if (!selectedRegion) return [];
       
       return this.areaOptions.filter(
         (area) => area.region_id === selectedRegion.id
@@ -297,7 +301,17 @@ export default {
       immediate: true,
       handler(newItem) {
         if (newItem) {
-          // Deep copy the item to avoid reference issues
+          let parsedArea;
+          try {
+            parsedArea = typeof newItem.area === 'string' ? 
+              JSON.parse(newItem.area) : 
+              Array.isArray(newItem.area) ? 
+                newItem.area : [];
+          } catch (e) {
+            parsedArea = [];
+            console.error('Error parsing area:', e);
+          }
+
           this.itemData = {
             id: newItem.id || null,
             username: newItem.username || "",
@@ -306,8 +320,7 @@ export default {
             email: newItem.email || "",
             phone: newItem.phone || "",
             type_md: newItem.type_md || "",
-            area: Array.isArray(newItem.area) ? [...newItem.area] : 
-                  typeof newItem.area === 'string' ? [newItem.area] : [],
+            area: parsedArea,
             region: newItem.region || "",
             valid_from: newItem.valid_from || "",
             valid_to: newItem.valid_to || "",
@@ -402,6 +415,7 @@ export default {
       if (this.$refs.form.validate()) {
         const formattedData = {
           ...this.itemData,
+          area: JSON.stringify(this.itemData.area)
         };
         this.$emit("save", formattedData);
         this.closeDialog();
@@ -410,10 +424,20 @@ export default {
     onRegionChange(item) {
       if (!item) {
         this.itemData.region = "";
-        return;
-      }else{
+        if (!this.isEdit) {
+          this.itemData.area = [];
+        }
+      } else {
+        if (!this.isEdit) {
+          this.itemData.area = [];
+        }
         this.itemData.region = item;
-      } 
+      }
+    },
+    onAreaChange(selectedAreas) {
+      if (!selectedAreas) {
+        this.itemData.area = [];
+      }
     },
     onRoleChange(item) {
       if (item) {
