@@ -148,6 +148,12 @@ export default [
         component: () => import('@/views/dashboard/component/Notifications'),
         meta: requiresAuth, // Protect this route
       },
+      {
+        name: 'Reimburse Bbm',
+        path: '/reimburse-bbm',
+        component: () => import('@/views/dashboard/pages/ReimburseBbm/ReimburseBbm.vue'),
+        meta: requiresAuth, // Protect this route
+      },
     ],
   },
 ];
