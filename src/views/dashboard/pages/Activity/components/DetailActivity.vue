@@ -356,19 +356,71 @@
                   <v-row>
                     <v-col cols="12" v-if="activitySios.length > 0">
                       <v-card-title class="d-flex justify-space-between">
-                        <h3 class="text-h4 font-weight-medium">Activity SIO</h3>
+                        <h3 class="text-h4 font-weight-medium primary--text">Activity SIO</h3>
                       </v-card-title>
-                      <div class="activities-container" style="padding: 20px">
+                      <div class="activities-container pa-4">
                         <v-row>
-                          <v-col v-for="(activity, index) in activitySios" :key="index" cols="12" sm="6" md="4" lg="3">
-                            <v-card class="mx-auto" outlined hover @click="openImagePreview(activity)">
-                              <v-img :src="activity.photo" height="150" contain></v-img>
-                              <v-card-title class="text-subtitle-1 justify-center" style="padding-bottom: 0;">
+                          <v-col v-for="(activity, index) in activitySios" :key="index" cols="12" sm="6" md="4">
+                            <v-card class="mx-auto" elevation="2" hover>
+                              <v-card-title class="text-h6 primary--text justify-center font-weight-bold">
                                 {{ activity.name }}
                               </v-card-title>
-                              <v-card-text class="text-subtitle-2 text-center" style="padding-top: 0;">
-                                {{ activity.description }}
+                              <v-divider></v-divider>
+                              <v-card-text class="text-subtitle-1 text-center grey--text text--darken-1">
+                                {{ activity.notes }}
                               </v-card-text>
+                              <v-row class="pa-3">
+                                <v-col cols="6">
+                                  <v-hover v-slot="{ hover }">
+                                    <v-card 
+                                      :elevation="hover ? 8 : 2"
+                                      class="transition-swing"
+                                      @click="openImagePreview(activity.photo_before, 'before')"
+                                    >
+                                      <v-img 
+                                        :src="activity.photo_before" 
+                                        height="150" 
+                                        contain
+                                        class="grey lighten-2"
+                                      >
+                                        <template v-slot:placeholder>
+                                          <v-row class="fill-height ma-0" align="center" justify="center">
+                                            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                                          </v-row>
+                                        </template>
+                                      </v-img>
+                                      <v-card-subtitle class="text-center pb-0">
+                                        <v-chip x-small label color="primary" text-color="white">Before</v-chip>
+                                      </v-card-subtitle>
+                                    </v-card>
+                                  </v-hover>
+                                </v-col>
+                                <v-col cols="6">
+                                  <v-hover v-slot="{ hover }">
+                                    <v-card 
+                                      :elevation="hover ? 8 : 2"
+                                      class="transition-swing"
+                                      @click="openImagePreview(activity.photo_after, 'after')"
+                                    >
+                                      <v-img 
+                                        :src="activity.photo_after" 
+                                        height="150" 
+                                        contain
+                                        class="grey lighten-2"
+                                      >
+                                        <template v-slot:placeholder>
+                                          <v-row class="fill-height ma-0" align="center" justify="center">
+                                            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                                          </v-row>
+                                        </template>
+                                      </v-img>
+                                      <v-card-subtitle class="text-center pb-0">
+                                        <v-chip x-small label color="success" text-color="white">After</v-chip>
+                                      </v-card-subtitle>
+                                    </v-card>
+                                  </v-hover>
+                                </v-col>
+                              </v-row>
                             </v-card>
                           </v-col>
                         </v-row>
@@ -590,9 +642,14 @@
         }
       },
 
-      openImagePreview(activity) {
-        this.previewImage = activity.photo;
-        this.previewTitle = activity.name;
+      openImagePreview(image, type) {
+        if (type === 'before') {
+          this.previewImage = image;
+          this.previewTitle = 'Before';
+        } else {
+          this.previewImage = image;
+          this.previewTitle = 'After';
+        }
         this.dialog = true;
       },
 
