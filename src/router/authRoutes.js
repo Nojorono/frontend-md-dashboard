@@ -12,22 +12,28 @@ export default [
     name: 'Logout',
     beforeEnter: async (to, from, next) => {
       try {
-        
+        // Perform the logout action
         await store.dispatch('logout');
-        
+
+        // Clear all intervals if any are running
         const intervals = window.intervals || [];
         intervals.forEach(clearInterval);
-        
+
+        // Show a success toast notification
         toastSuccess('Logout successfully');
-        
-        return next();
+
+        // Redirect to the login page
+        return next({ path: '/login' });
       } catch (error) {
         console.error('Logout error:', error);
+
+        // Show an error toast notification
         toastError('Logout failed. Please try again.');
-        
-        return next({ 
+
+        // Redirect to the login page with an error query parameter
+        return next({
           path: '/login',
-          query: { error: 'logout_failed' }
+          query: { error: 'logout_failed' },
         });
       }
     },

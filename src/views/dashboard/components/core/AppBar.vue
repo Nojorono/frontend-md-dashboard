@@ -92,10 +92,10 @@
             
             <v-list-item-content>
               <v-list-item-title class="subtitle-1" :class="{ 'grey--text': notification.is_read }">
-                {{ notification.outlet.name }} - {{ notification.outlet.outlet_code }}
+                {{ notification?.outlet?.name }} - {{ notification?.outlet?.outlet_code }}
               </v-list-item-title>
               <v-list-item-subtitle class="caption">
-                {{ notification.user.email }} - {{ notification.message }}
+                {{ notification?.user?.email }} - {{ notification?.message }}
               </v-list-item-subtitle>
               <v-list-item-subtitle class="caption">
                 {{ formatDate(notification.created_at) }}
@@ -310,10 +310,18 @@
         }
         
         // Navigate based on notification type and identifier
-        if (notification.type === 1 && notification.comments) {
-          this.$router.push({
-            path: `/activity/detail/${notification.comments.activity_id}`
-          });
+
+        switch (notification.type) {
+          case 1:
+            this.$router.push({
+              path: `/activity/detail/${notification.comments.activity_id}`
+            });
+            break;
+          case 2:
+            this.$router.push({
+              path: `/activity/detail/${notification.activity_id}`
+            });
+            break;
         }
       },
     },

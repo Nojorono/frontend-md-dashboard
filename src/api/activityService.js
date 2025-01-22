@@ -53,7 +53,7 @@ export const updateData = async (id, data) => {
   }
 };
 
-export const updateStatus = async (id, data) => {
+export const updateStatusApproval = async (id, data) => {
   try {
     const response = await axiosInstance.put(`/activity/status/${id}`, data);
     return response.data;

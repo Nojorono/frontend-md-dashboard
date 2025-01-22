@@ -193,7 +193,7 @@
     deleteData,
     updateData,
     getAll,
-    updateStatus,
+    updateStatusApproval,
   } from "@/api/activityService";
   import FormCallPlan from "@/views/dashboard/pages/CallPlan/components/FormCallPlan.vue";
   import Vue from "vue";
@@ -532,9 +532,9 @@
 
           if (result.isConfirmed) {
             const data = {
-              status: status,
+              status_approval: status,
             };
-            const res = await updateStatus(item.id, data);
+            const res = await updateStatusApproval(item.id, data);
 
             if (res.statusCode === 200) {
               this.$toast.success(`Update status Successfully!`);

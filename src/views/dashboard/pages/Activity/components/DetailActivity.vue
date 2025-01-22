@@ -274,23 +274,21 @@
                         <v-col cols="12" v-if="activitySogs.length > 0">
                           <v-card-title class="text-h5 font-weight-medium">Activity SOG</v-card-title>
                           <v-card-text>
-                            <div style="max-height: 500px; overflow-y: auto;">
+                            <div style="max-height: 300px; overflow-y: auto;">
                           <v-simple-table dense class="elevation-1" style="padding: 5px;">
                             <template v-slot:default>
                               <thead>
                                 <tr>
                                   <th>No</th>
                                   <th>Name</th>
-                                  <th>Description</th>
-                                  <th>Notes</th>
+                                  <th>Stock</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 <tr v-for="(item, index) in activitySogs" :key="item.id">
                                   <td>{{ index + 1 }}</td>
                                   <td>{{ item.name }}</td>
-                                  <td>{{ item.description }}</td>
-                                  <td>{{ item.notes }}</td>
+                                  <td>{{ item.value }}</td>
                                 </tr>
                               </tbody>
                             </template>
@@ -299,25 +297,48 @@
                       </v-card-text>
                       </v-col>
                       <v-col cols="12" v-if="activityBranches.length > 0">
-                          <v-card-title class="text-h5 font-weight-medium">Activity Branch</v-card-title>
+                          <v-card-title class="text-h5 font-weight-medium">Activity Brand Family</v-card-title>
                           <v-card-text>
-                            <div style="max-height: 500px; overflow-y: auto;">
+                            <div style="max-height: 300px; overflow-y: auto;">
                           <v-simple-table dense class="elevation-1" style="padding: 5px;">
                             <template v-slot:default>
                               <thead>
                                 <tr>
                                   <th>No</th>
                                   <th>Name</th>
-                                  <th>Description</th>
-                                  <th>Notes</th>
+                                  <th>Stock</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 <tr v-for="(item, index) in activityBranches" :key="item.id">
                                   <td>{{ index + 1 }}</td>
                                   <td>{{ item.name }}</td>
-                                  <td>{{ item.description }}</td>
-                                  <td>{{ item.notes }}</td>
+                                  <td>{{ item.value }}</td>
+                                </tr>
+                              </tbody>
+                            </template>
+                          </v-simple-table>
+                        </div>
+                      </v-card-text>
+                      </v-col>
+                      <v-col cols="12" v-if="activityBranches.length > 0">
+                          <v-card-title class="text-h5 font-weight-medium">Activity Program Competitor</v-card-title>
+                          <v-card-text>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                          <v-simple-table dense class="elevation-1" style="padding: 5px;">
+                            <template v-slot:default>
+                              <thead>
+                                <tr>
+                                  <th>No</th>
+                                  <th>Name</th>
+                                  <th>Stock</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(item, index) in activityBranches" :key="item.id">
+                                  <td>{{ index + 1 }}</td>
+                                  <td>{{ item.name }}</td>
+                                  <td>{{ item.value }}</td>
                                 </tr>
                               </tbody>
                             </template>

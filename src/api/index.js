@@ -19,4 +19,18 @@ axiosInstance.interceptors.request.use(
   }
 )
 
+axiosInstance.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    if (error.response && error.response.status === 401) {
+      // Clear token and redirect to login if unauthorized
+      localStorage.removeItem('token')
+      window.location.href = '/logout'
+    }
+    return Promise.reject(error)
+  }
+)
+
 export default axiosInstance
