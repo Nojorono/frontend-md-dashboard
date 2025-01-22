@@ -25,3 +25,27 @@ export const reportOutlet = async (params) => {
     throw error.response;
   }
 };
+
+export const reportReimbursement = async (params) => {
+  try {
+    const response = await axiosInstance.get('/report/reimbursement', {
+      params: params,
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const reportAbsent = async (params) => {
+  try {
+    const response = await axiosInstance.get('/report/absent', {
+      params: params,
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};

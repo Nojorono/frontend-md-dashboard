@@ -151,6 +151,136 @@
                 </v-card-text>
               </v-card>
             </v-list-group>
+
+            <v-divider class="my-2"></v-divider>
+
+            <!-- Outlet Report Reimbursement -->
+            <v-list-group
+              color="primary"
+            >
+              <template v-slot:activator>
+                <v-list-item-icon>
+                  <v-icon color="primary">mdi-store</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title class="text-h6">Report Reimbursement</v-list-item-title>
+                </v-list-item-content>
+              </template>
+
+              <v-card flat class="mx-4 mt-2">
+                <v-card-text>
+                  <v-row>
+                    <v-col cols="12" sm="6">
+                      <v-text-field
+                        v-model="filter.area"
+                        label="Area"
+                        outlined
+                        dense
+                        prepend-inner-icon="mdi-map-marker"
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-text-field
+                        v-model="filter.region"
+                        label="Region"
+                        outlined
+                        dense
+                        prepend-inner-icon="mdi-earth"
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" class="text-center">
+                      <v-btn
+                        color="primary"
+                        large
+                        rounded
+                        :disabled="loadingReimbursement"
+                        @click="downloadReportReimbursement"
+                        class="px-6"
+                        elevation="2"
+                      >
+                        <v-icon left>mdi-cloud-download</v-icon>
+                        Download Report Reimbursement
+                        <v-progress-circular
+                          v-if="loadingReimbursement"
+                          indeterminate
+                          color="white"
+                          size="20"
+                          width="2"
+                          class="ml-2"
+                        ></v-progress-circular>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-list-group>
+
+            <v-divider class="my-2"></v-divider>
+
+            <!-- Outlet Report Absent -->
+            <v-list-group
+              color="primary"
+            >
+              <template v-slot:activator>
+                <v-list-item-icon>
+                  <v-icon color="primary">mdi-store</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title class="text-h6">Report Absent</v-list-item-title>
+                </v-list-item-content>
+              </template>
+
+              <v-card flat class="mx-4 mt-2">
+                <v-card-text>
+                  <v-row>
+                    <v-col cols="12" sm="6">
+                      <v-text-field
+                        v-model="filter.area"
+                        label="Area"
+                        outlined
+                        dense
+                        prepend-inner-icon="mdi-map-marker"
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-text-field
+                        v-model="filter.region"
+                        label="Region"
+                        outlined
+                        dense
+                        prepend-inner-icon="mdi-earth"
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" class="text-center">
+                      <v-btn
+                        color="primary"
+                        large
+                        rounded
+                        :disabled="loadingAbsent"
+                        @click="downloadReportAbsent"
+                        class="px-6"
+                        elevation="2"
+                      >
+                        <v-icon left>mdi-cloud-download</v-icon>
+                        Download Report Absent
+                        <v-progress-circular
+                          v-if="loadingAbsent"
+                          indeterminate
+                          color="white"
+                          size="20"
+                          width="2"
+                          class="ml-2"
+                        ></v-progress-circular>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-list-group>
           </v-list>
         </v-card>
       </v-col>
@@ -159,7 +289,7 @@
 </template>
 
 <script>
-import { reportActivity, reportOutlet } from "@/api/reportService";
+import { reportActivity, reportOutlet, reportReimbursement, reportAbsent } from "@/api/reportService";
 import { getAllList } from "@/api/batchService";
 export default {
   name: "Report",
@@ -175,7 +305,9 @@ export default {
       },
       loadingBatchCodes: false,
       loadingActivity: false,
-      loadingOutlet: false
+      loadingOutlet: false,
+      loadingReimbursement: false,
+      loadingAbsent: false,
     };
   },
   async mounted() {
@@ -242,7 +374,8 @@ export default {
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.setAttribute("download", "outlet_report.xlsx");
+          const date = new Date().toISOString().split('T')[0];
+          link.setAttribute("download", `outlet_report_${date}.xlsx`);
           document.body.appendChild(link);
           link.click();
           link.remove();
@@ -255,6 +388,58 @@ export default {
         this.loadingOutlet = false;
       }
     },
+
+    async downloadReportReimbursement() {
+      this.loadingReimbursement = true;
+      try {
+        const response = await reportReimbursement(this.filter);
+        if (response) {
+          const blob = new Blob([response], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          const date = new Date().toISOString().split('T')[0];
+          link.setAttribute("download", `reimbursement_report_${date}.xlsx`);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        }
+      } catch (error) {
+        console.error("Error downloading report:", error);
+        alert("There was an error downloading the report.");
+      } finally {
+        this.loadingReimbursement = false;
+      }
+    },
+
+    async downloadReportAbsent() {
+      this.loadingAbsent = true;
+      try {
+        const response = await reportAbsent(this.filter);
+        if (response) {
+          const blob = new Blob([response], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          const date = new Date().toISOString().split('T')[0];
+          link.setAttribute("download", `absent_report_${date}.xlsx`);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        }
+      } catch (error) {
+        console.error("Error downloading report:", error);
+        alert("There was an error downloading the report.");
+      } finally {
+        this.loadingAbsent = false;
+      }
+    }
   },
 };
 </script>
