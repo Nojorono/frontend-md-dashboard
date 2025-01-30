@@ -230,7 +230,6 @@ export default {
 
   data() {
     return {
-      apiUrl: process.env.VUE_APP_API_URL,
       itemData: {
         name: "",
         batch_code: "",
@@ -298,15 +297,18 @@ export default {
         }
       },
     },
+    dialog: {
+      immediate: true,
+      handler() {
+        this.batchCode();
+      },
+    },
   },
 
   mounted() {
     this.fetchOutletSurvey();
-    this.batchCode();
   },
-
   methods: {
-
     async batchCode() {
       this.itemData.batch_code = this.getCodeBatch.code_batch;
     },
@@ -343,7 +345,6 @@ export default {
     resetForm() {
       this.itemData = {
         name: "",
-        batch_code: "",
         brand: "",
         address_line: "",
         sub_district: "",
@@ -362,6 +363,7 @@ export default {
         remarks: "",
         photos: [],
         outlet_id: null,
+        is_approved: 0,
       };
       this.formValid = false;
       if (this.$refs.form) {
