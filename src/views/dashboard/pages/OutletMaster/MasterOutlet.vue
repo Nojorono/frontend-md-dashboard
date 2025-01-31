@@ -51,8 +51,6 @@
               dense
               outlined
               hide-details
-              small-chips
-              deletable-chips
               @change="handleAreaChange"
               @click:clear="clearAreaFilter"
             >
@@ -658,6 +656,7 @@ export default {
     clearRegionFilter() {
       this.filter.region = "";
       this.filter.area = "";
+      console.log(this.filter.area, this.filter.region)
       this.fetchData();
     },
 
