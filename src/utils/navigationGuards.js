@@ -34,7 +34,21 @@ export function checkAuthGuard(to, from, next) {
 
     // Check if user has access to menu
     const userMenus = store.state.user.menus || [];
-    const hasMenuAccess = userMenus.some(menu => to.path.startsWith(menu.path));
+    const hasMenuAccess = userMenus.some(menu => {
+      // Handle exact path matches
+      if (menu.path === to.path) {
+        return true;
+      }
+      // Handle nested paths
+      if (to.path.startsWith(menu.path + '/')) {
+        return true;
+      }
+      // Handle root path
+      if (menu.path === '/' && to.path === '/') {
+        return true;
+      }
+      return false;
+    });
 
     if (!hasMenuAccess) {
       next('/forbidden');

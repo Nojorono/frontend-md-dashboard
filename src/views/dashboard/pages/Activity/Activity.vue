@@ -631,6 +631,12 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
+        if (this.getRegionOptions.length === 1) {
+          this.filter.region = this.getRegionOptions[0].name;
+        }
+        if (this.getAreaOptions.length === 1) {
+          this.filter.area = this.getAreaOptions[0].area;
+        }
         const response = await getAll({
           page: this.options.page,
           limit: this.options.itemsPerPage,
