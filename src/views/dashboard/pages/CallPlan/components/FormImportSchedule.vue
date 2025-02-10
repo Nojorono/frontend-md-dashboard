@@ -65,6 +65,7 @@
   
   <script>
   import Vue from 'vue'
+  import { importScheduleData } from '@/api/callPlanService'
   
   export default {
     name: "FormImportSchedule",
@@ -116,9 +117,8 @@
 
         this.loading = true
         try {
-          const formData = new FormData()
-          formData.append('file', this.file)
-          
+          const res = await importScheduleData({ file: this.file, call_plan_id: this.callPlanId })
+          console.log(res)
           // TODO: Implement API call to import excel
           // await importExcel(formData)
           

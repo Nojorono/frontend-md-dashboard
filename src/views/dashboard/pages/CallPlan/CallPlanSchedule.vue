@@ -250,7 +250,6 @@
       :dialog="isImportDialog"
       :call-plan-id="id"
       @close="closeImportDialog"
-      @save="handleImport"
     />
   </v-container>
 </template>
@@ -264,7 +263,7 @@ import {
   geListSchedule,
   createScheduleData,
   updateScheduleData,
-  deleteScheduleData
+  deleteScheduleData,
 } from '@/api/callPlanService'
 import { getAllMdRole } from "@/api/userService";
 import { EXISTING_SURVEY_STATUS, NEW_SURVEY_STATUS, STATUS_COLORS } from '@/constants/status';

@@ -93,3 +93,19 @@ export const deleteScheduleData = async (id) => {
     throw error.response;
   }
 };
+
+export const importScheduleData = async (fileData) => {
+  try {
+    const { file, call_plan_id } = fileData;
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosInstance.post(`/schedule-plan/import-schedule/${call_plan_id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
