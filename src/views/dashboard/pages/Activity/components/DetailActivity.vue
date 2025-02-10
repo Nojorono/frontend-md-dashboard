@@ -152,22 +152,22 @@
               <v-col cols="12">
                 <h3 class="text-h6 font-weight-medium mb-3">Location</h3>
                 <v-row class="align-center">
-                  <v-col cols="6">
+                  <v-col cols="3">
                     <v-btn color="primary" outlined class="mb-4" @click="openInMaps" :disabled="!hasCoordinates">
                       <v-icon left>mdi-map-marker</v-icon>
                       Open in Maps
                     </v-btn>
                   </v-col>
-                  <v-col cols="6">
+                  <v-col cols="5">
                     <v-btn color="primary" outlined class="mb-4">
-                      <!-- <v-icon left>mdi-map-marker</v-icon> -->
                       Total Penjualan Outlet Mingguan  {{ data?.sale_outlet_weekly }}/Bungkus
                     </v-btn>
                   </v-col>
+                  <v-col cols="4">
+                    <v-btn color="primary" outlined class="mb-4">Notes: {{ data?.notes }}</v-btn>
+                  </v-col>
                 </v-row>
               </v-col>
-
-              
             </v-row>
 
             <!-- Photos Section -->
@@ -348,7 +348,7 @@
                                   <td>{{ index + 1 }}</td>
                                   <td>{{ item.name }}</td>
                                   <td>{{ item.desc }}</td>
-                                  <td>{{ item.photo }}</td>
+                                  <td><a :href="item.photo" target="_blank">View Photo</a></td>
                                 </tr>
                               </tbody>
                             </template>

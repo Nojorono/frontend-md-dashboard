@@ -66,7 +66,7 @@ export default [
       },
       {
         name: 'Sio Gallery',
-        path: '/sio/gallery/:id',
+        path: '/master/sio/:id',
         component: () => import('@/views/dashboard/pages/Sio/SioGallery.vue'),
         meta: requiresAuth, // Protect this route
       },

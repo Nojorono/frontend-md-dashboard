@@ -130,17 +130,7 @@
               </button>
             </td>
             <td class="font-weight-medium">{{ item?.kilometer_out }}</td>
-            <td>{{ item?.description }}</td>
-            <td>
-              <v-chip
-                small
-                label
-                text-color="white"
-                :color="item?.status === 'On Time' ? 'primary' : 'warning'"
-              >
-                {{ item?.status }}
-              </v-chip>
-            </td>
+            <td class="font-weight-medium">{{ item?.total_kilometer }}</td>
           </tr>
         </template>
       </v-data-table>
@@ -268,25 +258,32 @@ export default {
           width: "8%",
         },
         {
-          text: "Description",
-          value: "description",
+          text: "Total Kilometer",
+          value: "total_kilometer",
           sortable: false,
           class: "text-left font-weight-bold",
           width: "15%",
         },
-        {
-          text: "Status",
-          value: "status",
-          sortable: false,
-          class: "text-left font-weight-bold",
-          width: "10%",
-        },
-        {
-          text: "Actions",
-          value: "actions",
-          sortable: false,
-          class: "text-center font-weight-bold",
-        },
+        // {
+        //   text: "Description",
+        //   value: "description",
+        //   sortable: false,
+        //   class: "text-left font-weight-bold",
+        //   width: "15%",
+        // },
+        // {
+        //   text: "Status",
+        //   value: "status",
+        //   sortable: false,
+        //   class: "text-left font-weight-bold",
+        //   width: "10%",
+        // },
+        // {
+        //   text: "Actions",
+        //   value: "actions",
+        //   sortable: false,
+        //   class: "text-center font-weight-bold",
+        // },
       ],
       tableData: [],
       totalItems: 0,

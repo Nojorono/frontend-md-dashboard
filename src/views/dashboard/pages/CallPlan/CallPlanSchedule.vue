@@ -97,6 +97,19 @@
                 </v-btn>
               </div>
             </v-col>
+            <v-col cols="2">
+              <v-btn
+                color="primary"
+                class="text-none px-4"
+                elevation="1"
+                @click="openHandleImport"
+              >
+                <v-icon left>
+                  mdi-file-import
+                </v-icon>
+                Import Schedule
+              </v-btn>
+            </v-col>
           </v-row>
         </template>
 
@@ -232,13 +245,21 @@
       @close="closeFormDialog"
       @save="handleSave"
     />
+
+    <form-import-schedule
+      :dialog="isImportDialog"
+      :call-plan-id="id"
+      @close="closeImportDialog"
+      @save="handleImport"
+    />
   </v-container>
 </template>
 
 <script>
 import Vue from "vue";
 import ConfirmDeleteDialog from '@/components/base/ConfirmDeleteDialog.vue'
-import FormCallPlanSchedule from "@/views/dashboard/pages/CallPlan/components/FromCallPlanSchedule.vue";
+import FormCallPlanSchedule from "@/views/dashboard/pages/CallPlan/components/FormCallPlanSchedule.vue";
+import FormImportSchedule from "@/views/dashboard/pages/CallPlan/components/FormImportSchedule.vue";
 import {
   geListSchedule,
   createScheduleData,
@@ -253,6 +274,7 @@ export default {
   name: 'CallPlanSchedule',
   components: {
     FormCallPlanSchedule,
+    FormImportSchedule,
     ConfirmDeleteDialog,
   },
   data() {
@@ -284,6 +306,7 @@ export default {
       isConfirmDeleteDialogOpen: false,
       search: '',
       userId: null,
+      isImportDialog: false,
     }
   },
   computed :{
@@ -427,7 +450,13 @@ export default {
         this.userId = null
         this.fetchData(this.id);
       }
-    }
+    },
+    openHandleImport() {
+      this.isImportDialog = true
+    },
+    closeImportDialog() {
+      this.isImportDialog = false
+    },
   },
 }
 </script>
