@@ -1,8 +1,8 @@
 <template>
   <base-material-card class="v-card--material-chart" v-bind="$attrs" v-on="$listeners">
     <template v-slot:heading>
-      <chartist :data="data" :event-handlers="eventHandlers" :options="options" :ratio="ratio"
-        :responsive-options="responsiveOptions" :type="type" class="chart-container"  />
+      <chartist :data="chartData" :event-handlers="eventHandlers" :options="options" :ratio="ratio"
+        :responsive-options="responsiveOptions" :type="type" class="chart-container" />
     </template>
 
     <slot slot="reveal-actions" name="reveal-actions" />
@@ -60,7 +60,17 @@
       },
     },
 
+    computed: {
+      chartData() {
+        return {
+          ...this.data,
+          colors: this.data.colors
+        }
+      }
+    },
+
     mounted() {
+      console.log(this.data);
     }
   }
 </script>

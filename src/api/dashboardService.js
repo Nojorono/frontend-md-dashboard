@@ -43,3 +43,30 @@ export const getAllArea = async () => {
     throw error.response;
   }
 };
+
+export const getAllComponent = async () => {
+  try {
+    const response = await axiosInstance.get('/dashboard/all-component');
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const getTimeMotion = async () => {
+  try {
+    const response = await axiosInstance.get('/dashboard/time-motion');
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};
+
+export const getOutletDistribution = async () => {
+  try {
+    const response = await axiosInstance.get('/dashboard/outlet-distribution');
+    return response.data;
+  } catch (error) {
+    throw error.response;
+  }
+};

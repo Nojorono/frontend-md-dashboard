@@ -6,163 +6,20 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12" lg="4">
-        <material-chart-card
-          color="info"
-          type="Pie"
-          :data="outletStatusData"
-          :options="chartOptions"
-        >
-          <h4 class="font-weight-light">Outlet Status Distribution</h4>
-          <p class="font-weight-light">Total Outlets: {{ totalOutlets }}</p>
-          
-          <template v-slot:actions>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ attrs, on }">
-                <v-btn
-                  v-bind="attrs"
-                  color="info"
-                  icon
-                  v-on="on"
-                  @click="fetchOutletStatusData"
-                  :loading="loading"
-                >
-                  <v-icon color="info">mdi-refresh</v-icon>
-                </v-btn>
-              </template>
-              <span>Refresh Outlet Status</span>
-            </v-tooltip>
-
-            <v-tooltip bottom>
-              <template v-slot:activator="{ attrs, on }">
-                <v-btn
-                  v-bind="attrs"
-                  light
-                  icon
-                  v-on="on"
-                  @click="downloadOutletReport"
-                  :loading="downloading"
-                >
-                  <v-icon>mdi-download</v-icon>
-                </v-btn>
-              </template>
-              <span>Download Outlet Report</span>
-            </v-tooltip>
-          </template>
-
-          <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-          <span class="caption grey--text font-weight-light">
-            Last updated {{ outletLastUpdated }}
-          </span>
-        </material-chart-card>
+      <v-col cols="12" lg="6">
+        <time-motion />
       </v-col>
 
-      <v-col cols="12" lg="4">
-        <material-chart-card
-          color="success"
-          type="Pie"
-          :data="outletRegionData"
-          :options="chartOptions"
-        >
-          <h4 class="font-weight-light">Outlet Distribution by Region</h4>
-          <p class="font-weight-light">Active Regions: {{ activeRegions }}</p>
-
-          <template v-slot:actions>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ attrs, on }">
-                <v-btn
-                  v-bind="attrs"
-                  color="info"
-                  icon
-                  v-on="on"
-                  @click="fetchOutletRegionData"
-                  :loading="loading"
-                >
-                  <v-icon color="info">mdi-refresh</v-icon>
-                </v-btn>
-              </template>
-              <span>Refresh Region Data</span>
-            </v-tooltip>
-
-            <v-tooltip bottom>
-              <template v-slot:activator="{ attrs, on }">
-                <v-btn
-                  v-bind="attrs"
-                  light
-                  icon
-                  v-on="on"
-                  @click="downloadRegionReport"
-                  :loading="downloading"
-                >
-                  <v-icon>mdi-file-download</v-icon>
-                </v-btn>
-              </template>
-              <span>Download Region Report</span>
-            </v-tooltip>
-          </template>
-
-          <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-          <span class="caption grey--text font-weight-light">
-            Last updated {{ regionLastUpdated }}
-          </span>
-        </material-chart-card>
-      </v-col>
-
-      <v-col cols="12" lg="4">
-        <material-chart-card
-          color="warning"
-          type="Pie"
-          :data="outletTypeData"
-          :options="chartOptions"
-        >
-          <h4 class="font-weight-light">Outlet Distribution by Type</h4>
-          <p class="font-weight-light">Total Types: {{ totalTypes }}</p>
-
-          <template v-slot:actions>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ attrs, on }">
-                <v-btn
-                  v-bind="attrs"
-                  color="info"
-                  icon
-                  v-on="on"
-                  @click="fetchOutletTypeData"
-                  :loading="loading"
-                >
-                  <v-icon color="info">mdi-refresh</v-icon>
-                </v-btn>
-              </template>
-              <span>Refresh Type Data</span>
-            </v-tooltip>
-
-            <v-tooltip bottom>
-              <template v-slot:activator="{ attrs, on }">
-                <v-btn
-                  v-bind="attrs"
-                  light
-                  icon
-                  v-on="on"
-                  @click="downloadTypeReport"
-                  :loading="downloading"
-                >
-                  <v-icon>mdi-export</v-icon>
-                </v-btn>
-              </template>
-              <span>Export Type Report</span>
-            </v-tooltip>
-          </template>
-
-          <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-          <span class="caption grey--text font-weight-light">
-            Last updated {{ typeLastUpdated }}
-          </span>
-        </material-chart-card>
+      <v-col cols="12" lg="6">
+        <outlet-distribution />
       </v-col>
 
       <v-col cols="12" md="12">
         <base-material-card color="warning" class="px-5 py-3 elevation-6">
           <template v-slot:heading>
-            <div class="display-2 font-weight-light">Outlet Analytics Summary</div>
+            <div class="display-2 font-weight-light">
+              Outlet Analytics Summary
+            </div>
             <div class="subtitle-1 font-weight-light">{{ summaryDate }}</div>
           </template>
           <v-card-text>
@@ -179,15 +36,17 @@
 <script>
 import LeafletMap from "@/views/dashboard/components/dashboard/LeafletMap.vue";
 import DashboardBatchTarget from "@/views/dashboard/components/dashboard/BatchTarget.vue";
-import MaterialChartCard from "@/components/base/MaterialChartCard.vue";
-import Vue from 'vue';
+import TimeMotion from "@/views/dashboard/components/dashboard/TimeMotion.vue";
+import OutletDistribution from "@/views/dashboard/components/dashboard/OutletDistribution.vue";
+import Vue from "vue";
 
 export default {
   name: "DashboardDashboard",
-  components: { 
-    LeafletMap, 
+  components: {
+    LeafletMap,
     DashboardBatchTarget,
-    MaterialChartCard
+    TimeMotion,
+    OutletDistribution,
   },
 
   data() {
@@ -204,18 +63,18 @@ export default {
       totalTypes: 0,
 
       outletStatusData: {
-        labels: ['Active', 'Inactive', 'Pending', 'Closed'],
-        series: [25, 25, 25, 25]
+        labels: ["Active", "Inactive", "Pending", "Closed"],
+        series: [25, 25, 25, 25],
       },
 
       outletRegionData: {
-        labels: ['North', 'South', 'East', 'West', 'Central'],
-        series: [20, 20, 20, 20, 20]
+        labels: ["North", "South", "East", "West", "Central"],
+        series: [20, 20, 20, 20, 20],
       },
 
       outletTypeData: {
-        labels: ['Type A', 'Type B', 'Type C', 'Type D'],
-        series: [25, 25, 25, 25]
+        labels: ["Type A", "Type B", "Type C", "Type D"],
+        series: [25, 25, 25, 25],
       },
 
       chartOptions: {
@@ -225,26 +84,23 @@ export default {
         total: 100,
         showLabel: true,
         chartPadding: 30,
-        labelInterpolationFnc: (value) => `${value}%`
-      }
-    }
+        labelInterpolationFnc: (value) => `${value}%`,
+      },
+    };
   },
 
-  computed: {
-   
-  },
+  computed: {},
 
   methods: {
-
     async fetchOutletStatusData() {
       this.loading = true;
       try {
         await this.fetchOutlets();
         this.outletStatusData = this.outletData;
         this.outletLastUpdated = new Date().toLocaleString();
-        this.totalOutlets = this.outletData.series.reduce((a,b) => a + b, 0);
+        this.totalOutlets = this.outletData.series.reduce((a, b) => a + b, 0);
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
+        Vue.prototype.$toast.error(`${error.data.message}`);
       } finally {
         this.loading = false;
       }
@@ -258,7 +114,7 @@ export default {
         this.regionLastUpdated = new Date().toLocaleString();
         this.activeRegions = this.regionData.labels.length;
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
+        Vue.prototype.$toast.error(`${error.data.message}`);
       } finally {
         this.loading = false;
       }
@@ -272,7 +128,7 @@ export default {
         this.typeLastUpdated = new Date().toLocaleString();
         this.totalTypes = this.typeData.labels.length;
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
+        Vue.prototype.$toast.error(`${error.data.message}`);
       } finally {
         this.loading = false;
       }
@@ -281,9 +137,9 @@ export default {
     async downloadOutletReport() {
       this.downloading = true;
       try {
-        await this.downloadReport('outlet');
+        await this.downloadReport("outlet");
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
+        Vue.prototype.$toast.error(`${error.data.message}`);
       } finally {
         this.downloading = false;
       }
@@ -292,9 +148,9 @@ export default {
     async downloadRegionReport() {
       this.downloading = true;
       try {
-        await this.downloadReport('region');
+        await this.downloadReport("region");
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
+        Vue.prototype.$toast.error(`${error.data.message}`);
       } finally {
         this.downloading = false;
       }
@@ -303,9 +159,9 @@ export default {
     async downloadTypeReport() {
       this.downloading = true;
       try {
-        await this.downloadReport('type');
+        await this.downloadReport("type");
       } catch (error) {
-        Vue.prototype.$toast.error(`${error.data.message}`)
+        Vue.prototype.$toast.error(`${error.data.message}`);
       } finally {
         this.downloading = false;
       }
@@ -313,9 +169,9 @@ export default {
 
     async downloadReport(type) {
       // Implement report download logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log(`Downloading ${type} report...`);
-    }
+    },
   },
 
   // async created() {
@@ -325,7 +181,7 @@ export default {
   //     this.fetchOutletTypeData()
   //   ]);
   // }
-}
+};
 </script>
 
 <style scoped>
