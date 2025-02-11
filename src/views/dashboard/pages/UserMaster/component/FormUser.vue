@@ -249,12 +249,12 @@ export default {
       validEndMenu: false,
       usernameRules: [
         (v) => !!v || "Username is required",
-        (v) => v.length >= 2 || "Username must be at least 2 characters",
+        (v) => v.length >= 4 || "Username must be at least 4 characters",
         (v) => v.length <= 50 || "Username must be less than 50 characters",
       ],
       fullnameRules: [
         (v) => !!v || "FullName is required",
-        (v) => v.length >= 2 || "Username must be at least 2 characters",
+        (v) => v.length >= 5 || "Full Name must be at least 5 characters",
         (v) => v.length <= 50 || "Full Name must be less than 50 characters",
       ],
       emailRules: [

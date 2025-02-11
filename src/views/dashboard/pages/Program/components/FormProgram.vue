@@ -22,12 +22,14 @@
             <v-col cols="12">
               <v-text-field
                 v-model="itemData.description"
+                :rules="maxLengthRules"
                 label="Description"
               />
             </v-col>
             <v-col cols="12">
               <v-textarea
                 v-model="itemData.notes"
+                :rules="maxLengthRules"
                 label="Notes"
               />
             </v-col>
@@ -68,6 +70,7 @@ export default {
       },
       formValid: false,
       requiredRules: [(v) => !!v || "required"],
+      maxLengthRules: [(v) => v.length <= 150 || "Max length is 150 characters"],
     };
   },
   watch: {
