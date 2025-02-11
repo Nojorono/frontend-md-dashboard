@@ -88,6 +88,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.area"
+                        :items="getAreaOptions"
+                        item-text="area"
+                        item-value="area"
                         label="Area"
                         outlined
                         dense
@@ -98,6 +101,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.region"
+                        :items="getRegionOptions"
+                        item-text="name"
+                        item-value="name"
                         label="Region"
                         outlined
                         dense
@@ -108,6 +114,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.brand"
+                        :items="getBrandOptions"
+                        item-text="brand"
+                        item-value="brand"
                         label="Brand"
                         outlined
                         dense
@@ -118,6 +127,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.sio_type"
+                        :items="getSioTypeOptions"
+                        item-text="sio_type"
+                        item-value="sio_type"
                         label="SIO Type"
                         outlined
                         dense
@@ -173,6 +185,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.area"
+                        :items="getAreaOptions"
+                        item-text="area"
+                        item-value="area"
                         label="Area"
                         outlined
                         dense
@@ -183,6 +198,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.region"
+                        :items="getRegionOptions"
+                        item-text="name"
+                        item-value="name"
                         label="Region"
                         outlined
                         dense
@@ -238,6 +256,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.area"
+                        :items="getAreaOptions"
+                        item-text="area"
+                        item-value="area"
                         label="Area"
                         outlined
                         dense
@@ -248,6 +269,9 @@
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="filter.region"
+                        :items="getRegionOptions"
+                        item-text="name"
+                        item-value="name"
                         label="Region"
                         outlined
                         dense
@@ -291,6 +315,7 @@
 <script>
 import { reportActivity, reportOutlet, reportReimbursement, reportAbsent } from "@/api/reportService";
 import { getAllList } from "@/api/batchService";
+import { mapGetters } from "vuex";
 export default {
   name: "Report",
   data() {
@@ -310,8 +335,21 @@ export default {
       loadingAbsent: false,
     };
   },
+  computed: {
+    ...mapGetters([
+      "getUser",
+      "getAreaOptions",
+      "getRegionOptions",
+      "getBrandOptions",
+      "getSioTypeOptions",
+    ]),
+  },
   async mounted() {
     await this.getBatchCode();
+    console.log(this.getAreaOptions);
+    console.log(this.getRegionOptions);
+    console.log(this.getBrandOptions);
+    console.log(this.getSioTypeOptions);
   },
   methods: {
     async getBatchCode() {

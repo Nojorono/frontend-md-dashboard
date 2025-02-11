@@ -68,10 +68,6 @@
         }
       }
     },
-
-    mounted() {
-      console.log(this.data);
-    }
   }
 </script>
 
