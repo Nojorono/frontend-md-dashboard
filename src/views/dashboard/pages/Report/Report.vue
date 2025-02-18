@@ -86,8 +86,8 @@
                 <v-card-text>
                   <v-row>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.area"
+                      <v-autocomplete
+                        v-model="outletFilter.area"
                         :items="getAreaOptions"
                         item-text="area"
                         item-value="area"
@@ -96,11 +96,11 @@
                         dense
                         prepend-inner-icon="mdi-map-marker"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.region"
+                      <v-autocomplete
+                        v-model="outletFilter.region"
                         :items="getRegionOptions"
                         item-text="name"
                         item-value="name"
@@ -109,11 +109,11 @@
                         dense
                         prepend-inner-icon="mdi-earth"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.brand"
+                      <v-autocomplete
+                        v-model="outletFilter.brand"
                         :items="getBrandOptions"
                         item-text="brand"
                         item-value="brand"
@@ -122,20 +122,20 @@
                         dense
                         prepend-inner-icon="mdi-tag"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.sio_type"
+                      <v-autocomplete
+                        v-model="outletFilter.sio_type"
                         :items="getSioTypeOptions"
-                        item-text="sio_type"
-                        item-value="sio_type"
+                        item-text="name"
+                        item-value="name"
                         label="SIO Type"
                         outlined
                         dense
                         prepend-inner-icon="mdi-format-list-checks"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" class="text-center">
                       <v-btn
@@ -183,8 +183,8 @@
                 <v-card-text>
                   <v-row>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.area"
+                      <v-autocomplete
+                        v-model="reimbursementFilter.area"
                         :items="getAreaOptions"
                         item-text="area"
                         item-value="area"
@@ -193,11 +193,11 @@
                         dense
                         prepend-inner-icon="mdi-map-marker"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.region"
+                      <v-autocomplete
+                        v-model="reimbursementFilter.region"
                         :items="getRegionOptions"
                         item-text="name"
                         item-value="name"
@@ -206,7 +206,7 @@
                         dense
                         prepend-inner-icon="mdi-earth"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" class="text-center">
                       <v-btn
@@ -254,8 +254,8 @@
                 <v-card-text>
                   <v-row>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.area"
+                      <v-autocomplete
+                        v-model="absentFilter.area"
                         :items="getAreaOptions"
                         item-text="area"
                         item-value="area"
@@ -264,11 +264,11 @@
                         dense
                         prepend-inner-icon="mdi-map-marker"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="filter.region"
+                      <v-autocomplete
+                        v-model="absentFilter.region"
                         :items="getRegionOptions"
                         item-text="name"
                         item-value="name"
@@ -277,7 +277,7 @@
                         dense
                         prepend-inner-icon="mdi-earth"
                         clearable
-                      ></v-text-field>
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="12" class="text-center">
                       <v-btn
@@ -322,11 +322,19 @@ export default {
     return {
       batch_code: null,
       batchCodeOptions: [],
-      filter: {
+      outletFilter: {
         area: '',
         region: '',
         brand: '',
         sio_type: '',
+      },
+      reimbursementFilter: {
+        area: '',
+        region: '',
+      },
+      absentFilter: {
+        area: '',
+        region: '',
       },
       loadingBatchCodes: false,
       loadingActivity: false,
@@ -404,7 +412,7 @@ export default {
     async downloadReportOutlet() {
       this.loadingOutlet = true;
       try {
-        const response = await reportOutlet(this.filter);
+        const response = await reportOutlet(this.outletFilter);
         if (response) {
           const blob = new Blob([response], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -430,7 +438,7 @@ export default {
     async downloadReportReimbursement() {
       this.loadingReimbursement = true;
       try {
-        const response = await reportReimbursement(this.filter);
+        const response = await reportReimbursement(this.reimbursementFilter);
         if (response) {
           const blob = new Blob([response], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -456,7 +464,7 @@ export default {
     async downloadReportAbsent() {
       this.loadingAbsent = true;
       try {
-        const response = await reportAbsent(this.filter);
+        const response = await reportAbsent(this.absentFilter);
         if (response) {
           const blob = new Blob([response], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
