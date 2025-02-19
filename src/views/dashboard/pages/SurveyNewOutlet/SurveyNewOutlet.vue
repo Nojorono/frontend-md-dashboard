@@ -129,6 +129,11 @@
                 {{ (options.page - 1) * options.itemsPerPage + index + 1 }}
               </td>
               <td>
+                <v-chip small :color="getStatusColor(item.is_approved)" text-color="white">
+                  {{ getStatusLabelOption(item.is_approved) }}
+                </v-chip>
+              </td>
+              <td>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <span
@@ -248,7 +253,7 @@
                   <span>{{ item?.cycle }}</span>
                 </v-tooltip>
               </td>
-              <td>
+              <td v-if="item.is_approved === 0">
                 <v-btn
                   small
                   color="primary"
@@ -325,12 +330,6 @@ export default {
   },
   data() {
     return {
-      activeTab: 0,
-      tabs: [
-        { name: "On Progress", label: "On Progress", value: 0 },
-        { name: "Approved", label: "Approved", value: 1 },
-        { name: "Rejected", label: "Rejected", value: 2 },
-      ],
       tableHeaders: [
         {
           text: "No",
@@ -339,6 +338,7 @@ export default {
           class: "text-left",
           width: "5%",
         },
+        { text: "Status", value: "is_approved", sortable: true },
         { text: "Region", value: "region", sortable: true },
         { text: "Area", value: "area", sortable: true },
         { text: "Address", value: "address_line", sortable: true },
@@ -412,6 +412,16 @@ export default {
     this.fetchData();
   },
   methods: {
+    getStatusColor(status) {
+      if (status === 1) return 'success';
+      if (status === 0) return 'warning';
+      return 'error';
+    },
+    getStatusLabelOption(status) {
+      if (status === 1) return 'Approved';
+      if (status === 0) return 'Belum Dijalankan';
+      return 'Rejected';
+    },
     handleFilterChange() {
       this.options.page = 1;
       this.fetchData();

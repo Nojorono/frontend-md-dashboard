@@ -41,7 +41,7 @@ export const NEW_SURVEY_STATUS = {
   [STATUS_PERM_CLOSED]: 'Outlet Tutup Permanen', 
   [STATUS_NOT_FOUND]: 'Outlet Tidak Ditemukan',
   [STATUS_REJECTED]: 'Outlet Menolak',
-
+  [STATUS_VISITED]: 'Sudah Dikunjungi',
   [STATUS_NOT_VISITED]: 'Belum Dikunjungi',
   [STATUS_PIC_REJECTED]: 'Ditolak PIC',
   [STATUS_HO_PROCESSING]: 'Proses HO',

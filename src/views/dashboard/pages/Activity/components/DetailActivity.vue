@@ -23,7 +23,7 @@
                     {{ getStatusLabelOption(data.status) }}
                   </v-chip>
                   <v-chip small :color="getStatusColor(data.status_approval)" text-color="white">
-                    {{ getStatusLabelOption(data.status_approval) }}
+                    {{ data.status_approval === 3 ? 'Approved' : data.status_approval === 0 ? 'Butuh Pemeriksaan' : getStatusLabelOption(data.status_approval) }}
                   </v-chip>
                 </div>
               </v-card-title>
@@ -556,6 +556,8 @@
 
     methods: {
       getStatusColor(status) {
+        if (status === 3) return 'success';
+        if (status === 0) return 'warning';
         return STATUS_COLORS[status];
       },
       getStatusLabelOption(value) {

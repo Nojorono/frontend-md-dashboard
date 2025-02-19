@@ -366,7 +366,7 @@ export default {
   methods: {
     getOutletText(item) {
       return item
-        ? `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area} - ${item.sio_type} - ${item.brand}`
+        ? `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area} - ${item.sio_type} - ${item.brand} - ${item.visit_day}`
         : "";
     },
     onSurveyOutletChange(surveyOutlet) {
