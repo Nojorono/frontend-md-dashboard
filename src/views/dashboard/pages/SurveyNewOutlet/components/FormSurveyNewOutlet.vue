@@ -170,25 +170,6 @@
                 />
 
                 <v-text-field v-model="itemData.remarks" label="Remarks" />
-
-                <div v-if="isEdit">
-                  <div class="image-gallery">
-                    <div
-                      v-for="(photo, index) in itemData.photos"
-                      :key="index"
-                      class="image-container"
-                    >
-                      <img
-                        :src="`${decodeURIComponent(photo.url)}`"
-                        class="image-preview"
-                        alt="Store Photo"
-                      />
-                      <button class="delete-button" @click="deleteImage(index)">
-                        <v-icon>mdi-delete</v-icon>
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </v-card>
             </v-col>
           </v-row>
@@ -213,7 +194,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { deleteImageS3 } from "@/api/S3Service";
 import { getAllOutletSurvey } from "@/api/masterOutletService";
 
 export default {
@@ -317,20 +297,6 @@ export default {
       return item
         ? `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area} - ${item.sio_type} - ${item.brand}`
         : "";
-    },
-
-    async deleteImage(index) {
-      const photo = this.itemData.photos[index];
-      this.itemData.photos.splice(index, 1);
-      await this.removeImageFromServer(photo.url);
-    },
-
-    async removeImageFromServer(key) {
-      try {
-        await deleteImageS3(key);
-      } catch (error) {
-        console.error("Error deleting image:", error);
-      }
     },
 
     async fetchOutletSurvey() {

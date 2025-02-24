@@ -232,9 +232,10 @@
                         !(
                           ((getUser?.roles === 'ADMIN' ||
                             getUser?.roles === 'NASIONAL' ||
-                            getUser?.roles === 'SUPERADMIN') &&
+                            getUser?.roles === 'SUPER-ADMIN') &&
                             item?.status_approval === 101) ||
-                          ((getUser?.roles === 'AMO' ||
+                          ((getUser?.roles === 'SUPER-ADMIN' ||
+                            getUser?.roles === 'AMO' ||
                             getUser?.roles === 'REGIONAL') &&
                             item?.status_approval === 0)
                         )
@@ -248,7 +249,7 @@
                       v-if="
                         (getUser?.roles === 'ADMIN' ||
                           getUser?.roles === 'NASIONAL' ||
-                          getUser?.roles === 'SUPERADMIN') &&
+                          getUser?.roles === 'SUPER-ADMIN') &&
                         item?.status_approval === 101
                       "
                     >
@@ -269,7 +270,7 @@
                     </template>
                     <template
                       v-else-if="
-                        (getUser?.roles === 'AMO' ||
+                        (getUser?.roles === 'SUPER-ADMIN' || getUser?.roles === 'AMO' || 
                           getUser?.roles === 'REGIONAL') &&
                         item?.status_approval === 0
                       "
