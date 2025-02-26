@@ -413,14 +413,17 @@ export default {
   },
   methods: {
     getStatusColor(status) {
-      if (status === 1) return 'success';
+      if (status === 203) return 'success';
+      if (status === 101) return 'warning';
       if (status === 0) return 'warning';
+      if (status === 407) return 'error';
       return 'error';
     },
     getStatusLabelOption(status) {
-      if (status === 1) return 'Approved';
+      if (status === 203) return 'Approved';
+      if (status === 101) return 'Pending';
+      if (status === 407) return 'Pending';
       if (status === 0) return 'Belum Dijalankan';
-      return 'Rejected';
     },
     handleFilterChange() {
       this.options.page = 1;
