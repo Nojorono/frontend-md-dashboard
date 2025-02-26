@@ -24,7 +24,6 @@
                 label="Region"
                 :items="getRegionOptions"
                 clearable
-                return-object
                 dense
                 outlined
                 hide-details
@@ -44,7 +43,6 @@
                 label="Area"
                 :items="getAreaOptions"
                 clearable
-                return-object
                 dense
                 outlined
                 hide-details
