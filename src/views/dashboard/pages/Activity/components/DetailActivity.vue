@@ -28,75 +28,7 @@
                 </div>
               </v-card-title>
             </v-col>
-            <v-col cols="4" md="4" class="d-flex justify-end">
-              <div class="d-flex align-start">
-                <v-menu offset-y :close-on-content-click="false">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="primary" outlined small v-bind="attrs" v-on="on" :disabled="!(
-                      ((currentUser?.roles === 'ADMIN' ||
-                      currentUser?.roles === 'NASIONAL' ||
-                        currentUser?.roles === 'SUPERADMIN') &&
-                        (data?.status_approval === 101)) ||
-                      ((currentUser?.roles === 'AMO' ||
-                        currentUser?.roles === 'REGIONAL') &&
-                        (data?.status_approval === 0))
-                    )">
-                      <v-icon small>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list dense>
-                    <template v-if="
-                      (currentUser?.roles === 'ADMIN' ||
-                        currentUser?.roles === 'NASIONAL' ||
-                        currentUser?.roles === 'SUPERADMIN') &&
-                      data?.status_approval === 101
-                    ">
-                      <v-list-item v-for="(status, index) in statusLevel2Options" :key="index"
-                        @click="updateStatus(status.value)">
-                        <v-list-item-icon class="mr-2">
-                          <v-icon small :color="getStatusColor(status.value)">
-                            mdi-circle-small
-                          </v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>{{
-                          getStatusLabelOption(status.value)
-                          }}</v-list-item-title>
-                      </v-list-item>
-                    </template>
-                    <template v-else-if="
-                      (currentUser?.roles === 'AMO' ||
-                        currentUser?.roles === 'REGIONAL') &&
-                      (data?.status_approval === 0)
-                    ">
-                      <v-list-item v-for="(status, index) in statusLevel1Options" :key="index"
-                        @click="updateStatus(status.value)" class="cursor-pointer">
-                        <v-list-item-icon class="mr-2">
-                          <v-icon small :color="getStatusColor(status.value)">
-                            mdi-circle-small
-                          </v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>{{
-                          getStatusLabelOption(status.value)
-                          }}</v-list-item-title>
-                      </v-list-item>
-                    </template>
-                    <template v-else>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title class="text-caption text-center grey--text">
-                            No actions available
-                          </v-list-item-title>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </template>
-                  </v-list>
-                </v-menu>
-              </div>
-            </v-col>
-          </v-row>
-
-
-
+          </v-row>       
           <!-- General Information Section -->
           <v-divider class="my-4" />
           <v-card-text>
