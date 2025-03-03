@@ -28,7 +28,7 @@
                 </div>
               </v-card-title>
             </v-col>
-          </v-row>       
+          </v-row>        
           <!-- General Information Section -->
           <v-divider class="my-4" />
           <v-card-text>

@@ -334,6 +334,8 @@ export default {
         this.call_plan_id = this.$route.params.id;
         this.fetchOutlets();
         this.fetchSurveyOutlet();
+      }else{
+        this.resetForm();
       }
     },
     item: {
@@ -364,6 +366,10 @@ export default {
     this.fetchProgram();
   },
   methods: {
+    closeDialog() {
+      this.resetForm();
+      this.$emit("close");
+    },
     getOutletText(item) {
       return item
         ? `${item.outlet_code} - ${item.name} - ${item.region} - ${item.area} - ${item.sio_type} - ${item.brand} - ${item.visit_day}`
@@ -379,12 +385,12 @@ export default {
     resetForm() {
       this.isProgram = false;
       this.itemData = {
+        user_id: null,
         outlet_id: [],
         notes: "",
         day_plan: "",
         survey_outlet_id: null,
         type: 0,
-        user_id: null,
         program_id: null,
         status: 400,
       };
@@ -392,10 +398,6 @@ export default {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
-    },
-    closeDialog() {
-      this.resetForm();
-      this.$emit("close");
     },
     saveItem() {
       if (this.$refs.form.validate()) {

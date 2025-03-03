@@ -366,19 +366,18 @@ export default {
           const res = await updateScheduleData(id, itemWithoutId)
           if (res.statusCode === 200){
             Vue.prototype.$toast.success(`Update data Successfully!`)
-            this.closeFormDialog()
           }
         } else {
           const res = await createScheduleData(item)
           if (res.statusCode === 200){
             Vue.prototype.$toast.success(`Create data Successfully!`)
-            this.closeFormDialog()
           }
         }
       } catch (error) {
         Vue.prototype.$toast.error(`${error.data.message}`)
         console.error(error)
       } finally {
+        this.closeFormDialog()
         await this.fetchData(this.id)
       }
     },
