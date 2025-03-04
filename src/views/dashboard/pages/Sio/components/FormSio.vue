@@ -22,36 +22,6 @@
             required
           />
 
-          <!-- Dynamic SOG Inputs -->
-          <div
-            v-for="(sog, index) in itemData.component"
-            :key="index"
-            class="sog-input"
-          >
-            <v-text-field
-              v-model="itemData.component[index]"
-              :label="`Item ${index + 1}`"
-              placeholder="Enter Item"
-              class="mr-2"
-            />
-            <v-btn
-              icon
-              @click="removeSog(index)"
-            >
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </div>
-
-          <!-- Add SOG Button -->
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="addSog"
-          >
-            <v-icon left>
-              mdi-plus
-            </v-icon> Add Item
-          </v-btn>
         </v-form>
       </v-card-text>
 
