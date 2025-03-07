@@ -190,7 +190,7 @@ export default {
     ...mapActions(['showLoading', 'hideLoading']),
     async handleBatchTarget(id) {
       await this.$router.push({
-        name: 'Batch Target',
+        name: 'Batch Allocation',
         params: { id },
       });
     },

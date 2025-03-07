@@ -89,8 +89,8 @@ export default [
         meta: requiresAuth, // Protect this route
       },
       {
-        name: 'Batch Target',
-        path: '/master/batch/target/:id',
+        name: 'Batch Allocation',
+        path: '/master/batch/allocation/:id',
         component: () => import('@/views/dashboard/pages/Batch/BatchTarget.vue'),
         meta: requiresAuth, // Protect this route
       },
