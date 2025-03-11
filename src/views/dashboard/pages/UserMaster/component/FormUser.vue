@@ -180,7 +180,6 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
-                    :rules="[...dateRules, validEndDateRule]"
                     v-on="on"
                     outlined
                     dense

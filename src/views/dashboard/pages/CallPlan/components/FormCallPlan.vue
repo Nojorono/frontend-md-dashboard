@@ -88,65 +88,6 @@
                 </template>
               </v-autocomplete>
 
-              <v-row>
-                <v-col cols="6">
-                  <v-menu
-                    v-model="startDateMenu"
-                    :close-on-content-click="false"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        v-model="itemData.start_plan"
-                        label="Start Date"
-                        outlined
-                        dense
-                        readonly
-                        v-on="on"
-                        :rules="dateRules"
-                        prepend-inner-icon="mdi-calendar"
-                      />
-                    </template>
-                    <v-date-picker
-                      v-model="itemData.start_plan"
-                      no-title
-                      @input="startDateMenu = false"
-                    />
-                  </v-menu>
-                </v-col>
-                <v-col cols="6">
-                  <v-menu
-                    v-model="endDateMenu"
-                    :close-on-content-click="false"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        v-model="itemData.end_plan"
-                        label="End Date"
-                        outlined
-                        dense
-                        readonly
-                        v-on="on"
-                        :rules="dateRules"
-                        prepend-inner-icon="mdi-calendar"
-                      />
-                    </template>
-                    <v-date-picker
-                      v-model="itemData.end_plan"
-                      no-title
-                      :min="itemData.start_plan"
-                      @input="endDateMenu = false"
-                    />
-                  </v-menu>
-                </v-col>
-              </v-row>
             </v-col>
           </v-row>
         </v-form>
