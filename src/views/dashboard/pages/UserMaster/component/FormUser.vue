@@ -72,7 +72,7 @@
                 item-value="name"
                 label="Region"
                 clearable
-                :rules="regionRules"
+                :rules="computedRegionRules"
                 @update:search-input="onRegionChange"
                 outlined
                 dense
@@ -94,7 +94,7 @@
                 chips
                 deletable-chips
                 required
-                :rules="areaRules"
+                :rules="computedAreaRules"
                 outlined
                 dense
                 multiple
@@ -104,7 +104,11 @@
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-content>
-                      {{ !itemData.region ? 'Please select a region first' : 'Area not found' }}
+                      {{
+                        !itemData.region
+                          ? "Please select a region first"
+                          : "Area not found"
+                      }}
                     </v-list-item-content>
                   </v-list-item>
                 </template>
@@ -267,8 +271,8 @@ export default {
         (v) => /^[0-9]*$/.test(v) || "Phone number must contain only numbers",
         (v) => v.length <= 20 || "Phone number must be less than 20 characters",
       ],
-      regionRules: [(v) => !!v || "Region is required"],
       areaRules: [(v) => !!v || "Area is required"],
+      regionRules: [(v) => !!v || "Region is required"],
       roleRules: [(v) => !!v || "Role is required"],
       dateRules: [(v) => !!v || "Date is required"],
     };
@@ -284,24 +288,34 @@ export default {
     },
     filteredAreaOptions() {
       if (!this.itemData.region) return [];
-      
+
       const selectedRegion = this.regionOptions.find(
-        (region) => region.name === this.itemData.region
+        (region) => region.name === this.itemDÒLata.region
       );
-      
+
       if (!selectedRegion) return [];
-      
+
       return this.areaOptions.filter(
         (area) => area.region_id === selectedRegion.id
       );
-    }
+    },
+    computedRegionRules() {
+      return this.isRoleExempted ? [] : this.regionRules;
+    },
+    computedAreaRules() {
+      return this.isRoleExempted ? [] : this.areaRules;
+    },
+    isRoleExempted() {
+      return ["NASIONAL", "ADMIN", "VENDOR"].includes(
+        this.getRoleNameById(this.itemData.user_role_id)
+      );
+    },
   },
   watch: {
     item: {
       immediate: true,
       handler(newItem) {
         if (newItem) {
-
           this.itemData = {
             id: newItem.id || null,
             username: newItem.username || "",
@@ -320,13 +334,13 @@ export default {
         }
       },
     },
-    'itemData.region': {
+    "itemData.region": {
       handler(newVal, oldVal) {
         if (newVal !== oldVal && !this.isEdit) {
           this.itemData.area = [];
         }
-      }
-    }
+      },
+    },
   },
   async mounted() {
     await Promise.all([
@@ -336,6 +350,10 @@ export default {
     ]);
   },
   methods: {
+    getRoleNameById(roleId) {
+      const role = this.rolesOptions.find((r) => r.id === roleId);
+      return role ? role.name : "";
+    },
     isNumber(event) {
       const charCode = event.which ? event.which : event.keyCode;
       if (charCode < 48 || charCode > 57) {
@@ -405,7 +423,7 @@ export default {
       if (this.$refs.form.validate()) {
         const formattedData = {
           ...this.itemData,
-          area: this.itemData.area
+          area: this.itemData.area,
         };
         this.$emit("save", formattedData);
         this.closeDialog();
@@ -430,6 +448,8 @@ export default {
       }
     },
     onRoleChange(item) {
+      // Re-evaluate validation when role changes
+      this.$refs.form.validate();
       if (item) {
         this.itemData.user_role_id = item;
       } else {
