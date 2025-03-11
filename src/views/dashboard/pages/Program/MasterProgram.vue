@@ -57,7 +57,7 @@
             <td>{{ (options.page - 1) * options.itemsPerPage + index + 1 }}</td>
             <td>{{ item?.name }}</td>
             <td>{{ item?.description }}</td>
-            <td>{{ item?.notes }}</td>
+            <!-- <td>{{ item?.notes }}</td> -->
             <td class="d-flex" style="align-items: center">
               <v-btn
                 class="mx-1"
@@ -134,7 +134,7 @@ export default {
         { text: "No", value: "no" },
         { text: "Name", value: "name" },
         { text: "Description", value: "description" },
-        { text: "Notes", value: "notes" },
+        // { text: "Notes", value: "notes" },
         { text: "Action", value: "action" },
       ],
       tableData: [],

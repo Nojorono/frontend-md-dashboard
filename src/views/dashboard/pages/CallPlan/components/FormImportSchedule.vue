@@ -36,7 +36,7 @@
 
           <v-row class="mt-2">
             <v-col cols="12">
-              <a href="#" @click="downloadTemplate">Download Template Excel</a>
+              <!-- <a href="#" @click="downloadTemplate">Download Template Excel</a> -->
             </v-col>
           </v-row>
         </v-card-text>

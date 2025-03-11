@@ -18,7 +18,7 @@
           <v-text-field
             v-model="itemData.name"
             :rules="nameRules"
-            label="Code Batch"
+            label="Region Name"
             required
           />
         </v-form>

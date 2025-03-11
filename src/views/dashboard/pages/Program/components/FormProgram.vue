@@ -20,19 +20,19 @@
               />
             </v-col>
             <v-col cols="12">
-              <v-text-field
+              <v-textarea
                 v-model="itemData.description"
                 :rules="maxLengthRules"
                 label="Description"
               />
             </v-col>
-            <v-col cols="12">
+            <!-- <v-col cols="12">
               <v-textarea
                 v-model="itemData.notes"
                 :rules="maxLengthRules"
                 label="Notes"
               />
-            </v-col>
+            </v-col> -->
           </v-row>
         </v-form>
       </v-card-text>
@@ -70,7 +70,7 @@ export default {
       },
       formValid: false,
       requiredRules: [(v) => !!v || "required"],
-      maxLengthRules: [(v) => v.length <= 150 || "Max length is 150 characters"],
+      maxLengthRules: [(v) => v.length <= 255 || "Max length is 255 characters"],
     };
   },
   watch: {
