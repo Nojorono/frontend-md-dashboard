@@ -164,7 +164,6 @@
                 clear-icon="mdi-close-circle"
                 label="Notes"
                 prepend-inner-icon="mdi-note-text"
-                :rules="notesRules"
                 counter="300"
                 auto-grow
                 rows="3"
