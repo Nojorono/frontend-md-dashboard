@@ -93,7 +93,7 @@
 
                 <v-autocomplete
                   v-model="itemData.area"
-                  :items="getAreaOptions"
+                  :items="filteredAreaOptions"
                   item-text="area"
                   item-value="area"
                   label="Area"
@@ -275,6 +275,19 @@ export default {
       "getSioTypeOptions",
       "getCodeBatch",
     ]),
+    filteredAreaOptions() {
+      if (!this.itemData.region) return this.getAreaOptions;
+
+      const selectedRegion = this.getRegionOptions.find(
+        (region) => region.name === this.itemData.region
+      );
+
+      if (!selectedRegion) return this.getAreaOptions;
+
+      return this.getAreaOptions.filter(
+        (area) => area.region_id === selectedRegion.id
+      );
+    },
   },
 
   watch: {
