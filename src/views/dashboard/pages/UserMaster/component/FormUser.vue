@@ -94,10 +94,10 @@
                 chips
                 deletable-chips
                 required
-                :rules="computedAreaRules"
                 outlined
                 dense
                 multiple
+                :rules="computedAreaRules"
                 :disabled="!itemData.region"
                 @change="onAreaChange"
               >
@@ -289,7 +289,7 @@ export default {
       if (!this.itemData.region) return [];
 
       const selectedRegion = this.regionOptions.find(
-        (region) => region.name === this.itemDÒLata.region
+        (region) => region.name === this.itemData.region
       );
 
       if (!selectedRegion) return [];
