@@ -26,6 +26,7 @@
                   item-value="id"
                   label="Outlet yang diganti"
                   clearable
+                  :rules="rules.requiredField"
                 >
                   <template #no-data>
                     <v-list-item>
@@ -52,6 +53,7 @@
                 <v-text-field
                   v-model="itemData.outlet_code"
                   label="Outlet Code SFA"
+                  :rules="rules.requiredField"
                 />
 
                 <v-autocomplete
@@ -61,6 +63,7 @@
                   item-value="name"
                   label="Sio Type"
                   clearable
+                  :rules="rules.requiredField"
                 >
                   <template #no-data>
                     <v-list-item>
@@ -77,6 +80,7 @@
                   label="Region"
                   clearable
                   @change="onRegionChange"
+                  :rules="rules.requiredField"
                 >
                   <template #no-data>
                     <v-list-item>
@@ -95,6 +99,7 @@
                   label="Area"
                   clearable
                   @change="onAreaChange"
+                  :rules="rules.requiredField"
                 >
                   <template #no-data>
                     <v-list-item>
@@ -110,6 +115,7 @@
                   item-value="brand"
                   label="Brand"
                   clearable
+                  :rules="rules.requiredField"
                 >
                   <template #no-data>
                     <v-list-item>
@@ -123,22 +129,19 @@
                 <v-text-field
                   v-model="itemData.address_line"
                   label="Alamat Toko"
+                  :rules="rules.requiredField"
                 />
 
                 <v-text-field
                   v-model="itemData.sub_district"
                   label="Kecamatan"
+                  :rules="rules.requiredField"
                 />
 
                 <v-text-field
                   v-model="itemData.city_or_regency"
                   label="Kab/Kota"
-                />
-
-                <v-text-field
-                  v-model="itemData.postal_code"
-                  label="Kode Pos"
-                  type="number"
+                  :rules="rules.requiredField"
                 />
               </v-card>
             </v-col>
@@ -153,12 +156,13 @@
 
                 <v-text-field v-model="itemData.longitude" label="Longitude" />
 
-                <v-text-field v-model="itemData.cycle" label="Cycle" />
+                <v-text-field v-model="itemData.cycle" label="Cycle" :rules="rules.requiredField" />
 
                 <v-select
                   v-model="itemData.visit_day"
                   :items="visitOptions"
                   label="Hari Kunjungan"
+                  :rules="rules.requiredField"
                   clearable
                 />
 
@@ -166,6 +170,7 @@
                   v-model="itemData.odd_even"
                   :items="oddEvenOptions"
                   label="Ganjil/Genap"
+                  :rules="rules.requiredField"
                   clearable
                 />
 
@@ -251,6 +256,12 @@ export default {
       formValid: false,
       rules: {
         nameRules: [(v) => !!v || "Name is required"],
+        // Add rules for all other fields
+        requiredField: [(v) => !!v || "This field is required"],
+        numberField: [
+          (v) => !!v || "This field is required",
+          (v) => (v && !isNaN(v)) || "Value must be a number",
+        ],
       },
     };
   },
@@ -353,6 +364,7 @@ export default {
     saveItem() {
       if (this.$refs.form.validate()) {
         this.$emit("save", { ...this.itemData });
+        this.closeDialog()
       }
     },
   },

@@ -113,6 +113,8 @@
                   clearable
                   prepend-inner-icon="mdi-magnify"
                   @click:append="handleSearch"
+                  @keyup.enter="handleSearch"
+
                 />
               </v-col>
               <v-spacer></v-spacer>
