@@ -117,7 +117,12 @@
         </v-col>
         <v-spacer></v-spacer>
         <v-btn
-          v-if="activeTab === 1"
+          v-if="
+            activeTab === 1 &&
+            (getUser?.roles === 'ADMIN' ||
+              getUser?.roles === 'SUPER_ADMIN' ||
+              getUser?.roles === 'NASIONAL')
+          "
           color="primary"
           class="text-none"
           @click="openImportDialog()"
@@ -656,7 +661,7 @@ export default {
     clearRegionFilter() {
       this.filter.region = "";
       this.filter.area = "";
-      console.log(this.filter.area, this.filter.region)
+      console.log(this.filter.area, this.filter.region);
       this.fetchData();
     },
 
