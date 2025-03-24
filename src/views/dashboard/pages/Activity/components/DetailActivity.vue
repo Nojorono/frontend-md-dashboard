@@ -95,7 +95,7 @@
                       Total Penjualan Outlet Mingguan  {{ data?.sale_outlet_weekly }}/Bungkus
                     </v-btn>
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="4" v-if="data?.notes">
                     <v-btn color="primary" outlined class="mb-4">Notes: {{ data?.notes }}</v-btn>
                   </v-col>
                 </v-row>
@@ -297,76 +297,91 @@
                   <!-- Activity SIO -->
                   <v-row>
                     <v-col cols="12" v-if="activitySios.length > 0">
-                      <v-card-title class="d-flex justify-space-between">
-                        <h3 class="text-h4 font-weight-medium primary--text">Activity SIO</h3>
-                      </v-card-title>
-                      <div class="activities-container pa-4">
+                      <v-card flat class="mb-6">
+                        <v-card-title class="d-flex align-center py-4 flex-wrap">
+                          <v-icon large color="primary" class="mr-3">mdi-clipboard-text-clock</v-icon>
+                          <h3 class="text-h4 font-weight-medium primary--text mb-0 responsive-title">Activity SIO</h3>
+                        </v-card-title>
+                      </v-card>
+                      <div class="activities-container">
                         <v-row>
-                          <v-col v-for="(activity, index) in activitySios" :key="index" cols="12" sm="6" md="4">
-                            <v-card class="mx-auto" elevation="2" hover>
-                              <v-card-title class="text-h6 primary--text justify-center font-weight-bold">
-                                {{ activity.name }}
-                              </v-card-title>
-                              <v-divider></v-divider>
-                              <v-card-text class="text-subtitle-1 text-center grey--text text--darken-1">
-                                {{ activity.notes }}
-                              </v-card-text>
-                              <v-row class="pa-3">
-                                <v-col cols="6">
-                                  <v-hover v-slot="{ hover }">
-                                    <v-card 
-                                      :elevation="hover ? 8 : 2"
-                                      class="transition-swing"
+                          <v-col v-for="(activity, index) in activitySios" :key="index" cols="12" sm="12" md="6" lg="4" xl="3">
+                            <v-hover v-slot="{ hover }">
+                              <v-card
+                                class="mx-auto activity-card transition-swing h-100"
+                                :elevation="hover ? 6 : 2"
+                                :class="{ 'on-hover': hover }"
+                              >
+                                <v-card-title class="text-h6 primary--text justify-center font-weight-bold pa-4 responsive-card-title">
+                                  {{ activity.name }}
+                                </v-card-title>
+                                <v-divider></v-divider>
+                                <v-card-text class="text-subtitle-1 text-center grey--text text--darken-1 pt-4 responsive-text">
+                                  {{ activity.notes }}
+                                </v-card-text>
+                                <v-row class="pa-4 image-row">
+                                  <v-col cols="12" sm="6" class="pb-2 pb-sm-4">
+                                    <v-card
+                                      class="image-card"
+                                      :class="{ 'scale-up': hover }"
                                       @click="openImagePreview(activity.photo_before, 'before')"
+                                      elevation="0"
                                     >
-                                      <v-img 
-                                        :src="activity.photo_before" 
-                                        height="150" 
-                                        contain
-                                        class="grey lighten-2"
+                                      <v-img
+                                        :src="activity.photo_before"
+                                        :height="$vuetify.breakpoint.xsOnly ? '200' : '160'"
+                                        class="rounded-lg grey lighten-2"
+                                        cover
                                       >
                                         <template v-slot:placeholder>
                                           <v-row class="fill-height ma-0" align="center" justify="center">
                                             <v-progress-circular indeterminate color="primary"></v-progress-circular>
                                           </v-row>
                                         </template>
+                                        <div class="image-overlay d-flex align-center justify-center">
+                                          <v-chip :small="!$vuetify.breakpoint.xsOnly" label color="primary" text-color="white" class="px-4 responsive-chip">
+                                            <v-icon :left="!$vuetify.breakpoint.xsOnly" :small="!$vuetify.breakpoint.xsOnly">mdi-clock-time-four-outline</v-icon>
+                                            Before
+                                          </v-chip>
+                                        </div>
                                       </v-img>
-                                      <v-card-subtitle class="text-center pb-0">
-                                        <v-chip x-small label color="primary" text-color="white">Before</v-chip>
-                                      </v-card-subtitle>
                                     </v-card>
-                                  </v-hover>
-                                </v-col>
-                                <v-col cols="6">
-                                  <v-hover v-slot="{ hover }">
-                                    <v-card 
-                                      :elevation="hover ? 8 : 2"
-                                      class="transition-swing"
+                                  </v-col>
+                                  <v-col cols="12" sm="6" class="pt-2 pt-sm-4">
+                                    <v-card
+                                      class="image-card"
+                                      :class="{ 'scale-up': hover }"
                                       @click="openImagePreview(activity.photo_after, 'after')"
+                                      elevation="0"
                                     >
-                                      <v-img 
-                                        :src="activity.photo_after" 
-                                        height="150" 
-                                        contain
-                                        class="grey lighten-2"
+                                      <v-img
+                                        :src="activity.photo_after"
+                                        :height="$vuetify.breakpoint.xsOnly ? '200' : '160'"
+                                        class="rounded-lg grey lighten-2"
+                                        cover
                                       >
                                         <template v-slot:placeholder>
                                           <v-row class="fill-height ma-0" align="center" justify="center">
                                             <v-progress-circular indeterminate color="primary"></v-progress-circular>
                                           </v-row>
                                         </template>
+                                        <div class="image-overlay d-flex align-center justify-center">
+                                          <v-chip :small="!$vuetify.breakpoint.xsOnly" label color="success" text-color="white" class="px-4 responsive-chip">
+                                            <v-icon :left="!$vuetify.breakpoint.xsOnly" :small="!$vuetify.breakpoint.xsOnly">mdi-check-circle</v-icon>
+                                            After
+                                          </v-chip>
+                                        </div>
                                       </v-img>
-                                      <v-card-subtitle class="text-center pb-0">
-                                        <v-chip x-small label color="success" text-color="white">After</v-chip>
-                                      </v-card-subtitle>
                                     </v-card>
-                                  </v-hover>
-                                </v-col>
-                              </v-row>
-                            </v-card>
+                                  </v-col>
+                                </v-row>
+                              </v-card>
+                            </v-hover>
                           </v-col>
                         </v-row>
                       </div>
+
+    
                     </v-col>
                   </v-row>
                 </v-card>
@@ -842,4 +857,67 @@
   .send-btn:disabled {
     opacity: 0.9;
   }
-</style>
+
+  .activity-card {
+    transition: all 0.3s ease-in-out;
+    border-radius: 12px;
+  }
+  .activity-card.on-hover {
+    transform: translateY(-5px);
+  }
+  .image-card {
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .image-card.scale-up img {
+    transform: scale(1.05);
+  }
+  .image-card img {
+    transition: transform 0.3s ease-in-out;
+  }
+  .image-overlay {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Responsive styles */
+  @media (max-width: 600px) {
+    .responsive-title {
+      font-size: 1.5rem !important;
+      line-height: 1.8rem;
+    }
+    .responsive-card-title {
+      font-size: 1.1rem !important;
+      line-height: 1.4rem;
+    }
+    .responsive-text {
+      font-size: 0.9rem !important;
+    }
+    .responsive-chip {
+      height: 28px !important;
+    }
+    .image-row {
+      margin: 0;
+    }
+  }
+
+  @media (min-width: 601px) and (max-width: 960px) {
+    .responsive-title {
+      font-size: 1.8rem !important;
+    }
+    .responsive-card-title {
+      font-size: 1.25rem !important;
+    }
+  }
+
+  .h-100 {
+    height: 100%;
+  }
+</style>  
