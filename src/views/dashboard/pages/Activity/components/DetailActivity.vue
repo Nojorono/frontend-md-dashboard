@@ -455,7 +455,7 @@
 
     computed: {
       hasCoordinates() {
-        const { latitude, longitude } = this.data.outlet || {};
+        const { latitude, longitude } = this.data || {};
         return !!(latitude && longitude);
       },
 
@@ -642,28 +642,8 @@
         this.$router.back();
       },
 
-      handleSwitchChange(data, isActive) {
-        if (isActive) {
-          this.$swal.fire({
-            title: "Are you sure?",
-            text: "This action cannot be undone.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, do it!",
-            cancelButtonText: "No, cancel!",
-            reverseButtons: true
-          }).then((result) => {
-            if (result.isConfirmed) {
-              this.$swal.fire("Success!", "Your action was completed.", "success");
-            } else {
-              this.$swal.fire("Cancelled", "Your action has been cancelled.", "error");
-            }
-          });
-        }
-      },
-
       openInMaps() {
-        const { latitude, longitude } = this.data.outlet || {};
+        const { latitude, longitude } = this.data || {};
         if (latitude && longitude) {
           const mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
           window.open(mapUrl, '_blank');
