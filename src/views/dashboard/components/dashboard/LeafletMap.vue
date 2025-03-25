@@ -166,7 +166,7 @@
       addMarkersToMap() {
         this.markersLayer.clearLayers();
         this.markersData.forEach(({ latitude, longitude, region, area, brand, sio_type, color }) => {
-          const marker = L.marker([longitude, latitude], {
+          const marker = L.marker([latitude, longitude], {
             icon: L.divIcon({
               className: 'mdi-icon',
               html: `<span class="mdi mdi-map-marker" style="font-size: 32px; color: ${color || '#1976D2'};"></span>`,
