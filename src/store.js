@@ -129,6 +129,11 @@ export default new Vuex.Store({
     logout({ commit }) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+      localStorage.removeItem('regionOptions')
+      localStorage.removeItem('areaOptions')
+      localStorage.removeItem('brandOptions')
+      localStorage.removeItem('sioTypeOptions')
+      localStorage.removeItem('codeBatch')
       commit('LOGOUT')
     },
     // Action to check authentication
