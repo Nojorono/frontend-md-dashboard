@@ -131,18 +131,17 @@
                   label="Alamat Toko"
                   :rules="rules.requiredField"
                 />
-
+                <v-text-field
+                  v-model="itemData.district"
+                  label="Kabupaten/Kota"
+                  :rules="rules.requiredField"
+                />
                 <v-text-field
                   v-model="itemData.sub_district"
                   label="Kecamatan"
                   :rules="rules.requiredField"
                 />
-
-                <v-text-field
-                  v-model="itemData.city_or_regency"
-                  label="Kab/Kota"
-                  :rules="rules.requiredField"
-                />
+                
               </v-card>
             </v-col>
 
@@ -222,8 +221,6 @@ export default {
         address_line: "",
         sub_district: "",
         district: "",
-        city_or_regency: "",
-        postal_code: null,
         latitude: "",
         longitude: "",
         outlet_code: "",
@@ -339,8 +336,6 @@ export default {
         address_line: "",
         sub_district: "",
         district: "",
-        city_or_regency: "",
-        postal_code: null,
         latitude: "",
         longitude: "",
         outlet_code: "",
