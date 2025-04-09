@@ -472,10 +472,10 @@
 
       outletDetailsRight() {
         return {
-          "Cycle": this.data.outlet?.cycle,
-          "Visit Day": this.data.outlet?.visit_day,
-          "Odd/Even": this.data.outlet?.odd_even,
-          "Postal Code": this.data.outlet?.postal_code || 'N/A',
+          "Cycle": this.data.outlet?.cycle || this.data.surveyOutlet?.cycle || 'N/A',
+          "Visit Day": this.data.outlet?.visit_day || this.data.surveyOutlet?.visit_day || 'N/A',
+          "Odd/Even": this.data.outlet?.odd_even || this.data.surveyOutlet?.odd_even || 'N/A',
+          "Postal Code": this.data.outlet?.postal_code || this.data.surveyOutlet?.postal_code || 'N/A',
           "": '',
           "End Time": this.formattedEndTime || 'N/A',
         };
