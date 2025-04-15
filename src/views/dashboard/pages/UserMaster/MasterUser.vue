@@ -433,7 +433,7 @@ export default {
       this.loading = true;
       try {
         await deleteData(this.selectedItem.id);
-        Vue.prototype.$toast.success(`User ${this.selectedItem.email} deleted successfully`);
+        Vue.prototype.$toast.success(`User deleted successfully`);
         await this.fetchData();
       } catch (error) {
         Vue.prototype.$toast.error(error.data?.message || "Failed to delete user");
