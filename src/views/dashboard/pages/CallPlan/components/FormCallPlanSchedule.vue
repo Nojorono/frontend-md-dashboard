@@ -288,12 +288,12 @@ export default {
       ],
       typeOptions: [
         {
-          text: "Visit Schedule",
+          text: "Visit Schedule (Outlet Existing)",
           value: 0,
           icon: "mdi-store-check",
         },
         {
-          text: "Survey Schedule",
+          text: "Survey Schedule (New Outlet)",
           value: 1,
           icon: "mdi-clipboard-check",
         },

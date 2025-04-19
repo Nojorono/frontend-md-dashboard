@@ -58,8 +58,8 @@
               >
                 <v-text-field
                   v-model="itemData.branch[index]"
-                  :label="`Branch ${index + 1}`"
-                  placeholder="Enter Branch"
+                  :label="`SKU ${index + 1}`"
+                  placeholder="Enter SKU"
                   class="mr-2"
                 />
                 <v-btn icon @click="removeBranch(index)">
@@ -69,7 +69,7 @@
 
               <!-- Add Branch Button -->
               <v-btn color="blue darken-1" text @click="addBranch">
-                <v-icon left> mdi-plus </v-icon> Add Branch
+                <v-icon left> mdi-plus </v-icon> Add SKU
               </v-btn>
             </v-col>
           </v-row>
