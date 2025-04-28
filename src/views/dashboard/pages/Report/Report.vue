@@ -412,24 +412,55 @@ export default {
     async downloadReportOutlet() {
       this.loadingOutlet = true;
       try {
+        console.log('Starting outlet report download with filters:', this.outletFilter);
         const response = await reportOutlet(this.outletFilter);
-        if (response) {
-          const blob = new Blob([response], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          });
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          const date = new Date().toISOString().split('T')[0];
-          link.setAttribute("download", `outlet_report_${date}.xlsx`);
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          window.URL.revokeObjectURL(url);
+        
+        if (!response) {
+          throw new Error('Empty response received');
         }
+        
+        console.log('Response received, type:', typeof response);
+        
+        // Create a proper blob with the correct MIME type
+        let blob;
+        if (response instanceof Blob) {
+          console.log('Response is already a Blob');
+          blob = response;
+        } else if (response instanceof ArrayBuffer) {
+          console.log('Response is an ArrayBuffer, converting to Blob');
+          blob = new Blob([response], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
+        } else {
+          console.log('Response is not a Blob or ArrayBuffer, trying to convert');
+          blob = new Blob([response], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
+        }
+        
+        console.log('Blob created, size:', blob.size);
+        
+        // Create a download link and trigger download
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        const date = new Date().toISOString().split('T')[0];
+        link.setAttribute("download", `outlet_report_${date}.xlsx`);
+        
+        // Use a more reliable way to trigger the download
+        document.body.appendChild(link);
+        setTimeout(() => {
+          console.log('Triggering download click');
+          link.click();
+          setTimeout(() => {
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            console.log('Download link removed and URL revoked');
+          }, 200);
+        }, 100);
       } catch (error) {
         console.error("Error downloading report:", error);
-        alert("There was an error downloading the report.");
+        alert(`Error downloading report: ${error.message || 'Unknown error'}`); 
       } finally {
         this.loadingOutlet = false;
       }
