@@ -171,7 +171,7 @@
                 label
                 text-color="white"
               >
-                {{ getStatusLabel(item) }}
+                {{ getStatusLabel(item?.status) }}
               </v-chip>
             </td>
             <td>
@@ -181,6 +181,8 @@
                     ? 'warning'
                     : item?.status_approval === 101
                     ? 'info'
+                    : getStatusColor(item?.status_approval)
+                    ? getStatusColor(item?.status_approval)
                     : 'success'
                 "
                 small
@@ -199,8 +201,8 @@
                 {{
                   item?.status_approval === 0
                     ? "Perlu Verifikasi"
-                    : item?.status_approval === 101
-                    ? "Proses HO"
+                    : getStatusLabel(item?.status_approval)
+                    ? getStatusLabel(item?.status_approval)
                     : "Approved"
                 }}
               </v-chip>
@@ -234,10 +236,10 @@
                             getUser?.roles === 'NASIONAL' ||
                             getUser?.roles === 'SUPER-ADMIN') &&
                             item?.status_approval === 101) ||
-                          ((getUser?.roles === 'SUPER-ADMIN' ||
-                            getUser?.roles === 'AMO' ||
-                            getUser?.roles === 'REGIONAL') ||
-                            getUser?.roles === 'TL' &&
+                          getUser?.roles === 'SUPER-ADMIN' ||
+                          getUser?.roles === 'AMO' ||
+                          getUser?.roles === 'REGIONAL' ||
+                          (getUser?.roles === 'TL' &&
                             item?.status_approval === 0)
                         )
                       "
@@ -265,32 +267,55 @@
                           </v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>
-                          {{getStatusLabelOption(status.value)}}
-                          </v-list-item-title>
+                          {{ getStatusLabelOption(status.value) }}
+                        </v-list-item-title>
                       </v-list-item>
                     </template>
                     <template
                       v-else-if="
-                        (getUser?.roles === 'SUPER-ADMIN' || getUser?.roles === 'AMO' || 
-                          getUser?.roles === 'REGIONAL') &&
+                        (getUser?.roles === 'SUPER-ADMIN' ||
+                          getUser?.roles === 'AMO' ||
+                          getUser?.roles === 'REGIONAL' ||
+                          getUser?.roles === 'TL') &&
                         item?.status_approval === 0
                       "
                     >
-                      <v-list-item
-                        v-for="(status, index) in statusLevel1Options"
-                        :key="index"
-                        @click="updateStatus(item, status.value)"
-                        class="cursor-pointer"
+                      <template
+                        v-if="item?.status === 401 || item?.status === 403"
                       >
-                        <v-list-item-icon class="mr-2">
-                          <v-icon small :color="getStatusColor(status.value)">
-                            mdi-circle-small
-                          </v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>{{
-                          getStatusLabelOption(status.value)
-                        }}</v-list-item-title>
-                      </v-list-item>
+                        <v-list-item
+                          v-for="(status, index) in statusLevelNot1Options"
+                          :key="index"
+                          @click="updateStatus(item, status.value)"
+                          class="cursor-pointer"
+                        >
+                          <v-list-item-icon class="mr-2">
+                            <v-icon small :color="getStatusColor(status.value)">
+                              mdi-circle-small
+                            </v-icon>
+                          </v-list-item-icon>
+                          <v-list-item-title>{{
+                            getStatusLabelOption(status.value)
+                          }}</v-list-item-title>
+                        </v-list-item>
+                      </template>
+                      <template v-else>
+                        <v-list-item
+                          v-for="(status, index) in statusLevel1Options"
+                          :key="index"
+                          @click="updateStatus(item, status.value)"
+                          class="cursor-pointer"
+                        >
+                          <v-list-item-icon class="mr-2">
+                            <v-icon small :color="getStatusColor(status.value)">
+                              mdi-circle-small
+                            </v-icon>
+                          </v-list-item-icon>
+                          <v-list-item-title>{{
+                            getStatusLabelOption(status.value)
+                          }}</v-list-item-title>
+                        </v-list-item>
+                      </template>
                     </template>
                     <template v-else>
                       <v-list-item>
@@ -494,6 +519,7 @@ export default {
         { value: 203 }, // STATUS_APPROVED
       ],
       statusLevel1Options: [{ value: 101 }, { value: 406 }],
+      statusLevelNot1Options: [{ value: 201 }],
       statusLevel2Options: [{ value: 203 }, { value: 407 }],
       status: "",
       statusUpdate: "",
@@ -548,8 +574,8 @@ export default {
     },
     getStatusLabel(item) {
       return item?.outlet_id
-        ? EXISTING_SURVEY_STATUS[item?.status]
-        : NEW_SURVEY_STATUS[item?.status];
+        ? EXISTING_SURVEY_STATUS[item]
+        : NEW_SURVEY_STATUS[item];
     },
     getStatusLabelOption(value) {
       return EXISTING_SURVEY_STATUS[value]
