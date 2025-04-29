@@ -190,6 +190,21 @@
                           style="max-width: 150px; display: inline-block"
                           v-on="on"
                         >
+                          {{ item?.sub_district }}
+                        </span>
+                      </template>
+                      <span>{{ item?.sub_district }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block"
+                          v-on="on"
+                        >
                           {{ item?.address_line }}
                         </span>
                       </template>
@@ -348,6 +363,21 @@
                         </span>
                       </template>
                       <span>{{ item?.area }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                          v-bind="attrs"
+                          class="text-truncate"
+                          style="max-width: 150px; display: inline-block"
+                          v-on="on"
+                        >
+                          {{ item?.sub_district }}
+                        </span>
+                      </template>
+                      <span>{{ item?.sub_district }}</span>
                     </v-tooltip>
                   </td>
                   <td>
@@ -547,6 +577,11 @@ export default {
         {
           text: "Area",
           value: "area",
+          sortable: false,
+        },
+        {
+          text: "Kecamatan",
+          value: "sub_district",
           sortable: false,
         },
         {
