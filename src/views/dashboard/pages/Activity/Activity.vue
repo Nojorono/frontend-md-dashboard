@@ -236,7 +236,8 @@
                             item?.status_approval === 101) ||
                           ((getUser?.roles === 'SUPER-ADMIN' ||
                             getUser?.roles === 'AMO' ||
-                            getUser?.roles === 'REGIONAL') &&
+                            getUser?.roles === 'REGIONAL') ||
+                            getUser?.roles === 'TL' &&
                             item?.status_approval === 0)
                         )
                       "
