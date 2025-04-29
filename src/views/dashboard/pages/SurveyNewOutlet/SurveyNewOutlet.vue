@@ -416,6 +416,7 @@ export default {
   methods: {
     getStatusColor(status) {
       if (status === 203) return 'success';
+      if (status === 201) return 'success';
       if (status === 101) return 'warning';
       if (status === 407) return 'error';
       if (status === 406) return 'error';
@@ -424,6 +425,7 @@ export default {
     },
     getStatusLabelOption(status) {
       if (status === 203) return 'Approved';
+      if (status === 201) return 'Selesai';
       if (status === 101) return 'Pending';
       if (status === 407) return 'Ditolak HO';
       if (status === 406) return 'Ditolak PIC';
