@@ -358,6 +358,12 @@ export default {
     },
 
     async handleSave(item) {
+      // Sanitize date fields before sending to backend
+      ['valid_from', 'valid_to'].forEach(field => {
+        if (!item[field] || isNaN(Date.parse(item[field]))) {
+          delete item[field];
+        }
+      });
       try {
         if (this.isEdit) {
           const { id, ...itemWithoutId } = item;

@@ -67,7 +67,7 @@
               <!-- Region Input -->
               <v-autocomplete
                 v-model="itemData.region"
-                :items="regionOptions"
+                :items="getRegionOptions"
                 item-text="name"
                 item-value="name"
                 label="Region"
@@ -216,7 +216,6 @@
 </template>
 
 <script>
-import { getAllArea, getAllRegion } from "@/api/regionAreaService";
 import { getAllList } from "@/api/masterRoleService";
 import { mapGetters } from "vuex";
 
@@ -277,7 +276,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getUser"]),
+    ...mapGetters(["getUser", 'getRegionOptions', 'getAreaOptions']),
     validEndDateRule() {
       return (v) =>
         !this.itemData.valid_from ||
@@ -286,15 +285,15 @@ export default {
         "Valid To date must be after Valid From date";
     },
     filteredAreaOptions() {
-      if (!this.itemData.region) return [];
+      if (!this.itemData.region) return this.getAreaOptions;
 
-      const selectedRegion = this.regionOptions.find(
+      const selectedRegion = this.getRegionOptions.find(
         (region) => region.name === this.itemData.region
       );
 
       if (!selectedRegion) return [];
 
-      return this.areaOptions.filter(
+      return this.getAreaOptions.filter(
         (area) => area.region_id === selectedRegion.id
       );
     },
@@ -343,8 +342,6 @@ export default {
   },
   async mounted() {
     await Promise.all([
-      this.fetchRegion(),
-      this.fetchArea(),
       this.fetchRoles(),
     ]);
   },
@@ -357,30 +354,6 @@ export default {
       const charCode = event.which ? event.which : event.keyCode;
       if (charCode < 48 || charCode > 57) {
         event.preventDefault();
-      }
-    },
-    async fetchArea() {
-      this.loading = true;
-      try {
-        const response = await getAllArea();
-        this.areaOptions = response.data.data;
-      } catch (error) {
-        console.error("Error fetching areas:", error);
-        this.$toast.error("Failed to fetch areas");
-      } finally {
-        this.loading = false;
-      }
-    },
-    async fetchRegion() {
-      this.loading = true;
-      try {
-        const response = await getAllRegion();
-        this.regionOptions = response.data.data;
-      } catch (error) {
-        console.error("Error fetching regions:", error);
-        this.$toast.error("Failed to fetch regions");
-      } finally {
-        this.loading = false;
       }
     },
     async fetchRoles() {
