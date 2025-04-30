@@ -166,26 +166,44 @@
       addMarkersToMap() {
         this.markersLayer.clearLayers();
         this.markersData.forEach(({ latitude, longitude, region, area, brand, sio_type, color }) => {
-          const marker = L.marker([latitude, longitude], {
-            icon: L.divIcon({
-              className: 'mdi-icon',
-              html: `<span class="mdi mdi-map-marker" style="font-size: 32px; color: ${color || '#1976D2'};"></span>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-              popupAnchor: [0, -32],
-            })
-          }).bindPopup(`
-            <div class="popup-content">
-              <h3>${brand}</h3>
-              <p><strong>Type:</strong> ${sio_type}</p>
-              <p><strong>Region:</strong> ${region}</p>
-              <p><strong>Area:</strong> ${area}</p>
-            </div>
-          `, {
-            maxWidth: 300,
-            className: 'custom-popup'
-          });
-          this.markersLayer.addLayer(marker);
+          try {
+            // Handle coordinates that might have commas instead of decimal points
+            let lat = typeof latitude === 'string' ? latitude.replace(',', '.') : latitude;
+            let lng = typeof longitude === 'string' ? longitude.replace(',', '.') : longitude;
+            
+            // Convert to numbers and validate
+            lat = parseFloat(lat);
+            lng = parseFloat(lng);
+            
+            // Check if coordinates are valid numbers and within range
+            if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+              console.warn(`Invalid coordinates for ${brand}: [${latitude}, ${longitude}]`);
+              return; // Skip this marker
+            }
+            
+            const marker = L.marker([lat, lng], {
+              icon: L.divIcon({
+                className: 'mdi-icon',
+                html: `<span class="mdi mdi-map-marker" style="font-size: 32px; color: ${color || '#1976D2'};"></span>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32],
+              })
+            }).bindPopup(`
+              <div class="popup-content">
+                <h3>${brand}</h3>
+                <p><strong>Type:</strong> ${sio_type}</p>
+                <p><strong>Region:</strong> ${region}</p>
+                <p><strong>Area:</strong> ${area}</p>
+              </div>
+            `, {
+              maxWidth: 300,
+              className: 'custom-popup'
+            });
+            this.markersLayer.addLayer(marker);
+          } catch (error) {
+            console.warn(`Error creating marker for ${brand}: ${error.message}`);
+          }
         });
       },
 

@@ -120,7 +120,7 @@
           v-if="
             activeTab === 1 &&
             (getUser?.roles === 'ADMIN' ||
-              getUser?.roles === 'SUPER_ADMIN' ||
+              getUser?.roles === 'SUPER-ADMIN' ||
               getUser?.roles === 'NASIONAL')
           "
           color="primary"
