@@ -302,6 +302,8 @@
       />
 
       <form-survey-new-outlet
+        :region="filter.region"
+        :area="filter.area"
         :dialog="isFormRoleDialog"
         :is-edit="isEdit"
         :item="selectedItem"

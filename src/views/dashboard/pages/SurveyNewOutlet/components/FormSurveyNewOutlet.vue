@@ -210,6 +210,14 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    region: {
+      type: String,
+      default: "",
+    },
+    area: {
+      type: String,
+      default: "",
+    },
   },
 
   data() {
@@ -271,6 +279,7 @@ export default {
       "getBrandOptions",
       "getSioTypeOptions",
       "getCodeBatch",
+      "getSurveyOutlet",
     ]),
     filteredAreaOptions() {
       if (!this.itemData.region) return this.getAreaOptions;
@@ -288,6 +297,18 @@ export default {
   },
 
   watch: {
+    region: {
+      immediate: true,
+      handler(newRegion) {
+        this.fetchOutletSurvey(newRegion, this.area);
+      },
+    },
+    area: {
+      immediate: true,
+      handler(newArea) {
+        this.fetchOutletSurvey(this.region, newArea);
+      },
+    },
     item: {
       immediate: true,
       handler(newItem) {
@@ -307,8 +328,9 @@ export default {
   },
 
   mounted() {
-    this.fetchOutletSurvey();
+    this.fetchOutletSurvey(this.region, this.area);
   },
+
   methods: {
     async batchCode() {
       this.itemData.batch_code = this.getCodeBatch.code_batch;
@@ -320,12 +342,17 @@ export default {
         : "";
     },
 
-    async fetchOutletSurvey() {
+    async fetchOutletSurvey(region, area) {
+      console.log('test');
+      const params = {
+        region,
+        area,
+      };
       try {
-        const { data } = await getAllOutletSurvey();
+        const { data } = await getAllOutletSurvey(params);
         this.outletOptions = data.data;
       } catch (error) {
-        console.error("Error fetching outlets:", error);
+        this.outletOptions = [];
       }
     },
 

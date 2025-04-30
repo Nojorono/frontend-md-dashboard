@@ -14,9 +14,11 @@ export const getAllOutlets = async (params) => {
   }
 };
 
-export const getAllOutletSurvey = async () => {
+export const getAllOutletSurvey = async (params) => {
   try {
-    const response = await axiosInstance.get('/outlets/survey-list');
+    const response = await axiosInstance.get(`/outlets/survey-list`, {
+      params: params,
+    });
     return response.data;
   } catch (error) {
     throw error.response;
