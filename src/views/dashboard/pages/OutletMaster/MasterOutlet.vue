@@ -121,7 +121,8 @@
             activeTab === 1 &&
             (getUser?.roles === 'ADMIN' ||
               getUser?.roles === 'SUPER-ADMIN' ||
-              getUser?.roles === 'NASIONAL')
+              getUser?.roles === 'NASIONAL' ||
+              getUser?.roles === 'REGIONAL')
           "
           color="primary"
           class="text-none"
