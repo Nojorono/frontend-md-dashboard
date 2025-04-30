@@ -327,10 +327,6 @@ export default {
     },
   },
 
-  mounted() {
-    this.fetchOutletSurvey(this.region, this.area);
-  },
-
   methods: {
     async batchCode() {
       this.itemData.batch_code = this.getCodeBatch.code_batch;
@@ -343,7 +339,6 @@ export default {
     },
 
     async fetchOutletSurvey(region, area) {
-      console.log('test');
       const params = {
         region,
         area,
