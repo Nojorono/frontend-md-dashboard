@@ -87,19 +87,6 @@
                   <v-row>
                     <v-col cols="12" sm="6">
                       <v-autocomplete
-                        v-model="outletFilter.area"
-                        :items="getAreaOptions"
-                        item-text="area"
-                        item-value="area"
-                        label="Area"
-                        outlined
-                        dense
-                        prepend-inner-icon="mdi-map-marker"
-                        clearable
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-autocomplete
                         v-model="outletFilter.region"
                         :items="getRegionOptions"
                         item-text="name"
@@ -108,6 +95,19 @@
                         outlined
                         dense
                         prepend-inner-icon="mdi-earth"
+                        clearable
+                      ></v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-autocomplete
+                        v-model="outletFilter.area"
+                        :items="getAreaOptions"
+                        item-text="area"
+                        item-value="area"
+                        label="Area"
+                        outlined
+                        dense
+                        prepend-inner-icon="mdi-map-marker"
                         clearable
                       ></v-autocomplete>
                     </v-col>
@@ -184,19 +184,6 @@
                   <v-row>
                     <v-col cols="12" sm="6">
                       <v-autocomplete
-                        v-model="reimbursementFilter.area"
-                        :items="getAreaOptions"
-                        item-text="area"
-                        item-value="area"
-                        label="Area"
-                        outlined
-                        dense
-                        prepend-inner-icon="mdi-map-marker"
-                        clearable
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-autocomplete
                         v-model="reimbursementFilter.region"
                         :items="getRegionOptions"
                         item-text="name"
@@ -205,6 +192,19 @@
                         outlined
                         dense
                         prepend-inner-icon="mdi-earth"
+                        clearable
+                      ></v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-autocomplete
+                        v-model="reimbursementFilter.area"
+                        :items="getAreaOptions"
+                        item-text="area"
+                        item-value="area"
+                        label="Area"
+                        outlined
+                        dense
+                        prepend-inner-icon="mdi-map-marker"
                         clearable
                       ></v-autocomplete>
                     </v-col>
@@ -255,19 +255,6 @@
                   <v-row>
                     <v-col cols="12" sm="6">
                       <v-autocomplete
-                        v-model="absentFilter.area"
-                        :items="getAreaOptions"
-                        item-text="area"
-                        item-value="area"
-                        label="Area"
-                        outlined
-                        dense
-                        prepend-inner-icon="mdi-map-marker"
-                        clearable
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-autocomplete
                         v-model="absentFilter.region"
                         :items="getRegionOptions"
                         item-text="name"
@@ -276,6 +263,19 @@
                         outlined
                         dense
                         prepend-inner-icon="mdi-earth"
+                        clearable
+                      ></v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-autocomplete
+                        v-model="absentFilter.area"
+                        :items="getAreaOptions"
+                        item-text="area"
+                        item-value="area"
+                        label="Area"
+                        outlined
+                        dense
+                        prepend-inner-icon="mdi-map-marker"
                         clearable
                       ></v-autocomplete>
                     </v-col>
@@ -354,10 +354,6 @@ export default {
   },
   async mounted() {
     await this.getBatchCode();
-    console.log(this.getAreaOptions);
-    console.log(this.getRegionOptions);
-    console.log(this.getBrandOptions);
-    console.log(this.getSioTypeOptions);
   },
   methods: {
     async getBatchCode() {

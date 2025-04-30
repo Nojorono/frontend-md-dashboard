@@ -6,8 +6,17 @@ export const reportActivity = async (params) => {
   try {
     const response = await axiosInstance.get(`/report/activity/`, {
       params: params,
-      responseType: 'blob',
+      responseType: 'arraybuffer',  
+      timeout: 1000000,  
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Type': 'application/json'
+      }
     });
+    if (!response.data) {
+      throw new Error('Empty response received from server');
+    }
+    
     return response.data;
   } catch (error) {
     throw error.response;
@@ -16,11 +25,21 @@ export const reportActivity = async (params) => {
 
 export const reportOutlet = async (params) => {
   try {
-    // Set explicit timeout to prevent timeout issues for large reports
-    const response = await axiosInstance.get('/report/outlet', {
-      params: params,
-      responseType: 'arraybuffer',  // Use arraybuffer instead of blob for better cross-browser compatibility
-      timeout: 300000,  // 5 minute timeout
+    // Create URLSearchParams for proper filter parameter serialization
+    const searchParams = new URLSearchParams();
+    
+    // Iterate through the filter params and format them correctly for the backend
+    if (params.area) searchParams.append('filter[area]', params.area);
+    if (params.region) searchParams.append('filter[region]', params.region);
+    if (params.brand) searchParams.append('filter[brand]', params.brand);
+    if (params.sio_type) searchParams.append('filter[sio_type]', params.sio_type);
+    
+    // Create URL with query string
+    const url = `/report/outlet?${searchParams.toString()}`;
+    
+    const response = await axiosInstance.get(url, {
+      responseType: 'arraybuffer',  
+      timeout: 1000000,  
       headers: {
         'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Type': 'application/json'
@@ -44,10 +63,28 @@ export const reportOutlet = async (params) => {
 
 export const reportReimbursement = async (params) => {
   try {
-    const response = await axiosInstance.get('/report/reimbursement', {
-      params: params,
-      responseType: 'blob',
+    // Create URLSearchParams for proper filter parameter serialization
+    const searchParams = new URLSearchParams();
+    
+    // Iterate through the filter params and format them correctly for the backend
+    if (params.area) searchParams.append('filter[area]', params.area);
+    if (params.region) searchParams.append('filter[region]', params.region);
+    
+    // Create URL with query string
+    const url = `/report/reimbursement?${searchParams.toString()}`;
+    
+    const response = await axiosInstance.get(url, {
+      responseType: 'arraybuffer',  
+      timeout: 1000000,  
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Type': 'application/json'
+      }
     });
+    if (!response.data) {
+      throw new Error('Empty response received from server');
+    }
+    
     return response.data;
   } catch (error) {
     throw error.response;
@@ -56,10 +93,28 @@ export const reportReimbursement = async (params) => {
 
 export const reportAbsent = async (params) => {
   try {
-    const response = await axiosInstance.get('/report/absent', {
-      params: params,
-      responseType: 'blob',
+    // Create URLSearchParams for proper filter parameter serialization
+    const searchParams = new URLSearchParams();
+    
+    // Iterate through the filter params and format them correctly for the backend
+    if (params.area) searchParams.append('filter[area]', params.area);
+    if (params.region) searchParams.append('filter[region]', params.region);
+    
+    // Create URL with query string
+    const url = `/report/absent?${searchParams.toString()}`;
+    
+    const response = await axiosInstance.get(url, {
+      responseType: 'arraybuffer',  
+      timeout: 1000000,  
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Type': 'application/json'
+      }
     });
+    if (!response.data) {
+      throw new Error('Empty response received from server');
+    }
+    
     return response.data;
   } catch (error) {
     throw error.response;
