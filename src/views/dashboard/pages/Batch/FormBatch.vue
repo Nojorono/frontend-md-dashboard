@@ -112,6 +112,7 @@ export default {
     return {
       dialogLocal: this.dialog,
       itemData: {
+        id: '',
         code_batch: '',
         start_plan: '',
         end_plan: '',
@@ -141,7 +142,10 @@ export default {
       handler(newItem) {
         if (newItem) {
           this.itemData = {
-            ...newItem,
+            id: newItem.id,
+            code_batch: newItem.code_batch,
+            start_plan: newItem.start_plan,
+            end_plan: newItem.end_plan,
           };
         } else {
           this.resetForm();
@@ -152,6 +156,7 @@ export default {
   methods: {
     resetForm() {
       this.itemData = {
+        id: '',
         code_batch: '',
         start_plan: '',
         end_plan: '',
@@ -168,6 +173,7 @@ export default {
     saveItem() {
       if (this.$refs.form.validate()) {
         const formattedData = {
+          id: this.itemData.id,
           code_batch: this.itemData.code_batch.trim(),
           start_plan: this.itemData.start_plan.trim(),
           end_plan: this.itemData.end_plan.trim()
