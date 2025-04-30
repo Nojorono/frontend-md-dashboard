@@ -552,7 +552,7 @@
           const comment = {
             user_id: this.currentUser.id,
             activity_id: parseInt(this.id),
-            outlet_id: parseInt(this.data.outlet?.id),
+            outlet_id: parseInt(this.data.outlet?.id) || null,
             content: this.newComment,
             is_liked: false,
           };

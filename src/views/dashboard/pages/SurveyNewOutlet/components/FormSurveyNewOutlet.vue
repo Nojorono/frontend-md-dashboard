@@ -300,13 +300,17 @@ export default {
     region: {
       immediate: true,
       handler(newRegion) {
-        this.fetchOutletSurvey(newRegion, this.area);
+        if (newRegion) {
+          this.fetchOutletSurvey(newRegion, this.area);
+        }
       },
     },
     area: {
       immediate: true,
       handler(newArea) {
-        this.fetchOutletSurvey(this.region, newArea);
+        if (newArea) {
+          this.fetchOutletSurvey(this.region, newArea);
+        }
       },
     },
     item: {
