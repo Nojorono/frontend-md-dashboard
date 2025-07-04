@@ -18,6 +18,8 @@ import Swal from 'sweetalert2'
 import 'vue-toastification/dist/index.css'
 import io from 'socket.io-client';
 import VueSocketIOExtended from 'vue-socket.io-extended';
+import dotenv from 'dotenv';
+dotenv.config();
 
 moment.locale('id')
 
