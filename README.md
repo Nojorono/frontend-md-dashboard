@@ -12,6 +12,7 @@ A dashboard application built with Vue.js, Vuetify, and Vuex.
 - RESTful API integration
 - Real-time updates with WebSocket
 
+
 ## Getting Started
 
 ### Prerequisites
