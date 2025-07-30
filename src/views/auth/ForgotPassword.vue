@@ -86,10 +86,14 @@ export default {
       if (this.email) {
         try {
           const response = await ForgotPassword(this.email);
-          if (response.statusCode === 200) {
+          // Check if response has data property (success case)
+          if (response && response.data) {
             this.$toast.success('Password reset link sent to your email.');
+          } else if (response && response.status) {
+            // Handle error response
+            this.$toast.error(response.data?.message || 'Failed to send reset link.');
           } else {
-            this.$toast.error(response.message);
+            this.$toast.error('An error occurred. Please try again.');
           }
         } catch (error) {
           console.error(error);
